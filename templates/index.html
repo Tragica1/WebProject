@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark rounded">
+        <a class="navbar-brand" href="#">ГосНИИП</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample09"
+            aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample09">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Детали</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Контракты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Календарь</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="conteiner" onload="createProductTree()" >
+        <ul id="mainTree">
+        </ul>
+    </div>
+    <script>
+        function createProductTree() {
+            console.log('ok')
+            fetch('/products')
+                .then(response => response.json())
+                .then(data => {
+                    products_childs = data.products_childs
+                    products = data.products
+                    parents = []
+                    childs = []
+                    for (var i = 0; i < products_childs.length; i++) {
+                        parents[i] = products_childs[i][1]
+                        childs[i] = products_childs[i][2]
+                    }
+                    console.log(childs)
+                    var tree = document.getElementById('mainTree')
+                    for (var i = 0; i < products.length; i++) {
+                        if (!checkProductInChilds(products[i][0], childs)) {
+                            var li = document.createElement('li')
+                            li.innerHTML = products[i][1]
+                            li.id = 'li' + i
+                            tree.appendChild(li)
+                        }
+                    }
+                });
+        }
+
+        function checkProductInChilds(p, c) {
+            for (var i = 0; i < c.length; i++) {
+                if (p == c[i]) {
+                    return true
+                }
+            }
+            return false            
+        }
+        window.onload = createProductTree;
+    </script>
+</body>
+
+</html>
