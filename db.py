@@ -61,7 +61,7 @@ def db_get_product(id):
         return [False, None]
 
 
-def db_get_product_childs(id):
+def db_get_product_children(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM product_parent_child WHERE idParent=%s'''
     cur.execute(sql, (id,))
@@ -75,7 +75,7 @@ def db_get_product_childs(id):
     return childsData
 
 
-def db_has_childs(id):
+def db_has_children(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM product_parent_child WHERE idParent=%s'''
     cur.execute(sql, (id,))
@@ -85,6 +85,18 @@ def db_has_childs(id):
     else:
         return False
     
+def db_is_child(id):
+    cur = con.cursor()
+    sql = '''SELECT idChild FROM product_parent_child'''
+    cur.execute(sql)
+    tmp = cur.fetchall()
+    lst = []
+    for i in tmp:
+        lst.append(i[0])
+    if id in lst:
+        return True
+    else:
+        return False
 
 def db_get_product_child():
     cur = con.cursor()

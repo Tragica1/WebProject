@@ -31,46 +31,37 @@
             </ul>
         </div>
     </nav>
-    <div class="conteiner" onload="createProductTree()" >
-        <ul id="mainTree">
-        </ul>
+    <div class="conteiner" onload="startCreation()">
+        <div id="mainTree">
+        </div>
     </div>
     <script>
-        function createProductTree() {
-            console.log('ok')
+        function createTree(element, data) {
+            const treeElement = document.createElement('ul');
+            treeElement.className = 'tree';
+            data.forEach((item) => {
+                console.log(item)
+                const listItem = document.createElement('li');
+                listItem.textContent = item.name;
+
+                if (item.children) {
+                    // listItem.append(createTree(listItem, item.children));
+                    createTree(listItem, item.children)
+                }
+                treeElement.append(listItem)
+            });
+            element.append(treeElement)
+        }
+        function startCreation() {
             fetch('/products')
                 .then(response => response.json())
                 .then(data => {
-                    products_childs = data.products_childs
-                    products = data.products
-                    parents = []
-                    childs = []
-                    for (var i = 0; i < products_childs.length; i++) {
-                        parents[i] = products_childs[i][1]
-                        childs[i] = products_childs[i][2]
-                    }
-                    console.log(childs)
-                    var tree = document.getElementById('mainTree')
-                    for (var i = 0; i < products.length; i++) {
-                        if (!checkProductInChilds(products[i][0], childs)) {
-                            var li = document.createElement('li')
-                            li.innerHTML = products[i][1]
-                            li.id = 'li' + i
-                            tree.appendChild(li)
-                        }
-                    }
+                    data = Array(data)
+                    const rootElement = document.getElementById('mainTree');
+                    createTree(rootElement, data);
                 });
         }
-
-        function checkProductInChilds(p, c) {
-            for (var i = 0; i < c.length; i++) {
-                if (p == c[i]) {
-                    return true
-                }
-            }
-            return false            
-        }
-        window.onload = createProductTree;
+        window.onload = startCreation;
     </script>
 </body>
 
