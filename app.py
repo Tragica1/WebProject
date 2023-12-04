@@ -1,5 +1,5 @@
 import os
-from printree import ptree
+# from printree import ptree
 import json
 from config import app
 # from models import Users, Recipes
@@ -53,7 +53,7 @@ def index():
 @app.route('/products')
 def send_products():
     products_tree = create_product_tree()
-    ptree(products_tree)
+    # ptree(products_tree)
     return products_tree
 
 create_product_tree()
