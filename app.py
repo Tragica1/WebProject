@@ -1,5 +1,5 @@
 import os
-# from printree import ptree
+from printree import ptree
 import json
 from config import app
 # from models import Users, Recipes
@@ -24,38 +24,39 @@ def add_product_child(product, child1):
         for child in children:
             add_product_child(child1, create_product(child[0], child[1]))
 
-def create_product_tree():
-    prod_state, products = db_get_products()
-    giga_products = []
-    main_root = create_product('Root', 'Root')
+def create_product_tree(input_id):
+    prod_state, product = db_get_product(input_id)
+    # giga_products = []
+    # main_root = create_product('Root', 'Root')
     if prod_state:
-        for p in products:
-            if not db_is_child(p[0]):
-                giga_products.append(p)
+        # for p in products:
+            # if not db_is_child(p[0]):
+                # giga_products.append(p)
         # Проходимся по каждому продукту
-        for product in giga_products:
+        # for product in giga_products:
             # Создаем корневой продукт
-            product_root = create_product(product[0], product[1])
-            children = db_get_product_children(product[0])
-            # Добавляем дочерние продукты
-            for child in children:
-                add_product_child(product_root, create_product(child[0], child[1]))
-            main_root['children'].append(product_root)
-    return main_root
+        product_root = create_product(product[0], product[1])
+        children = db_get_product_children(product[0])
+        # Добавляем дочерние продукты
+        for child in children:
+            add_product_child(product_root, create_product(child[0], child[1]))
+            # main_root['children'].append(product_root)
+    return product_root
 
 
 @app.route('/')
 @app.route('/index')
 def index():
+    
     return render_template('index.html')
 
 
 @app.route('/products')
 def send_products():
-    products_tree = create_product_tree()
+    input_id = 6
+    products_tree = create_product_tree(input_id)
     # ptree(products_tree)
     return products_tree
 
-create_product_tree()
 if __name__ == '__main__':
     app.run()

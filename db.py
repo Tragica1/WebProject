@@ -1,7 +1,7 @@
 import pymysql as ps
 
 con = ps.connect(
-    database="contracts",
+    database="mydb",
     user="root",
     password="123",
     host="localhost",
@@ -51,7 +51,7 @@ def db_get_products():
 
 def db_get_product(id):
     cur = con.cursor()
-    sql = '''SELECT * FROM product WHERE idProduct=%s'''
+    sql = '''SELECT * FROM product WHERE id=%s'''
     cur.execute(sql, (id,))
     product = cur.fetchone()
     cur.close()
@@ -63,7 +63,7 @@ def db_get_product(id):
 
 def db_get_product_children(id):
     cur = con.cursor()
-    sql = '''SELECT idChild FROM product_parent_child WHERE idParent=%s'''
+    sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
     cur.execute(sql, (id,))
     childs = cur.fetchall()
     childsData = list()
@@ -77,7 +77,7 @@ def db_get_product_children(id):
 
 def db_has_children(id):
     cur = con.cursor()
-    sql = '''SELECT idChild FROM product_parent_child WHERE idParent=%s'''
+    sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
     cur.execute(sql, (id,))
     childs = cur.fetchall()
     if childs:
@@ -87,7 +87,7 @@ def db_has_children(id):
     
 def db_is_child(id):
     cur = con.cursor()
-    sql = '''SELECT idChild FROM product_parent_child'''
+    sql = '''SELECT idChild FROM parentchildlist'''
     cur.execute(sql)
     tmp = cur.fetchall()
     lst = []
@@ -100,7 +100,7 @@ def db_is_child(id):
 
 def db_get_product_child():
     cur = con.cursor()
-    sql = '''SELECT * FROM product_parent_child'''
+    sql = '''SELECT * FROM parentchildlist'''
     cur.execute(sql)
     data = cur.fetchall()
     if data:
@@ -121,7 +121,7 @@ def db_add_product(data, parentId=None):
         cur.execute(sql, (data[0],))
         childId = cur.fetchone()
 
-        sql = '''INSERT INTO product_parent_child (idParent, idChild) VALUES (%s, %s)'''
+        sql = '''INSERT INTO parentchildlist (idParent, idChild) VALUES (%s, %s)'''
         cur.execute(sql, (parentId, childId))
     cur.close()
     con.commit()
@@ -129,7 +129,7 @@ def db_add_product(data, parentId=None):
 
 def db_add_child(parentId, childId):
     cur = con.cursor()
-    sql = '''INSERT INTO product_parent_child (idParent, idChild) VALUES (%s, %s)'''
+    sql = '''INSERT INTO parentchildlist (idParent, idChild) VALUES (%s, %s)'''
     cur.execute(sql, (parentId, childId))
     cur.close()
     con.commit()
