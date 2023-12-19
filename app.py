@@ -55,7 +55,7 @@ def index():
 def send_products():
     input_id = 10
     products_tree = create_product_tree(input_id)
-    # ptree(products_tree)
+    ptree(products_tree)
     return products_tree
 
 if __name__ == '__main__':

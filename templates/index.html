@@ -22,14 +22,21 @@
             </div>
         </div>
     </nav>
-    <nav class="bg-blue-800 border-gray-800 ">
+    <!-- <nav class="bg-blue-800 border-gray-800 ">
         <div class="flex px-4 py-3 mx-2 items-end">
             <ul class="flex flex-row font-semibold mt-5 space-x-5 text-sm">
-                <li>
-                    <a href="#" class="text-white hover:underline">Контракты</a>
+                <li class="ml-10">
+                    <label for="contracts" class="block pt-3 text-sm font-medium text-white">Выбор контракта: </label>
                 </li>
                 <li>
-                    <a href="#" class="text-white hover:underline">Изделия</a>
+                    <select id="contracts"
+                        class="bg-orange-500 border border-orange-800 text-white text-sm rounded-lg block w-full p-2.5">
+                        <option selected>Контракт</option>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="FR">France</option>
+                        <option value="DE">Germany</option>
+                    </select>
                 </li>
                 <li class="ml-10">
                     <button data-modal-target="createContract" data-modal-toggle="createContract"
@@ -39,20 +46,119 @@
                 </li>
             </ul>
         </div>
-    </nav>
-    <div class="grid grid-cols-2 gap-10">
+    </nav> -->
+    <div class="grid grid-cols-3 gap-10">
+        <div class="pt-5 pl-3">
+            <h2 class="mb-2 text-lg font-semibold text-gray-900">Госудрастенные контракты: </h2>
+        </div>
         <div class="pt-5 pl-3">
             <h2 class="mb-2 text-lg font-semibold text-gray-900">Список изделий: </h2>
             <div id="mainTree">
             </div>
         </div>
+        <div class="pt-5 pl-3">
+            <h2 class="mb-2 text-lg font-semibold text-gray-900">Деталь: </h2>
+            <div id="currentProduct"
+                class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+                <form class="space-y-6" action="#">
+                    <h5 id="productName" class="text-xl font-medium text-gray-900 dark:text-white">Изделие: </h5>
+                    <h5 id="productShifr" class="text-xl font-medium text-gray-900 dark:text-white">Шифр: </h5>
+                    <hr class="mx-auto h-px bg-black border-blue-700 border-2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Тип: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <select id="editType"
+                                class="bg-green-600 border border-green-900 text-white rounded-md text-sm block w-full p-2.5">
+                                <option selected>Yarik 1</option>
+                                <option value="US">Yarik 2</option>
+                                <option value="CA">Yarik 3</option>
+                                <option value="FR">Yarik 4</option>
+                                <option value="DE">Yarik 5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Состояние: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <select id="editType"
+                                class="bg-purple-500 border border-purple-800 text-white rounded-md text-sm block w-full p-2.5">
+                                <option selected>Anton 1</option>
+                                <option value="US">Anton 2</option>
+                                <option value="CA">Anton 3</option>
+                                <option value="FR">Anton 4</option>
+                                <option value="DE">Anton 5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900">Зав. номер: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <input type="text" id="productNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900">Кол-во: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <input type="text" id="productCount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900">Покупное изделие</h2>
+                        </div>
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <input id="" type="checkbox" value="" name="bordered-checkbox" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Поставщик: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <input type="text" id="productProvider" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Подписание: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <input type="date" id="startDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Исполнение: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <input type="date" id="endDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Примечание: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
         <!-- Main modal -->
-        <div id="updates" tabindex="-1" aria-hidden="true"
+        <!-- <div id="updates" tabindex="-1" aria-hidden="true"
             class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative p-4 w-full max-w-2xl max-h-full">
-                <!-- Modal content -->
                 <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <!-- Modal header -->
                     <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                         <h3 id="productName" class="text-xl font-semibold text-gray-900 dark:text-white">
                             Terms of Service
@@ -68,7 +174,6 @@
                             <span class="sr-only">Close modal</span>
                         </button>
                     </div>
-                    <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4">
                         <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                             With less than a month to go before the European Union enacts new consumer privacy laws for
@@ -82,7 +187,6 @@
                             personally affect them.
                         </p>
                     </div>
-                    <!-- Modal footer -->
                     <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                         <button data-modal-hide="default-modal" type="button"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I
@@ -92,7 +196,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -100,37 +204,42 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script>
-        function changeProduct(id) {
-            $('#productName').text(id)
-            $('#productName').val(id);
-            console.log($('#productName').val())
-            const $targetEl = document.getElementById('updates');
-
-            // options with default values
-            const options = {
-                placement: 'bottom-right',
-                backdrop: 'dynamic',
-                backdropClasses:
-                    'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-                closable: true,
-                onHide: () => {
-                    console.log('modal is hidden');
-                },
-                onShow: () => {
-                    console.log('modal is shown');
-                },
-                onToggle: () => {
-                    console.log('modal has been toggled');
-                },
-            };
-            // instance options object
-            const instanceOptions = {
-                id: 'updates',
-                override: true
-            };
-            const modal = new Modal($targetEl, options, instanceOptions);
-            modal.show();
+        function changeProduct(id, name) {
+            console.log(id)
+            $("#currentProduct").val("currentProduct" + id)
+            $("#productName").text("Изделие: " + name)
         }
+        // function changeProduct(id, name) {
+        //     $('#productName').text(name)
+        //     $('#productName').val(id);
+        //     console.log($('#productName').val())
+        //     const $targetEl = document.getElementById('updates');
+
+        //     // options with default values
+        //     const options = {
+        //         placement: 'bottom-right',
+        //         backdrop: 'dynamic',
+        //         backdropClasses:
+        //             'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
+        //         closable: true,
+        //         onHide: () => {
+        //             console.log('modal is hidden');
+        //         },
+        //         onShow: () => {
+        //             console.log('modal is shown');
+        //         },
+        //         onToggle: () => {
+        //             console.log('modal has been toggled');
+        //         },
+        //     };
+        //     // instance options object
+        //     const instanceOptions = {
+        //         id: 'updates',
+        //         override: true
+        //     };
+        //     const modal = new Modal($targetEl, options, instanceOptions);
+        //     modal.show();
+        // }
         function createTree(element, data) {
             const treeElement = document.createElement('ul');
             treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
@@ -139,8 +248,8 @@
                 const listItem = document.createElement('li')
                 listItem.innerHTML = `<button data-modal-target="updates" data-modal-toggle="updates"` +
                     `class="block text-white bg-green-300 hover:bg-green-800 focus:ring-2 focus:outline-none` +
-                    `focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button"` +
-                    `onclick="changeProduct(` + item.id + `)">` + item.name + `</button>`
+                    `focus:ring-black-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button"` +
+                    `onclick="changeProduct(` + item.id + `, '` + item.name + `')">` + item.name + `</button>`
                 if (item.children) {
                     createTree(listItem, item.children)
                 }
