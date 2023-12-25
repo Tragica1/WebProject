@@ -45,18 +45,52 @@ def create_product_tree(input_id):
 
 
 @app.route('/')
-@app.route('/index')
 def index():
-    
-    return render_template('index.html')
+    state, contrs = db_get_government_contracts()
+    contracts = []
+    if state:
+        for c in contrs:
+            contracts.append(list(c))
+        print(contracts)
+        return render_template('index.html', contracts=contracts)
+    else:
+        return render_template('index.html')
 
 
 @app.route('/products')
 def send_products():
     input_id = 10
     products_tree = create_product_tree(input_id)
-    ptree(products_tree)
+    # ptree(products_tree)
     return products_tree
+
+@app.route('/getSelector')
+def create_product_list():
+    state, prods = db_get_products()
+    res = []
+    products = []
+    for p in prods:
+        products.append(list(p))
+    if state:
+        for product in products:
+            if product[4] == 1:
+                res.append(dict({'id': product[0], 'name': product[1]}))
+    return(json.dumps(res))
+
+
+@app.route('/add_contract', methods=['POST'])
+def create_contract():
+    try:
+        data = request.get_json()
+        new_contract_id = int(db_add_government_contract(data)[0])
+        products = data.get('products')
+        for i in range(len(products)):
+            products[i] = int(products[i])
+        db_add_product_contract_list(new_contract_id, products)
+        return jsonify({'status': 'success', 'message': 'Contract added successfully'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})    
+
 
 if __name__ == '__main__':
     app.run()

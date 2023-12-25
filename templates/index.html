@@ -51,54 +51,24 @@
         <div class="pt-5 pl-3">
             <h2 class="mb-2 text-lg font-semibold text-black">Госудрастенные контракты: </h2>
             <div id="accordion-collapse" data-accordion="collapse">
-                <h2 id="accordion-collapse-heading-2" class="mb-3">
+                {% for contract in contracts %}
+                <h2 id="accordion-collapse-heading-{{ contract[0] }}" class="mb-3">
                     <button type="button"
                         class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-2 rounded-lg border-gray-900 gap-3"
-                        data-accordion-target="#accordion-collapse-body-2" aria-expanded="false"
-                        aria-controls="accordion-collapse-body-2">
-                        <span>Контракт 1</span>
+                        data-accordion-target="#accordion-collapse-body-{{ contract[0] }}" aria-expanded="false"
+                        aria-controls="accordion-collapse-body-{{ contract[0] }}">
+                        <span>Контракт № {{contract[1]}}</span>
                     </button>
-                    <div id="accordion-collapse-body-2" class="hidden" aria-labelledby="accordion-collapse-heading-2">
+                    <div id="accordion-collapse-body-{{ contract[0] }}" class="hidden" aria-labelledby="accordion-collapse-heading-{{ contract[0] }}">
                         <div class="w-96 p-5 border rounded-lg border-b-0 border-black">
-                            <h2 class="text-xs text-left font-medium text-black">Тип: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата подписания: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата сдачи: </h2>
+                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа: {{ contract[2] }}</h2>
+                            <h2 class="text-xs text-left font-medium text-black">Дата подписания: {{ contract[4] }}</h2>
+                            <h2 class="text-xs text-left font-medium text-black">Дата сдачи: {{ contract[5] }}</h2>
+                            <h2 class="text-xs text-left font-medium text-black">Город: {{ contract[3] }}</h2>
                         </div>
                     </div>
                 </h2>
-                <h2 id="accordion-collapse-heading-3" class="mb-3">
-                    <button type="button"
-                        class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-2 rounded-lg border-gray-900 gap-3"
-                        data-accordion-target="#accordion-collapse-body-3" aria-expanded="false"
-                        aria-controls="accordion-collapse-body-3">
-                        <span>Контракт 2</span>
-                    </button>
-                    <div id="accordion-collapse-body-3" class="hidden" aria-labelledby="accordion-collapse-heading-3">
-                        <div class="w-96 p-5 border rounded-lg border-b-0 border-black">
-                            <h2 class="text-xs text-left font-medium text-black">Тип: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата подписания: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата сдачи: </h2>
-                        </div>
-                    </div>
-                </h2>
-                <h2 id="accordion-collapse-heading-4" class="mb-3">
-                    <button type="button"
-                        class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-2 rounded-lg border-gray-900 gap-3"
-                        data-accordion-target="#accordion-collapse-body-4" aria-expanded="false"
-                        aria-controls="accordion-collapse-body-4">
-                        <span>Контракт 3</span>
-                    </button>
-                    <div id="accordion-collapse-body-4" class="hidden" aria-labelledby="accordion-collapse-heading-4">
-                        <div class="w-96 p-5 border rounded-lg border-b-0 border-black">
-                            <h2 class="text-xs text-left font-medium text-black">Тип: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата подписания: </h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата сдачи: </h2>
-                        </div>
-                    </div>
-                </h2>
+                {% endfor %}
                 <h2 class="mb-3">
                     <button type="button" data-modal-target="default-modal" data-modal-toggle="default-modal"
                         class="flex items-center justify-center w-96 p-5 font-medium text-white bg-green-500 hover:bg-green-800 border-gray-900 border-2 rounded-lg gap-3"
@@ -162,7 +132,7 @@
                                             </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
-                                            <input type="text" id="contractStartDate"
+                                            <input type="date" id="contractStartDate"
                                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
@@ -171,15 +141,38 @@
                                             <h2 class="text-xm text-left font-medium text-gray-900">Дата сдачи: </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
-                                            <input type="text" id="contractEndDate"
+                                            <input type="date" id="contractEndDate"
                                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="grid grid-rows-1 py-2 text-center">
+                                            <h2 class="text-xm text-left font-medium text-gray-900">Выбор изделия: </h2>
+                                        </div>
+                                        <div class="grid grid-rows-1">
+                                            <button id="unfilled" data-dropdown-toggle="dropdownDefaultCheckbox"
+                                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                type="button" onclick="addProductSelect()">Изделия<svg
+                                                    class="w-2.5 h-2.5 ms-3" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                                </svg>
+                                            </button>
+                                            <div id="dropdownDefaultCheckbox"
+                                                class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
+                                                <ul id="productsSelector"
+                                                    class="p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
+                                                    aria-labelledby="unfilled">
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
                             </div>
                             <div
                                 class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                                <button data-modal-hide="default-modal" type="button"
+                                <button data-modal-hide="default-modal" type="button" id="saveContract"
                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                     Сохранить</button>
                             </div>
@@ -308,49 +301,99 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script>
+        $(document).ready(function () {
+            $('#saveContract').click(function () {
+                var target = document.getElementById('productsSelector').getElementsByTagName('input')
+                var pr = []
+                for (var i = 0; i < target.length; i++) {
+                    if (target[i].checked)
+                        pr[i] = target[i].id
+                }
+                var formData = {
+                    'number': $('#contractNumber').val(),
+                    'innerNumber': $('#contractInnerNumber').val(),
+                    'city': $('#contractCity').val(),
+                    'startDate': $('#contractStartDate').val(),
+                    'endDate': $('#contractEndDate').val(),
+                    'products': pr
+                };
+                console.log(formData)
+                $.ajax({
+                    type: 'POST',
+                    url: '/add_contract',
+                    contentType: 'application/json;charset=UTF-8',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        location.reload();
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        location.reload();
+                        console.log(error);
+                    }
+                });
+            });
+        });
         function changeProduct(id, name) {
             console.log(id)
             $("#currentProduct").val("currentProduct" + id)
             $("#productName").text("Изделие: " + name)
-
-
         }
-        function addContract(id, name) {
-            // $('#productName').text(name)
-            // $('#productName').val(id);
-            // console.log($('#productName').val())
-            const $targetEl = document.getElementById('createContract');
-
-            // options with default values
-            const options = {
-                placement: 'bottom-right',
-                backdrop: 'dynamic',
-                backdropClasses:
-                    'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-                closable: true,
-                onHide: () => {
-                    console.log('modal is hidden');
-                },
-                onShow: () => {
-                    console.log('modal is shown');
-                },
-                onToggle: () => {
-                    console.log('modal has been toggled');
-                },
-            };
-            // instance options object
-            const instanceOptions = {
-                id: 'createContract',
-                override: true
-            };
-            const modal = new Modal($targetEl, options, instanceOptions);
-            modal.show();
+        function addProductSelect() {
+            if (document.getElementById('unfilled')) {
+                document.getElementById('unfilled').id = 'filled'
+                fetch('/getSelector')
+                    .then(response => response.json())
+                    .then(data => {
+                        const selector = document.getElementById('productsSelector')
+                        data.forEach((item) => {
+                            console.log(item)
+                            const opt = document.createElement('li')
+                            opt.innerHTML = `<div class="flex items-center">` +
+                                `<input id="` + item.id + `" type="checkbox" value=""` +
+                                `class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">` +
+                                `<label for="` + item.id + `"` +
+                                `class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">` + item.name + `</label></div>`
+                            selector.append(opt)
+                        });
+                    });
+            }
         }
+        // function addContract(id, name) {
+        //     // $('#productName').text(name)
+        //     // $('#productName').val(id);
+        //     // console.log($('#productName').val())
+        //     const $targetEl = document.getElementById('createContract');
+
+        //     // options with default values
+        //     const options = {
+        //         placement: 'bottom-right',
+        //         backdrop: 'dynamic',
+        //         backdropClasses:
+        //             'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
+        //         closable: true,
+        //         onHide: () => {
+        //             console.log('modal is hidden');
+        //         },
+        //         onShow: () => {
+        //             console.log('modal is shown');
+        //         },
+        //         onToggle: () => {
+        //             console.log('modal has been toggled');
+        //         },
+        //     };
+        //     // instance options object
+        //     const instanceOptions = {
+        //         id: 'createContract',
+        //         override: true
+        //     };
+        //     const modal = new Modal($targetEl, options, instanceOptions);
+        //     modal.show();
+        // }
         function createTree(element, data) {
             const treeElement = document.createElement('ul');
             treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
             data.forEach((item) => {
-                console.log(item)
                 const listItem = document.createElement('li')
                 listItem.innerHTML = `<button data-modal-target="updates" data-modal-toggle="updates"` +
                     `class="block text-white bg-green-300 hover:bg-green-800 ring-2` +

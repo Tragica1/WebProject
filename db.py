@@ -17,13 +17,37 @@ def db_add_contact(data):
     con.commit()
 
 
-def db_add_contract(data):
+def db_add_government_contract(data):
     cur = con.cursor()
-    sql = '''INSERT INTO contract (startDate, endDate, description) VALUES (%s)'''
-    cur.execute(sql, (data[0], data[1], data[2]))
+    sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive) VALUES (%s, %s, %s, %s, %s, %s)'''
+    cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1))
     cur.close()
     con.commit()
+    cur = con.cursor()
+    sql = '''SELECT id FROM governmentcontract WHERE number=%s AND innerNumber=%s'''
+    cur.execute(sql, (data['number'], data['innerNumber']))
+    contract_id = cur.fetchone()
+    cur.close()
+    return contract_id
 
+def db_add_product_contract_list(contract_id, product_id_list):
+    for prod_id in product_id_list:
+        cur = con.cursor()
+        sql = '''INSERT INTO productcontractlist (idGovernmentContract, idProduct) VALUES (%s, %s)'''
+        cur.execute(sql, (contract_id, prod_id))
+        cur.close()
+        con.commit()
+
+def db_get_government_contracts():
+    cur = con.cursor()
+    sql = '''SELECT * FROM governmentcontract'''
+    cur.execute(sql)
+    contracts = cur.fetchall()
+    cur.close()
+    if contracts[0]:
+        return [True, contracts]
+    else:
+        return [False, None]
 
 def db_get_contract(id):
     cur = con.cursor()
