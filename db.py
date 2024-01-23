@@ -8,6 +8,50 @@ con = ps.connect(
     port=3306
 )
 
+def db_get_localcontract(contract_id):
+    cur = con.cursor()
+    sql = '''SELECT localcontract.startDate, localcontract.endDate, company.name FROM localcontract JOIN company ON localContract.id=%s AND company.idLocalContract=localContract.id'''
+    cur.execute(sql, (contract_id,))
+    localcontract = cur.fetchone()
+    cur.close()
+    return localcontract
+
+
+def db_get_states():
+    cur = con.cursor()
+    sql = '''SELECT * FROM state'''
+    cur.execute(sql)
+    states = cur.fetchall()
+    cur.close()
+    return states
+
+
+def db_get_state(state_id):
+    cur = con.cursor()
+    sql = '''SELECT name FROM state WHERE id=%s'''
+    cur.execute(sql, (state_id,))
+    state = cur.fetchone()
+    cur.close()
+    return state
+    
+
+def db_get_types():
+    cur = con.cursor()
+    sql = '''SELECT * FROM type'''
+    cur.execute(sql)
+    types = cur.fetchall()
+    cur.close()
+    return types
+
+
+def db_get_type(type_id):
+    cur = con.cursor()
+    sql = '''SELECT name FROM type WHERE id=%s'''
+    cur.execute(sql, (type_id,))
+    type = cur.fetchone()
+    cur.close()
+    return type
+
 
 def db_add_contact(data):
     cur = con.cursor()
@@ -30,6 +74,7 @@ def db_add_government_contract(data):
     cur.close()
     return contract_id
 
+
 def db_add_product_contract_list(contract_id, product_id_list):
     for prod_id in product_id_list:
         cur = con.cursor()
@@ -38,13 +83,23 @@ def db_add_product_contract_list(contract_id, product_id_list):
         cur.close()
         con.commit()
 
+
+def db_get_product_contract_list(contract_id):
+    cur = con.cursor()
+    sql = '''SELECT idProduct FROM productcontractlist WHERE idGovernmentContract=%s'''
+    cur.execute(sql, (contract_id,))
+    result = cur.fetchall()
+    cur.close()
+    return result
+
+
 def db_get_government_contracts():
     cur = con.cursor()
     sql = '''SELECT * FROM governmentcontract'''
     cur.execute(sql)
     contracts = cur.fetchall()
     cur.close()
-    if contracts[0]:
+    if contracts:
         return [True, contracts]
     else:
         return [False, None]
@@ -89,14 +144,14 @@ def db_get_product_children(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
     cur.execute(sql, (id,))
-    childs = cur.fetchall()
-    childsData = list()
-    for i in childs:
-        tmp = db_get_product(i)
+    children = cur.fetchall()
+    childrenData = list()
+    for child in children:
+        tmp = db_get_product(child)
         if tmp[0]:
-            childsData.append(tmp[1])
+            childrenData.append(tmp[1])
     cur.close()
-    return childsData
+    return childrenData
 
 
 def db_has_children(id):
@@ -157,23 +212,4 @@ def db_add_child(parentId, childId):
     cur.execute(sql, (parentId, childId))
     cur.close()
     con.commit()
-
-
-def db_get_product_state(id):
-    cur = con.cursor()
-    sql = '''SELECT description FROM product_state WHERE idProductState=%s'''
-    cur.execute(sql, (id,))
-    state = cur.fetchone()
-    cur.close()
-    return state
-
-
-def db_get_product_type(id):
-    cur = con.cursor()
-    sql = '''SELECT description FROM product_type WHERE idProductType=%s'''
-    cur.execute(sql, (id,))
-    type = cur.fetchone()
-    cur.close()
-    return type
-
 

@@ -56,12 +56,15 @@
                     <button type="button"
                         class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-2 rounded-lg border-gray-900 gap-3"
                         data-accordion-target="#accordion-collapse-body-{{ contract[0] }}" aria-expanded="false"
-                        aria-controls="accordion-collapse-body-{{ contract[0] }}">
+                        aria-controls="accordion-collapse-body-{{ contract[0] }}"
+                        onclick="startCreation('{{ contract[0] }}')">
                         <span>Контракт № {{contract[1]}}</span>
                     </button>
-                    <div id="accordion-collapse-body-{{ contract[0] }}" class="hidden" aria-labelledby="accordion-collapse-heading-{{ contract[0] }}">
+                    <div id="accordion-collapse-body-{{ contract[0] }}" class="hidden"
+                        aria-labelledby="accordion-collapse-heading-{{ contract[0] }}">
                         <div class="w-96 p-5 border rounded-lg border-b-0 border-black">
-                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа: {{ contract[2] }}</h2>
+                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа:
+                                {{ contract[2] }}</h2>
                             <h2 class="text-xs text-left font-medium text-black">Дата подписания: {{ contract[4] }}</h2>
                             <h2 class="text-xs text-left font-medium text-black">Дата сдачи: {{ contract[5] }}</h2>
                             <h2 class="text-xs text-left font-medium text-black">Город: {{ contract[3] }}</h2>
@@ -189,23 +192,21 @@
         <div class="pt-5 pl-3">
             <h2 class="mb-2 text-lg font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
-                class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+                class="w-full max-w-md p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
                 <form class="space-y-6" action="#">
                     <h5 id="productName" class="text-xl font-medium text-gray-900 dark:text-white">Изделие: </h5>
-                    <h5 id="productShifr" class="text-xl font-medium text-gray-900 dark:text-white">Шифр: </h5>
+                    <h5 id="productCode" class="text-xl font-medium text-gray-900 dark:text-white">Шифр: </h5>
                     <hr class="mx-auto h-px bg-black border-blue-700 border-2">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="editType"
+                            <select id="productState"
                                 class="bg-green-600 border border-green-900 text-white rounded-md text-sm block w-full p-2.5">
-                                <option selected>Yarik 1</option>
-                                <option value="US">Yarik 2</option>
-                                <option value="CA">Yarik 3</option>
-                                <option value="FR">Yarik 4</option>
-                                <option value="DE">Yarik 5</option>
+                                {% for state in states %}
+                                <option value="{{state[0]}}">{{state[1]}}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -214,13 +215,11 @@
                             <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Состояние: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="editType"
+                            <select id="productType"
                                 class="bg-purple-500 border border-purple-800 text-white rounded-md text-sm block w-full p-2.5">
-                                <option selected>Anton 1</option>
-                                <option value="US">Anton 2</option>
-                                <option value="CA">Anton 3</option>
-                                <option value="FR">Anton 4</option>
-                                <option value="DE">Anton 5</option>
+                                {% for type in types %}
+                                <option value="{{type[0]}}">{{type[1]}}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -247,7 +246,7 @@
                             <h2 class="text-xm text-left font-medium text-gray-900">Покупное изделие</h2>
                         </div>
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <input id="" type="checkbox" value="" name="bordered-checkbox"
+                            <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox"
                                 class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                         </div>
                     </div>
@@ -292,7 +291,6 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -300,7 +298,11 @@
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+    <script type="text/javascript" src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
     <script>
+        function test() {
+            console.log('Super!!!!')
+        }
         $(document).ready(function () {
             $('#saveContract').click(function () {
                 var target = document.getElementById('productsSelector').getElementsByTagName('input')
@@ -320,7 +322,7 @@
                 console.log(formData)
                 $.ajax({
                     type: 'POST',
-                    url: '/add_contract',
+                    url: '/addContract',
                     contentType: 'application/json;charset=UTF-8',
                     data: JSON.stringify(formData),
                     success: function (response) {
@@ -334,10 +336,51 @@
                 });
             });
         });
-        function changeProduct(id, name) {
-            console.log(id)
+        function changeProduct(id, name, code, number, type, count, state, isContract, provider, start, end) {
+            // var d1 = new Date(start)
+            // var d2 = new Date(end)
+            // console.log(d1, d2)
             $("#currentProduct").val("currentProduct" + id)
             $("#productName").text("Изделие: " + name)
+            if (code != 'null') {
+                $("#productCode").text("Шифр: " + code)
+            } else {
+                $("#productCode").text("Шифр: ")
+            }
+            $("#productNumber").val(number)
+            $("#productType").val(type)
+            $("#productCount").val(count)
+            $("#productState").val(state)
+            if (isContract == 1) {
+                document.getElementById('isLocalContract').checked = true
+                // $("#isLocalContract").checked = true
+                $("#productProvider").val(provider)
+                $("#startDate").val(start)
+                $("#endDate").val(end)
+            } else {
+                document.getElementById('isLocalContract').checked = false
+                $("#productProvider").val('')
+                $("#startDate").val('')
+                $("#endDate").val('')
+            }
+            var formData = {
+                'id': id,
+                'name': name
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/changeProduct',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    // location.reload();
+                    console.log(response);
+                },
+                error: function (error) {
+                    // location.reload();
+                    console.log(error);
+                }
+            });
         }
         function addProductSelect() {
             if (document.getElementById('unfilled')) {
@@ -359,64 +402,60 @@
                     });
             }
         }
-        // function addContract(id, name) {
-        //     // $('#productName').text(name)
-        //     // $('#productName').val(id);
-        //     // console.log($('#productName').val())
-        //     const $targetEl = document.getElementById('createContract');
-
-        //     // options with default values
-        //     const options = {
-        //         placement: 'bottom-right',
-        //         backdrop: 'dynamic',
-        //         backdropClasses:
-        //             'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-        //         closable: true,
-        //         onHide: () => {
-        //             console.log('modal is hidden');
-        //         },
-        //         onShow: () => {
-        //             console.log('modal is shown');
-        //         },
-        //         onToggle: () => {
-        //             console.log('modal has been toggled');
-        //         },
-        //     };
-        //     // instance options object
-        //     const instanceOptions = {
-        //         id: 'createContract',
-        //         override: true
-        //     };
-        //     const modal = new Modal($targetEl, options, instanceOptions);
-        //     modal.show();
-        // }
-        function createTree(element, data) {
+        function createTree(element, data, idd) {
             const treeElement = document.createElement('ul');
             treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
+            if (idd != null && idd != 'root') {
+                treeElement.id = 'tree' + idd;
+                treeElement.className = '!visible hidden ' + treeElement.className
+                treeElement.setAttribute('data-te-collapse-item', '')
+            }
             data.forEach((item) => {
                 const listItem = document.createElement('li')
-                listItem.innerHTML = `<button data-modal-target="updates" data-modal-toggle="updates"` +
-                    `class="block text-white bg-green-300 hover:bg-green-800 ring-2` +
-                    `font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button"` +
-                    `onclick="changeProduct(` + item.id + `, '` + item.name + `')">` + item.name + `</button>`
-                if (item.children) {
-                    createTree(listItem, item.children)
+                if (item.id != 'root') {
+                    if (item.children.length != 0) {
+                        listItem.innerHTML = `<a data-te-collapse-init href="#tree` + item.id + `" role="button" aria-expanded="false" aria-controls="tree` + item.id + `"` +
+                            `class="flex items-center px-2 hover:bg-green-800 focus:text-primary active:text-primary">` +
+                            // `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                            // item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
+                            // item.isContract + `, '` + item.provider + `', '` + item.start + `', '` + item.end + `')">` +
+                            `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+                            `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
+                            item.name + `</a>`
+                        // treeElement.className += ` !visible hidden`
+                        // treeElement.attr('data-te-collapse-item')
+                        // listItem.innerHTML = `<button data-modal-target="updates" data-modal-toggle="updates"` +
+                        //     `class="block text-white bg-green-300 hover:bg-green-800 ring-2` +
+                        //     `font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button"` +
+                        //     `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                        //     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
+                        //     item.isContract + `, '` + item.provider + `', '` + item.start + `', '` + item.end + `')">` + item.name + `</button>`
+                    } else {
+                        listItem.innerHTML = `<a role="button" aria-expanded="false"` +
+                            `class="flex items-center px-2 hover:bg-secondary-100 focus:text-primary active:text-primary"` +
+                            `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                            item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
+                            item.isContract + `, '` + item.provider + `', '` + item.start + `', '` + item.end + `')">` +
+                            item.name + `</a>`
+                    }
+                }
+                if (item.children.length != 0) {
+                    createTree(listItem, item.children, item.id)
                 }
                 treeElement.append(listItem)
             });
             element.append(treeElement)
         }
-        function startCreation() {
-            fetch('/products')
+        function startCreation(id) {
+            fetch(`/products/${ id }`)
                 .then(response => response.json())
                 .then(data => {
                     data = Array(data)
                     const rootElement = document.getElementById('mainTree')
-                    createTree(rootElement, data)
+                    rootElement.innerHTML = ""
+                    createTree(rootElement, data, null)
                 });
         }
-        window.onload = startCreation;
-
     </script>
 </body>
 
