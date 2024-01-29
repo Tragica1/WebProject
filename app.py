@@ -112,6 +112,7 @@ def create_product_list():
 def create_contract():
     try:
         data = request.get_json()
+        
         new_contract_id = int(db_add_government_contract(data)[0])
         products = data.get('products')
         for i in range(len(products)):

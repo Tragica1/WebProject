@@ -6,132 +6,136 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная страница</title>
-    <link href="{{url_for('static', filename='output.css')}}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tw-elements/dist/css/tw-elements.min.css" />
+    <link rel="stylesheet" href="{{url_for('static', filename='css/tw-elements.min.css')}}" />
+    <link href="{{url_for('static', filename='css/flowbite.min.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static', filename='css/css.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static', filename='css/output.css')}}" rel="stylesheet">
+
 </head>
 
 <body>
     <nav class="bg-blue-900 border-gray-800 ">
-        <div class="flex flex-wrap justify-between items-center mx-2 max-w-screen-2xl p-4">
+        <div class="flex flex-wrap justify-between items-center p-4">
             <div class="flex  space-x-3 rtl:space-x-reverse">
                 <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />
-                <span class="self-center text-3xl font-bold whitespace-nowrap text-white">Контракты НПЦ-800</span>
+                <span class="self-center text-4xl font-bold whitespace-nowrap text-white">Контракты НПЦ-800</span>
             </div>
             <div class="flex space-x-5">
-                <a href="#" class="text-sm  text-white  hover:underline">Login</a>
+                <a href="#" class="text-xl  text-white  hover:underline">Вход/Регистрация</a>
             </div>
         </div>
     </nav>
-    <div class="grid grid-cols-3 gap-10">
-        <div class="pt-5 pl-3">
-            <h2 class="mb-2 text-lg font-semibold text-black">Госудрастенные контракты: </h2>
+
+    <div class="flex justify-between items-start content-around mx-16 pt-5">
+        <div>
+            <h2 class="mb-2 text-3xl font-semibold text-black">Госудрастенные контракты: </h2>
             <div id="accordion-collapse" data-accordion="collapse">
                 {% for contract in contracts %}
                 <h2 id="accordion-collapse-heading-{{ contract[0] }}" class="mb-3">
                     <button type="button"
-                        class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-2 rounded-lg border-gray-900 gap-3"
+                        class="flex items-center justify-center w-96 p-5 font-medium hover:bg-purple-800 hover:text-white text-black border-black border rounded-lg gap-3"
                         data-accordion-target="#accordion-collapse-body-{{ contract[0] }}" aria-expanded="false"
                         aria-controls="accordion-collapse-body-{{ contract[0] }}"
                         onclick="startCreation('{{ contract[0] }}')">
-                        <span>Контракт № {{contract[1]}}</span>
+                        <span class="text-xl">Контракт № {{contract[1]}}</span>
                     </button>
                     <div id="accordion-collapse-body-{{ contract[0] }}" class="hidden"
                         aria-labelledby="accordion-collapse-heading-{{ contract[0] }}">
-                        <div class="w-96 p-5 border rounded-lg border-b-0 border-black">
-                            <h2 class="text-xs text-left font-medium text-black">Внутренний номер заказа:
+                        <div class="w-96 p-5 border rounded-lg  border-black">
+                            <h2 class="text-xl text-left font-medium text-black">Внутренний номер заказа:
                                 {{ contract[2] }}</h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата подписания: {{ contract[4] }}</h2>
-                            <h2 class="text-xs text-left font-medium text-black">Дата сдачи: {{ contract[5] }}</h2>
-                            <h2 class="text-xs text-left font-medium text-black">Город: {{ contract[3] }}</h2>
+                            <h2 class="text-xl text-left font-medium text-black">Дата подписания: {{ contract[4] }}
+                            </h2>
+                            <h2 class="text-xl text-left font-medium text-black">Дата сдачи: {{ contract[5] }}</h2>
+                            <h2 class="text-xl text-left font-medium text-black">Город: {{ contract[3] }}</h2>
                         </div>
                     </div>
                 </h2>
                 {% endfor %}
                 <h2 class="mb-3">
                     <button type="button" data-modal-target="default-modal" data-modal-toggle="default-modal"
-                        class="flex items-center justify-center w-96 p-5 font-medium text-white bg-green-500 hover:bg-green-800 border-gray-900 border-2 rounded-lg gap-3"
+                        class="flex items-center justify-center w-96 p-5 font-medium text-white bg-emerald-500 hover:bg-green-800 border-black border rounded-lg gap-3"
                         aria-expanded="false">
-                        <span>Добавить контракт</span>
+                        <span class="text-xl">Добавить контракт</span>
                     </button>
                 </h2>
                 <div id="default-modal" tabindex="-1" aria-hidden="true"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative p-4 w-full max-w-2xl max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <div
-                                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        <div class="relative bg-white rounded-lg shadow">
+                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                                <h3 class="text-2xl font-semibold text-black ">
                                     Добавление контракта
                                 </h3>
                                 <button type="button"
-                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                    class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                                     data-modal-hide="default-modal">
                                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                         fill="none" viewBox="0 0 14 14">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                                     </svg>
-                                    <span class="sr-only">Close modal</span>
                                 </button>
                             </div>
-                            <div class="p-4 md:p-5 space-y-4">
+                            <div class="p-4 md:p-5 space-y-4 text-xl">
                                 <form class="space-y-6" action="#">
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Номер: </h2>
+                                            <h2 class="text-left font-medium text-black">Номер: </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="text" id="contractNumber"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Внутренний номер:
+                                            <h2 class="text-left font-medium text-black">Внутренний
+                                                номер:
                                             </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="text" id="contractInnerNumber"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Город: </h2>
+                                            <h2 class="text-left font-medium text-black">Город: </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="text" id="contractCity"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Дата подписания:
+                                            <h2 class="text-left font-medium text-black">Дата подписания:
                                             </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="date" id="contractStartDate"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Дата сдачи: </h2>
+                                            <h2 class="text-left font-medium text-black">Дата сдачи:
+                                            </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="date" id="contractEndDate"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div class="grid grid-rows-1 py-2 text-center">
-                                            <h2 class="text-xm text-left font-medium text-gray-900">Выбор изделия: </h2>
+                                            <h2 class="text-left font-medium text-black">Выбор изделия:
+                                            </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <button id="unfilled" data-dropdown-toggle="dropdownDefaultCheckbox"
-                                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-lg text-center inline-flex items-center"
                                                 type="button" onclick="addProductSelect()">Изделия<svg
                                                     class="w-2.5 h-2.5 ms-3" aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
@@ -140,9 +144,8 @@
                                                 </svg>
                                             </button>
                                             <div id="dropdownDefaultCheckbox"
-                                                class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-                                                <ul id="productsSelector"
-                                                    class="p-3 space-y-3 text-sm text-gray-700 dark:text-gray-200"
+                                                class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow ">
+                                                <ul id="productsSelector" class="p-3 text-left space-y-3 text-black"
                                                     aria-labelledby="unfilled">
                                                 </ul>
                                             </div>
@@ -150,10 +153,9 @@
                                     </div>
                                 </form>
                             </div>
-                            <div
-                                class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <button data-modal-hide="default-modal" type="button" id="saveContract"
-                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                     Сохранить</button>
                             </div>
                         </div>
@@ -161,127 +163,137 @@
                 </div>
             </div>
         </div>
-        <div class="pt-5 pl-3">
-            <h2 class="mb-2 text-lg font-semibold text-black">Список изделий: </h2>
+        <div>
+            <h2 class="mb-2 text-3xl font-semibold text-black">Список изделий: </h2>
 
             <div id="mainTree">
             </div>
-                <a data-te-collapse-init href="#collapseThree" role="button" aria-expanded="false"
-                    aria-controls="collapseThree"
-                    class="flex items-center px-2 hover:bg-secondary-100 focus:text-primary active:text-primary">
-                    </a>
+            <a data-te-collapse-init href="#collapseThree" role="button" aria-expanded="false"
+                aria-controls="collapseThree" class="flex items-center px-2">
+            </a>
         </div>
-        <div class="pt-5 pl-3">
-            <h2 class="mb-2 text-lg font-semibold text-black">Деталь: </h2>
+        <div>
+            <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
-                class="w-full max-w-md p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
-                <form class="space-y-6" action="#">
-                    <h5 id="productName" class="text-xl font-medium text-gray-900 dark:text-white">Изделие: </h5>
-                    <h5 id="productCode" class="text-xl font-medium text-gray-900 dark:text-white">Шифр: </h5>
-                    <hr class="mx-auto h-px bg-black border-blue-700 border-2">
+                class="w-full max-w-xl p-2 bg-white border border-black rounded-lg shadow sm:p-6 md:p-8">
+                <form class="space-y-6 text-xl" action="#">
+                    <h5 id="productName" class="font-medium text-black">Изделие: </h5>
+                    <h5 id="productCode" class="font-medium text-black">Шифр: </h5>
+                    <hr class="mx-auto h-px bg-black border-blue-800 border-2">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Тип: </h2>
-                        </div>
-                        <div class="grid grid-rows-1">
-                            <select id="productState"
-                                class="bg-green-600 border border-green-900 text-white rounded-md text-sm block w-full p-2.5">
-                                {% for state in states %}
-                                <option value="{{state[0]}}">{{state[1]}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Состояние: </h2>
+                            <h2 class="text-left font-medium text-black ">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <select id="productType"
-                                class="bg-purple-500 border border-purple-800 text-white rounded-md text-sm block w-full p-2.5">
+                                class="bg-green-600 text-lg border border-black text-white focus:ring-green-950 focus:ring-0 rounded-md block w-full p-2.5">
                                 {% for type in types %}
-                                <option value="{{type[0]}}">{{type[1]}}</option>
+                                <option class="hover:bg-green-800" value="{{type[0]}}">{{type[1]}}</option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900">Зав. номер: </h2>
+                            <h2 class="text-left font-medium text-black ">Состояние: </h2>
+                        </div>
+                        <div class="grid grid-rows-1">
+                            <select id="productState"
+                                class="bg-cyan-500 text-lg border border-black text-white focus:ring-cyan-950 focus:ring-0 rounded-md block w-full p-2.5">
+                                {% for state in states %}
+                                <option  class="hover:bg-cyan-800" value="{{state[0]}}">{{state[1]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-rows-1 py-2 text-center">
+                            <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="text" id="productNumber"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900">Кол-во: </h2>
+                            <h2 class="text-left font-medium text-black">Кол-во: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="text" id="productCount"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900">Покупное изделие</h2>
+                            <h2 class="text-left font-medium text-black">Покупное изделие</h2>
                         </div>
-                        <div class="grid grid-rows-1 py-2 text-center">
+                        <div class="grid grid-rows-1 pt-3 text-center">
                             <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox"
                                 class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Поставщик: </h2>
+                    <div id="hideen">
+                        <div class="grid grid-cols-2 gap-4 py-2">
+                            <div class="grid grid-rows-1 py-2 text-center">
+                                <h2 class="text-left font-medium text-black">Поставщик: </h2>
+                            </div>
+                            <div class="grid grid-rows-1">
+                                <input type="text" id="productProvider"
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            </div>
                         </div>
-                        <div class="grid grid-rows-1">
-                            <input type="text" id="productProvider"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <div class="grid grid-cols-2 gap-4 py-2">
+                            <div class="grid grid-rows-1 py-2 text-center">
+                                <h2 class="text-left font-medium text-gray-900 ">Подписание:
+                                </h2>
+                            </div>
+                            <div class="grid grid-rows-1">
+                                <input type="date" id="startDate"
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 py-2">
+                            <div class="grid grid-rows-1 py-2 text-center">
+                                <h2 class="text-left font-medium text-black">Исполнение:
+                                </h2>
+                            </div>
+                            <div class="grid grid-rows-1">
+                                <input type="date" id="endDate"
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            </div>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Подписание:
-                            </h2>
-                        </div>
-                        <div class="grid grid-rows-1">
-                            <input type="date" id="startDate"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Исполнение:
-                            </h2>
-                        </div>
-                        <div class="grid grid-rows-1">
-                            <input type="date" id="endDate"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-xm text-left font-medium text-gray-900 dark:text-white">Примечание:
+                            <h2 class="text-left font-medium text-black">Примечание:
                             </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <textarea id="message" rows="4"
-                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tw-elements/dist/js/tw-elements.umd.min.js"></script>
+
+    <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="./static/js/jquery-3.6.4.min.js"></script>
+    <script src="./static/js/flowbite.min.js"></script>
+    <script src="./static/js/tw-elements.umd.min.js"></script>
     <script>
+        document.getElementById('hideen').style.display = 'none'
+        $('#isLocalContract').click(function () {
+            var elem = document.getElementById('hideen')
+            if (elem.style.display == 'none'){
+                elem.style.display = 'block'
+            }else{
+                elem.style.display = 'none'
+            }
+        })
+
         function test() {
             console.log('Super!!!!')
         }
@@ -335,15 +347,16 @@
             $("#productState").val(state)
             if (isContract == 1) {
                 document.getElementById('isLocalContract').checked = true
-                // $("#isLocalContract").checked = true
                 $("#productProvider").val(provider)
                 $("#startDate").val(start)
                 $("#endDate").val(end)
+                document.getElementById('hideen').style.display = 'block'
             } else {
                 document.getElementById('isLocalContract').checked = false
                 $("#productProvider").val('')
                 $("#startDate").val('')
                 $("#endDate").val('')
+                document.getElementById('hideen').style.display = 'none'
             }
             var formData = {
                 'id': id,
@@ -374,11 +387,11 @@
                         data.forEach((item) => {
                             console.log(item)
                             const opt = document.createElement('li')
-                            opt.innerHTML = `<div class="flex items-center">` +
+                            opt.innerHTML = `<div class="flex items-baseline" >` +
                                 `<input id="` + item.id + `" type="checkbox" value=""` +
-                                `class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">` +
+                                `class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">` +
                                 `<label for="` + item.id + `"` +
-                                `class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">` + item.name + `</label></div>`
+                                `class="ms-2 text-lg texl-left font-medium text-black ">` + item.name + `</label></div>`
                             selector.append(opt)
                         });
                     });
@@ -388,7 +401,7 @@
             const treeElement = document.createElement('ul');
             treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
             if (idd != null && idd != 'root') {
-                treeElement.id = 'tree' + idd;
+                treeElement.id = 'collapse' + idd;
                 treeElement.className = '!visible hidden ' + treeElement.className
                 treeElement.setAttribute('data-te-collapse-item', '')
             }
@@ -396,8 +409,8 @@
                 const listItem = document.createElement('li')
                 if (item.id != 'root') {
                     if (item.children.length != 0) {
-                        listItem.innerHTML = `<a data-te-collapse-init href="#tree` + item.id + `" role="button" aria-expanded="false" aria-controls="tree` + item.id + `"` +
-                            `class="flex items-center px-2 hover:bg-green-700 focus:text-primary active:text-primary"` +
+                        listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + item.id + `" role="button" aria-expanded="false" aria-controls="collapse` + item.id + `"` +
+                            `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-300 rounded-lg"` +
                             `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                             item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                             item.isContract + `, '` + item.provider + `', '` + item.start + `', '` + item.end + `')">` +
@@ -406,7 +419,7 @@
                             item.name + `</a>`
                     } else {
                         listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                            `class="flex items-center px-2 hover:bg-green-700 focus:text-primary active:text-primary"` +
+                            `class="flex text-xl text-black items-center px-2 hover:bg-purple-300 rounded-lg"` +
                             `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                             item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                             item.isContract + `, '` + item.provider + `', '` + item.start + `', '` + item.end + `')">` +
@@ -421,7 +434,7 @@
             element.append(treeElement)
         }
         function startCreation(id) {
-            fetch(`/products/${ id }`)
+            fetch(`/products/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     data = Array(data)
