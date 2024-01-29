@@ -1,17 +1,13 @@
-// /** @type {import('tailwindcss').Config} */
-// module.exports = {
-//   content: [
-//     "./templates/*.html",
-//     "./static/*.css",
-//     "./node_modules/flowbite/**/*.js",
-//     "./node_modules/tw-elements/dist/js/**/*.js"
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [
-//     require("tw-elements/dist/plugin"),
-//     require('flowbite/plugin'),
-//   ],
-// }
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./templates/*.html",
+    "./static/css/*.css",
+    "./static/js/*.js"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
 
