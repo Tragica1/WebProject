@@ -10,11 +10,20 @@ con = ps.connect(
 
 def db_get_localcontract(contract_id):
     cur = con.cursor()
-    sql = '''SELECT localcontract.startDate, localcontract.endDate, company.name FROM localcontract JOIN company ON localContract.id=%s AND company.idLocalContract=localContract.id'''
+    sql = '''SELECT localcontract.startDate, localcontract.endDate, company.id FROM localcontract JOIN company ON localContract.id=%s AND company.idLocalContract=localContract.id'''
     cur.execute(sql, (contract_id,))
     localcontract = cur.fetchone()
     cur.close()
     return localcontract
+
+
+def db_get_companies():
+    cur = con.cursor()
+    sql = '''SELECT * FROM company'''
+    cur.execute(sql)
+    companies = cur.fetchall()
+    cur.close()
+    return companies
 
 
 def db_get_states():

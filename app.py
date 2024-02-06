@@ -80,16 +80,20 @@ def index():
     contracts = []
     types = []
     states = []
+    companies = []
     tps = db_get_types()
     sts = db_get_states()
+    comps = db_get_companies()
     for t in tps:
         types.append(list(t))
     for s in sts:
         states.append(list(s))
+    for c in comps:
+        companies.append(list(c))
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('index.html', contracts=contracts, types=types, states=states)
+        return render_template('index.html', contracts=contracts, types=types, states=states, companies=companies)
     else:
         return render_template('index.html')
 
