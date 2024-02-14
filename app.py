@@ -64,7 +64,7 @@ def create_product_tree(input_id):
 
 @app.route('/products/<contract_id>')
 def send_products(contract_id):
-    print(contract_id)
+    # print(f'Selected contract: {contract_id}\n')
     products_id = db_get_product_contract_list(contract_id)
     root_obj = create_product('root', '', '', '', '', '', '', '')
     for pr_id in products_id:
@@ -112,12 +112,13 @@ def create_product_list():
     return(json.dumps(res))
 
 
-@app.route('/addContract', methods=['POST'])
-def create_contract():
+@app.route('/saveContract', methods=['POST'])
+def save_contract():
     try:
         data = request.get_json()
-        
+        # print(data)
         new_contract_id = int(db_add_government_contract(data)[0])
+        # print(f'AAAAAAAAAAAAAAAAA --- {new_contract_id}')
         products = data.get('products')
         for i in range(len(products)):
             products[i] = int(products[i])
@@ -132,7 +133,28 @@ def change_product():
     try:
         data = request.get_json()
         print(data)
+        if data['isContarct'] == 1:
+            id_localContract = int(db_add_localcontract(data['start'], data['end'])[0])
+            db_add_company_contract_list(int(data['idProvider']), id_localContract)
+        else:
+            id_localContract = None
+        db_update_product(data, id_localContract)
         return jsonify({'status': 'success', 'message': 'Product changed successfully'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+    
+
+@app.route('/saveProvider', methods=['POST'])    
+def save_provider():
+    try:
+        data = request.get_json()
+        print(data)
+        company_id = db_add_company(data['name'], data['address'])
+        if(data['contacts']):
+            for contact in data['contacts']:
+                contact_id = db_add_contact(contact['name'], contact['number'])
+                db_add_contact_company_list(contact_id, company_id)
+        return jsonify({'status': 'success', 'message': 'Provider added successfully'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
     

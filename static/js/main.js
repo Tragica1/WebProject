@@ -1,4 +1,23 @@
+
+
+function showContact(tmp){
+    // let variable = $('#'+tmp.value).data('test');
+    let a = document.getElementById('company'+tmp.value)
+    console.log($('#company' + tmp.value).data('test'))
+
+}
+
+
 function getContractInfo(id, number, innerNumber, city, startDate, endDate) {
+    var currentConract = {
+        'id': id,
+        'number': number,
+        'innerNumber': innerNumber,
+        'city': city,
+        'startDate': startDate,
+        'endDate': endDate
+    }
+    localStorage.setItem("currentConract", JSON.stringify(currentConract));
     $("#cNumber").text("Выбран контракт № " + number)
     $("#cInnerNumber").text("Внутренний номер: " + innerNumber)
     $("#cCity").text("Город: " + city)
@@ -6,40 +25,136 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate) {
     $("#cEnd").text("Дата сдачи: " + endDate)
     startCreation(id)
 };
+
+
+function saveProvider() {
+    var contacts = []
+    if (counter > 0) {
+        for (var i = 1; i <= counter; i++){
+            var tmp = {
+                'name': $("#contactName" + i).val(),
+                'number': $("#contactNumber" + i).val()
+            }
+            contacts[i-1] = tmp
+        }
+    }
+
+    var formData = {
+        'name': $('#companyName').val(),
+        'address': $('#companyAddress').val(),
+        'contacts': contacts
+    }
+    // console.log(formData)
+    $.ajax({
+        type: 'POST',
+        url: '/saveProvider',
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(formData),
+        success: function (response) {
+            location.reload();
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+
+function saveContract() {
+    var target = document.getElementById('productsSelector').getElementsByTagName('input')
+    var pr = []
+    var j = 0
+    for (var i = 0; i < target.length; i++) {
+        if (target[i].checked) {
+            pr[j] = target[i].id
+            j += 1
+        }
+    }
+    var formData = {
+        'number': $('#contractNumber').val(),
+        'innerNumber': $('#contractInnerNumber').val(),
+        'city': $('#contractCity').val(),
+        'startDate': $('#contractStartDate').val(),
+        'endDate': $('#contractEndDate').val(),
+        'products': pr
+    };
+    // console.log(formData)
+    $.ajax({
+        type: 'POST',
+        url: '/saveContract',
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(formData),
+        success: function (response) {
+            location.reload();
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
 var counter = 0;
 function addContactBlock() {
     counter += 1
     var itemBlock = document.getElementById('companyContacts')
     var contactBlock = document.createElement('div')
-    contactBlock.className = 'w-full max-w-xl p-2 bg-white border border-black rounded-lg shadow sm:p-6'
-    contactBlock.innerHTML = `<h2 class="text-left font-medium text-black">Контакт № `+ counter+`</h2>`+
-                            `<hr class="mx-auto h-px bg-black border-blue-800 border-2">` +
-                            `<div class="grid grid-cols-2 gap-4">` +
-                            `<div class="grid grid-rows-1 py-2 text-center">` +
-                            `<h2 class="text-left font-medium text-black">ФИО: </h2>` +
-                            `</div>` +
-                            `<div class="grid grid-rows-1">` +
-                            `<input type="text" id="contactName`+ counter +`"`+
-                            `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">` +
-                            `</div>`+
-                            `</div>` +
-                            `<div class="grid grid-cols-2 gap-4">` +
-                            `<div class="grid grid-rows-1 py-2 text-center">` +
-                            `<h2 class="text-left font-medium text-black">Телефон: </h2>`+
-                            `</div>` +
-                            `<div class="grid grid-rows-1">` +
-                            `<input type="text" id="contactNumber`+ counter +`"` +
-                            `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">` +
-                            `</div>` +
-                            `</div>`
+    contactBlock.className = 'w-full max-w-xl p-2 bg-white border border-black rounded-lg shadow m-auto sm:p-4'
+    contactBlock.setAttribute('id', 'contactBlock' + counter)
+    contactBlock.innerHTML = `<div class="flex items-start justify-between">` +
+        `<h2 id="contactBlockName` + counter + `" class="text-left font-medium text-black">Контакт № ` + counter + `</h2>` +
+        `<button id="contactToDelete` + counter + `" type="button" onclick="deleteContactBlock(` + counter + `)">` +
+        `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ms-2 text-gray-500 hover:text-gray-800">` +
+        `<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />` +
+        `</svg>` +
+        `</button>` +
+        `</div>` +
+        `<hr class="mx-auto my-1 h-px bg-black border-grey-300 border">` +
+        `<div class="grid grid-cols-2 gap-4 my-3">` +
+        `<div class="grid grid-rows-1 py-2 text-center">` +
+        `<h2 class="text-left font-medium text-black">ФИО: </h2>` +
+        `</div>` +
+        `<div class="grid grid-rows-1">` +
+        `<input type="text" id="contactName` + counter + `"` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">` +
+        `</div>` +
+        `</div>` +
+        `<div class="grid grid-cols-2 gap-4">` +
+        `<div class="grid grid-rows-1 py-2 text-center">` +
+        `<h2 class="text-left font-medium text-black">Телефон: </h2>` +
+        `</div>` +
+        `<div class="grid grid-rows-1">` +
+        `<input type="text" id="contactNumber` + counter + `"` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">` +
+        `</div>` +
+        `</div>`
     itemBlock.appendChild(contactBlock)
-    
+    // console.log(counter)
 };
 
-function changeProduct(id, name, code, number, type, count, state, isContract, provider, start, end) {
-    // var d1 = new Date(start)
-    // var d2 = new Date(end)
-    // console.log(d1, d2)
+
+function deleteContactBlock(block_id) {
+    var block = document.getElementById('contactBlock' + block_id)
+    block.remove()
+    var new_counter = block_id
+    for (var i = block_id + 1; i <= counter; i++) {
+        document.getElementById("contactBlock" + i).id = "contactBlock" + new_counter
+        $("#contactBlockName" + i).text('Контакт № ' + new_counter)
+        document.getElementById("contactBlockName" + i).id = "contactBlockName" + new_counter
+        document.getElementById("contactToDelete" + i).setAttribute("onclick", "deleteContactBlock(" + new_counter + ")")
+        document.getElementById("contactToDelete" + i).id = "contactToDelete" + new_counter
+        document.getElementById("contactName" + i).id = "contactName" + new_counter
+        document.getElementById("contactNumber" + i).id = "contactNumber" + new_counter
+        new_counter += 1
+    }
+    counter -= 1
+}
+
+
+function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end) {
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     if (code != 'null') {
@@ -47,7 +162,6 @@ function changeProduct(id, name, code, number, type, count, state, isContract, p
         $("#productCode").text("Шифр: " + code)
     } else {
         document.getElementById('productCode').style.display = 'none'
-        // $("#productCode").style.display = 'none'
     }
     $("#productNumber").val(number)
     $("#productType").val(type)
@@ -66,25 +180,52 @@ function changeProduct(id, name, code, number, type, count, state, isContract, p
         $("#endDate").val('')
         document.getElementById('hideen').style.display = 'none'
     }
-    var formData = {
-        'id': id,
-        'name': name
+};
+
+
+function changeProduct() {
+    var formData = {}
+    if (document.getElementById('isLocalContract').checked) {
+        formData = {
+            'id': $("#currentProduct").val().slice(14),
+            'type': $("#productType").val(),
+            'state': $("#productState").val(),
+            'number': $("#productNumber").val(),
+            'count': $("#productCount").val(),
+            'isContarct': 1,
+            'idProvider': $("#productProvider").val(),
+            'start': $("#startDate").val(),
+            'end': $("#endDate").val(),
+        }
+    } else {
+        formData = {
+            'id': $("#currentProduct").val().slice(14),
+            'type': $("#productType").val(),
+            'state': $("#productState").val(),
+            'number': $("#productNumber").val(),
+            'count': $("#productCount").val(),
+            'isContarct': 0,
+            'idProvider': null,
+            'start': null,
+            'end': null,
+        }
     }
+
     $.ajax({
         type: 'POST',
         url: '/changeProduct',
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-            // location.reload();
+            location.reload();
             console.log(response);
         },
         error: function (error) {
-            // location.reload();
+            location.reload();
             console.log(error);
         }
     });
-};
+}
 
 
 function addProductSelect() {
@@ -123,7 +264,7 @@ function createTree(element, data, idd) {
             if (item.children.length != 0) {
                 listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + item.id + `" role="button" aria-expanded="false" aria-controls="collapse` + item.id + `"` +
                     `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500 rounded-lg"` +
-                    `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                    `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                     item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -132,7 +273,7 @@ function createTree(element, data, idd) {
             } else {
                 listItem.innerHTML = `<a role="button" aria-expanded="false"` +
                     `class="flex text-xl text-black items-center px-2 hover:bg-purple-300 rounded-lg"` +
-                    `onclick="changeProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                    `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                     item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
                     item.name + `</a>`
@@ -148,7 +289,7 @@ function createTree(element, data, idd) {
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             data = Array(data)
