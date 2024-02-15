@@ -133,7 +133,7 @@ def change_product():
     try:
         data = request.get_json()
         print(data)
-        if data['isContarct'] == 1:
+        if data['isContract'] == 1:
             id_localContract = int(db_add_localcontract(data['start'], data['end'])[0])
             db_add_company_contract_list(int(data['idProvider']), id_localContract)
         else:

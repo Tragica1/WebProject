@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="1234",
+    password="123",
     host="localhost",
     port=3306
 )
@@ -233,7 +233,7 @@ def db_add_product(data, parentId=None):
 
 def db_update_product(data, contract_id=None):
     cur = con.cursor()
-    sql = '''UPDATE product SET number=%s, idType=%s, count=%s, idLocal=%s, idState=%s WHERE id=%s'''
+    sql = '''UPDATE product SET number=%s, idType=%s, count=%s, idLocalContract=%s, idState=%s WHERE id=%s'''
     cur.execute(sql, (int(data['number']), int(data['type']), int(data['count']), contract_id, int(data['state']), int(data['id'])))
     cur.close()
     con.commit()

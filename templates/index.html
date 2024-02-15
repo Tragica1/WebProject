@@ -270,11 +270,22 @@
                         </div>
                     </div>
                     <div id="hideen">
-                        <div class="grid grid-cols-2 gap-4 py-2">
-                            <div class="flex grid-rows-1 py-2 text-center ">
-                                <button class="text-left font-medium text-black hover:text-green-500 underline"
-                                    type="button" data-modal-target="company-modal"
-                                    data-modal-toggle="company-modal">Поставщик:</button>
+                        <div class="grid grid-cols-2 gap-4 py-2 items-baseline ">
+                            <div class="inline-flex grid-rows-1 py-2">
+                                <div class="flex grid-cols-2 gap-4 py-2">
+                                    <button type="button" data-modal-target="company-modal"
+                                        data-modal-toggle="company-modal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"
+                                            stroke-width="1.5" stroke="currentColor"
+                                            class="w-5 h-5  text-left text-green-500 hover:text-green-800">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </button>
+                                    <h2 class="text-left font-medium text-black">Поставщик:</h2>
+                                </div>
+
+                                
                             </div>
                             <div class="grid grid-rows-1">
                                 <div data-popover-target="popover-description-provider" data-popover-placement="left"
@@ -283,7 +294,8 @@
                                         class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                         <option value="" selected disabled hidden></option>
                                         {% for company in companies %}
-                                        <option id="company{{company[0]}}" data-test="{{company[1]}}" value="{{company[0]}}">{{company[1]}}</option>
+                                        <option id="company{{company[0]}}" data-test="{{company[1]}}"
+                                            value="{{company[0]}}">{{company[1]}}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
