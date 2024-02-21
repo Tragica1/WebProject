@@ -38,6 +38,21 @@ def db_get_companies():
     return companies
 
 
+def db_get_company_contacts(company_id):
+    cur = con.cursor()
+    sql = '''SELECT idContact FROM contactcompanylist WHERE idCompany=%s'''
+    cur.execute(sql, (company_id,))
+    contacts_id = cur.fetchall()
+    contacts = []
+    for id in contacts_id:
+        sql = '''SELECT * FROM contact WHERE id=%s'''
+        cur.execute(sql, (id,))
+        tmp = cur.fetchone()
+        contacts.append(tmp)
+    cur.close()
+    return contacts
+
+
 def db_get_states():
     cur = con.cursor()
     sql = '''SELECT * FROM state'''

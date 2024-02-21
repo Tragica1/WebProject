@@ -64,7 +64,7 @@ def create_product_tree(input_id):
 
 @app.route('/products/<contract_id>')
 def send_products(contract_id):
-    # print(f'Selected contract: {contract_id}\n')
+    print(f'Selected contract: {contract_id}\n')
     products_id = db_get_product_contract_list(contract_id)
     root_obj = create_product('root', '', '', '', '', '', '', '')
     for pr_id in products_id:
@@ -89,7 +89,10 @@ def index():
     for s in sts:
         states.append(list(s))
     for c in comps:
-        companies.append(list(c))
+        tmp = list(c)
+        tmp.append(db_get_company_contacts(c[0]))
+        print(tmp)
+        companies.append(tmp)
     if state:
         for c in contrs:
             contracts.append(list(c))

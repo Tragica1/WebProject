@@ -285,7 +285,7 @@
                                     <h2 class="text-left font-medium text-black">Поставщик:</h2>
                                 </div>
 
-                                
+
                             </div>
                             <div class="grid grid-rows-1">
                                 <div data-popover-target="popover-description-provider" data-popover-placement="left"
@@ -294,17 +294,24 @@
                                         class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                         <option value="" selected disabled hidden></option>
                                         {% for company in companies %}
-                                        <option id="company{{company[0]}}" data-test="{{company[1]}}"
-                                            value="{{company[0]}}">{{company[1]}}</option>
+                                        <option id="company{{company[0]}}" data-address="{{company[2]}}"
+                                            data-contacts="{{company[3]}}" value="{{company[0]}}">{{company[1]}}
+                                        </option>
                                         {% endfor %}
                                     </select>
                                 </div>
                                 <div data-popover id="popover-description-provider" role="tooltip"
-                                    class="absolute z-10 invisible inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-                                    <div class="p-3 space-y-2">
-                                        <h3 id="contactName" class="font-semibold text-black"></h3>
-                                        <h3 id="contactNumber" class="font-semibold text-black"></h3>
-
+                                    class="absolute z-10 invisible inline-block text-sm text-gray-700 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+                                    <div id="contacts" class="p-3 space-y-2">
+                                        <div class="grid grid-cols-2">
+                                            <div class="grid grid-rows-1 py-2 text-center">
+                                                <h2 class="text-left font-medium text-black">Адрес: </h2>
+                                            </div>
+                                            <div class="grid grid-rows-1">
+                                                <p id="providerAddress" class="text-left font-medium"></p>
+                                            </div>
+                                        </div>
+                                        <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
                                     </div>
                                     <div data-popper-arrow></div>
                                 </div>
@@ -423,6 +430,7 @@
     <script src="./static/js/flowbite.min.js"></script>
     <script src="./static/js/tw-elements.umd.min.js"></script>
     <script src="./static/js/main.js"></script>
+
     <script>
         window.onload = function () {
             console.log(localStorage)

@@ -1,9 +1,18 @@
 
 
-function showContact(tmp){
-    // let variable = $('#'+tmp.value).data('test');
-    let a = document.getElementById('company'+tmp.value)
-    console.log($('#company' + tmp.value).data('test'))
+function showContact(tmp) {
+    var addr = $('#company' + tmp.value).data('address')
+    var contacts = ($('#company' + tmp.value).data('contacts'))
+    console.log(contacts.split(","))
+    $("#providerAddress").text(addr)
+    var block = document.getElementById('contacts')
+    for (var i = 0; i < contacts.length; i++) {
+        var d = document.createElement('div')
+        d.innerHTML = `<p class="font-semibold">`+ contacts[i][1] + `</p>` +
+            `<p class="font-semibold">`+ contacts[i][2] + `</p>`
+        block.appendChild(d)
+    }
+
 
 }
 
@@ -30,12 +39,12 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate) {
 function saveProvider() {
     var contacts = []
     if (counter > 0) {
-        for (var i = 1; i <= counter; i++){
+        for (var i = 1; i <= counter; i++) {
             var tmp = {
                 'name': $("#contactName" + i).val(),
                 'number': $("#contactNumber" + i).val()
             }
-            contacts[i-1] = tmp
+            contacts[i - 1] = tmp
         }
     }
 
@@ -128,10 +137,12 @@ function addContactBlock() {
         `</div>` +
         `<div class="grid grid-rows-1">` +
         `<input type="text" id="contactNumber` + counter + `"` +
-        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="+7(999)999-99-99" required>` +
         `</div>` +
         `</div>`
+    // $('#contactNumber'+ counter).inputmask("(999) 999-9999");
     itemBlock.appendChild(contactBlock)
+    // $('#contactNumber').inputmask("(999) 999-9999");
     // console.log(counter)
 };
 
@@ -289,10 +300,11 @@ function createTree(element, data, idd) {
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             data = Array(data)
+            // localStorage.setItem("currentProductsData", JSON.stringify(data));
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
             createTree(rootElement, data, null)
