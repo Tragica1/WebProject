@@ -38,7 +38,7 @@
                         <li>
                             <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-lg font-normal text-white hover:bg-neutral-100 hover:text-neutral-900 active:no-underline "
                                 data-te-dropdown-item-ref
-                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}')">Контракт
+                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}')">Контракт
                                 № {{contract[1]}}</a>
                         </li>
                         {% endfor %}
@@ -62,6 +62,7 @@
                         <div class="p-3 space-y-2 text-black bg-white ">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
                             <h3 id="cCity" class="font-semibold"></h3>
+                            <h3 id="cType" class="font-semibold"></h3>
                             <h3 id="cStart" class="font-semibold"></h3>
                             <h3 id="cEnd" class="font-semibold"></h3>
                         </div>
@@ -145,6 +146,21 @@
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="grid grid-rows-1 py-2 text-center">
+                                                <h2 class="text-left font-medium text-black">Тип контракта:
+                                                </h2>
+                                            </div>
+                                            <div class="flex flex-wrap items-center" id="contractType">
+                                                {% for contractType in contractTypes %}
+                                                <input id="{{contractType[0]}}" type="radio" name="colored-radio"
+                                                    class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600">
+                                                <label for="{{contractType[0]}}"
+                                                    class="ms-2 text-lg font-medium text-black me-4">{{contractType[1]}}</label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="grid grid-rows-1 py-2 text-center">
                                                 <h2 class="text-left font-medium text-black">Выбор изделия:
                                                 </h2>
                                             </div>
@@ -160,7 +176,7 @@
                                                     </svg>
                                                 </button>
                                                 <div id="dropdownDefaultCheckbox"
-                                                    class="z-10 hidden w-48 bg-white divide-y divide-gray-100 rounded-lg shadow ">
+                                                    class="z-10 hidden w-72 bg-white divide-y divide-gray-700 rounded-lg shadow ">
                                                     <ul id="productsSelector" class="p-3 text-left space-y-3 text-black"
                                                         aria-labelledby="unfilled">
                                                     </ul>
@@ -205,7 +221,7 @@
                 aria-controls="collapseThree" class="flex items-center px-2">
             </a>
         </div>
-        <div>
+        <div id="currentDetal">
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
                 class="w-full max-w-xl p-2 bg-white border border-black rounded-lg shadow sm:p-6 md:p-8">
@@ -302,7 +318,7 @@
                                 </div>
                                 <div data-popover id="popover-description-provider" role="tooltip"
                                     class="absolute z-10 invisible inline-block text-sm text-gray-700 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-                                    <div id="contacts" class="p-3 space-y-2">
+                                    <div class="p-3 space-y-2">
                                         <div class="grid grid-cols-2">
                                             <div class="grid grid-rows-1 py-2 text-center">
                                                 <h2 class="text-left font-medium text-black">Адрес: </h2>
@@ -312,6 +328,9 @@
                                             </div>
                                         </div>
                                         <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
+                                        <div id="contacts">
+
+                                        </div>
                                     </div>
                                     <div data-popper-arrow></div>
                                 </div>
@@ -424,6 +443,8 @@
             </div>
         </div>
     </div>
+    <script src="./static/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="./static/js/inputmask.js"></script>
 
     <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
     <script src="./static/js/jquery-3.6.4.min.js"></script>
@@ -431,11 +452,12 @@
     <script src="./static/js/tw-elements.umd.min.js"></script>
     <script src="./static/js/main.js"></script>
 
+
     <script>
         window.onload = function () {
             console.log(localStorage)
             var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
-            getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'])
+            getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'])
         }
         document.getElementById('hideen').style.display = 'none'
         $('#isLocalContract').click(function () {
@@ -447,6 +469,20 @@
             }
         });
 
+        $(document).ready(function () {
+            var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
+            var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
+
+            $(window).scroll(function () {
+                var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
+
+                if (windowTop > originalTop) {
+                    $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
+                } else {
+                    $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
+                }
+            });
+        });
 
 
     </script>

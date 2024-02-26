@@ -89,6 +89,24 @@ def db_get_type(type_id):
     return type
 
 
+def db_get_contract_types():
+    cur = con.cursor()
+    sql = '''SELECT * FROM contracttype'''
+    cur.execute(sql)
+    types = cur.fetchall()
+    cur.close()
+    return types
+
+
+def db_get_contract_type(type_id):
+    cur = con.cursor()
+    sql = '''SELECT name FROM contracttype WHERE id=%s'''
+    cur.execute(sql, (type_id,))
+    type = cur.fetchall()
+    cur.close()
+    return type
+
+
 def db_add_contact(data):
     cur = con.cursor()
     sql = '''INSERT INTO contact (name, phone) VALUES (%s, %s)'''
@@ -99,8 +117,8 @@ def db_add_contact(data):
 
 def db_add_government_contract(data):
     cur = con.cursor()
-    sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive) VALUES (%s, %s, %s, %s, %s, %s)'''
-    cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1))
+    sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive, type) VALUES (%s, %s, %s, %s, %s, %s, %s)'''
+    cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1, int(data['contractType'])))
     cur.execute('''SELECT LAST_INSERT_ID()''')
     contract_id = cur.fetchone()
     con.commit()
@@ -128,7 +146,7 @@ def db_get_product_contract_list(contract_id):
 
 def db_get_government_contracts():
     cur = con.cursor()
-    sql = '''SELECT * FROM governmentcontract'''
+    sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.type'''
     cur.execute(sql)
     contracts = cur.fetchall()
     cur.close()

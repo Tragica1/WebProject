@@ -1,30 +1,37 @@
 
-
+var currentProvider = -1;
 function showContact(tmp) {
-    var addr = $('#company' + tmp.value).data('address')
-    var contacts = ($('#company' + tmp.value).data('contacts'))
-    console.log(contacts.split(","))
-    $("#providerAddress").text(addr)
-    var block = document.getElementById('contacts')
-    for (var i = 0; i < contacts.length; i++) {
-        var d = document.createElement('div')
-        d.innerHTML = `<p class="font-semibold">`+ contacts[i][1] + `</p>` +
-            `<p class="font-semibold">`+ contacts[i][2] + `</p>`
-        block.appendChild(d)
+    if (currentProvider != tmp.value) {
+        var addr = $('#company' + tmp.value).data('address')
+        $("#providerAddress").text(addr)
+        fetch(`/contacts/${ tmp.value }`)
+            .then(response => response.json())
+            .then(data => {
+                contacts = data
+                var block = document.getElementById('contacts')
+                block.innerHTML = ""
+                for (var i = 0; i < contacts.length; i++) {
+                    var d = document.createElement('div')
+                    d.className = "pb-2"
+                    d.innerHTML = `<p class="font-semibold">` + contacts[i][1] + `</p>` +
+                        `<p class="font-semibold">` + contacts[i][2] + `</p>`
+                    block.appendChild(d)
+                }
+            });
     }
-
-
+    currentProvider = tmp.value
 }
 
 
-function getContractInfo(id, number, innerNumber, city, startDate, endDate) {
+function getContractInfo(id, number, innerNumber, city, startDate, endDate, type) {
     var currentConract = {
         'id': id,
         'number': number,
         'innerNumber': innerNumber,
         'city': city,
         'startDate': startDate,
-        'endDate': endDate
+        'endDate': endDate,
+        'type': type
     }
     localStorage.setItem("currentConract", JSON.stringify(currentConract));
     $("#cNumber").text("Выбран контракт № " + number)
@@ -32,6 +39,7 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate) {
     $("#cCity").text("Город: " + city)
     $("#cStart").text("Дата подписания: " + startDate)
     $("#cEnd").text("Дата сдачи: " + endDate)
+    $("#cType").text("Тип контракта: " + type)
     startCreation(id)
 };
 
@@ -72,13 +80,20 @@ function saveProvider() {
 
 
 function saveContract() {
-    var target = document.getElementById('productsSelector').getElementsByTagName('input')
+    var products = document.getElementById('productsSelector').getElementsByTagName('input')
     var pr = []
     var j = 0
-    for (var i = 0; i < target.length; i++) {
-        if (target[i].checked) {
-            pr[j] = target[i].id
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].checked) {
+            pr[j] = products[i].id
             j += 1
+        }
+    }
+    var types = document.getElementById('contractType').getElementsByTagName('input')
+    var type = 0
+    for (var i = 0; i < types.length; i++) {
+        if (types[i].checked) {
+            type = types[i].id
         }
     }
     var formData = {
@@ -87,6 +102,7 @@ function saveContract() {
         'city': $('#contractCity').val(),
         'startDate': $('#contractStartDate').val(),
         'endDate': $('#contractEndDate').val(),
+        'contractType': type,
         'products': pr
     };
     // console.log(formData)
@@ -136,14 +152,14 @@ function addContactBlock() {
         `<h2 class="text-left font-medium text-black">Телефон: </h2>` +
         `</div>` +
         `<div class="grid grid-rows-1">` +
-        `<input type="text" id="contactNumber` + counter + `"` +
-        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="+7(999)999-99-99" required>` +
+        `<input type="text" id="contactNumber` + counter + `"` + `data-inputmask="'mask': '+7(999)-999-9999', 'showMaskOnHover': false, 'placeholder': '#'"` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" maxlength="16" placeholder="+7(999)999-99-99" required>` +
         `</div>` +
         `</div>`
-    // $('#contactNumber'+ counter).inputmask("(999) 999-9999");
+
     itemBlock.appendChild(contactBlock)
-    // $('#contactNumber').inputmask("(999) 999-9999");
-    // console.log(counter)
+    let allIns = document.querySelectorAll("input");
+    Inputmask().mask(allIns);
 };
 
 
@@ -261,11 +277,12 @@ function addProductSelect() {
 };
 
 
-function createTree(element, data, idd) {
+function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
     treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
     if (idd != null && idd != 'root') {
-        treeElement.id = 'collapse' + idd;
+        var tmp = idd + i - 1
+        treeElement.id = 'collapse' + tmp;
         treeElement.className = '!visible hidden ' + treeElement.className
         treeElement.setAttribute('data-te-collapse-item', '')
     }
@@ -273,7 +290,8 @@ function createTree(element, data, idd) {
         const listItem = document.createElement('li')
         if (item.id != 'root') {
             if (item.children.length != 0) {
-                listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + item.id + `" role="button" aria-expanded="false" aria-controls="collapse` + item.id + `"` +
+                var tmp = item.id + i
+                listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                     `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500 rounded-lg"` +
                     `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
@@ -281,6 +299,7 @@ function createTree(element, data, idd) {
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
                     item.name + `</a>`
+                i+=1
             } else {
                 listItem.innerHTML = `<a role="button" aria-expanded="false"` +
                     `class="flex text-xl text-black items-center px-2 hover:bg-purple-300 rounded-lg"` +
@@ -291,7 +310,7 @@ function createTree(element, data, idd) {
             }
         }
         if (item.children.length != 0) {
-            createTree(listItem, item.children, item.id)
+            createTree(listItem, item.children, item.id, i)
         }
         treeElement.append(listItem)
     });
@@ -307,6 +326,7 @@ function startCreation(id) {
             // localStorage.setItem("currentProductsData", JSON.stringify(data));
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
-            createTree(rootElement, data, null)
+            var i = 1   
+            createTree(rootElement, data, null, i)
         });
 }

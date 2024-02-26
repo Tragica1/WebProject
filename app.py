@@ -74,29 +74,38 @@ def send_products(contract_id):
     return root_obj
 
 
+@app.route('/contacts/<company_id>')
+def send_contacts(company_id):
+    contacts = db_get_company_contacts(company_id)
+    return json.dumps(contacts)
+
 @app.route('/')
 def index():
     state, contrs = db_get_government_contracts()
     contracts = []
+    contractTypes = []
     types = []
     states = []
     companies = []
     tps = db_get_types()
     sts = db_get_states()
     comps = db_get_companies()
+    contrs_types = db_get_contract_types()
     for t in tps:
         types.append(list(t))
     for s in sts:
         states.append(list(s))
     for c in comps:
         tmp = list(c)
-        tmp.append(db_get_company_contacts(c[0]))
-        print(tmp)
+        # tmp.append(db_get_company_contacts(c[0]))
+        # print(tmp)
         companies.append(tmp)
+    for ct in contrs_types:
+        contractTypes.append(list(ct))
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('index.html', contracts=contracts, types=types, states=states, companies=companies)
+        return render_template('index.html', contracts=contracts, types=types, states=states, companies=companies, contractTypes=contractTypes)
     else:
         return render_template('index.html')
 
