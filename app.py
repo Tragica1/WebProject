@@ -130,13 +130,14 @@ def save_contract():
         data = request.get_json()
         # print(data)
         new_contract_id = int(db_add_government_contract(data)[0])
-        # print(f'AAAAAAAAAAAAAAAAA --- {new_contract_id}')
         products = data.get('products')
         for i in range(len(products)):
             products[i] = int(products[i])
         db_add_product_contract_list(new_contract_id, products)
+        print('Contract added successfully')
         return jsonify({'status': 'success', 'message': 'Contract added successfully'})
     except Exception as e:
+        print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
 

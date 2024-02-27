@@ -100,8 +100,9 @@
                                                 <h2 class="text-left font-medium text-black">Номер: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="text" id="contractNumber"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
+                                                <input type="number" id="contractNumber" minlength="1" maxlength="10"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -111,8 +112,9 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="text" id="contractInnerNumber"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                <input type="number" id="contractInnerNumber"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -121,7 +123,8 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="text" id="contractCity"
-                                                    class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                    class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -131,7 +134,8 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="date" id="contractStartDate"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -141,7 +145,8 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="date" id="contractEndDate"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -152,7 +157,8 @@
                                             <div class="flex flex-wrap items-center" id="contractType">
                                                 {% for contractType in contractTypes %}
                                                 <input id="{{contractType[0]}}" type="radio" name="colored-radio"
-                                                    class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600">
+                                                    class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 focus:ring-teal-500 dark:focus:ring-teal-600"
+                                                    required>
                                                 <label for="{{contractType[0]}}"
                                                     class="ms-2 text-lg font-medium text-black me-4">{{contractType[1]}}</label>
                                                 {% endfor %}
@@ -186,7 +192,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                    <button data-modal-hide="contract-modal" type="button" onclick="saveContract()"
+                                    <button data-modal-hide="contract-modal" type="submit" onclick="saveContract()"
                                         id="saveContract"
                                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                         Сохранить</button>
@@ -300,13 +306,11 @@
                                     </button>
                                     <h2 class="text-left font-medium text-black">Поставщик:</h2>
                                 </div>
-
-
                             </div>
                             <div class="grid grid-rows-1">
                                 <div data-popover-target="popover-description-provider" data-popover-placement="left"
                                     type="button">
-                                    <select id="productProvider" onchange="showContact(this)"
+                                    <select id="productProvider" onchange="showContacts(this)"
                                         class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                         <option value="" selected disabled hidden></option>
                                         {% for company in companies %}
@@ -324,7 +328,7 @@
                                                 <h2 class="text-left font-medium text-black">Адрес: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <p id="providerAddress" class="text-left font-medium"></p>
+                                                <p id=" " class="text-left font-medium"></p>
                                             </div>
                                         </div>
                                         <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
@@ -454,37 +458,7 @@
 
 
     <script>
-        window.onload = function () {
-            console.log(localStorage)
-            var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
-            getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'])
-        }
-        document.getElementById('hideen').style.display = 'none'
-        $('#isLocalContract').click(function () {
-            var elem = document.getElementById('hideen')
-            if (elem.style.display == 'none') {
-                elem.style.display = 'block'
-            } else {
-                elem.style.display = 'none'
-            }
-        });
-
-        $(document).ready(function () {
-            var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
-            var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
-
-            $(window).scroll(function () {
-                var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
-
-                if (windowTop > originalTop) {
-                    $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
-                } else {
-                    $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
-                }
-            });
-        });
-
-
+      
     </script>
 </body>
 

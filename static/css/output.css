@@ -3353,14 +3353,14 @@ video {
   border-color: rgb(75 85 99 / var(--tw-divide-opacity));
 }
 
-.divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-opacity: 1;
-  border-color: rgb(229 229 229 / var(--tw-divide-opacity));
-}
-
 .divide-gray-700 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(55 65 81 / var(--tw-divide-opacity));
+}
+
+.divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(229 229 229 / var(--tw-divide-opacity));
 }
 
 .place-self-center {
@@ -7666,6 +7666,11 @@ video {
   background-color: rgb(229 229 229 / var(--tw-bg-opacity));
 }
 
+.focus\:bg-purple-900:focus {
+  --tw-bg-opacity: 1;
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity));
+}
+
 .focus\:text-\[\#3b71ca\]:focus {
   --tw-text-opacity: 1;
   color: rgb(59 113 202 / var(--tw-text-opacity));
@@ -7913,6 +7918,16 @@ video {
 .active\:bg-\[\#cacfd1\]:active {
   --tw-bg-opacity: 1;
   background-color: rgb(202 207 209 / var(--tw-bg-opacity));
+}
+
+.active\:bg-purple-500:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(168 85 247 / var(--tw-bg-opacity));
+}
+
+.active\:bg-purple-900:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity));
 }
 
 .active\:no-underline:active {
@@ -8658,11 +8673,6 @@ video {
     border-color: transparent;
   }
 
-  .dark\:border-gray-600 {
-    --tw-border-opacity: 1;
-    border-color: rgb(75 85 99 / var(--tw-border-opacity));
-  }
-
   .dark\:\!bg-neutral-600 {
     --tw-bg-opacity: 1 !important;
     background-color: rgb(82 82 82 / var(--tw-bg-opacity)) !important;
@@ -8724,11 +8734,6 @@ video {
     background-color: rgb(39 39 42 / var(--tw-bg-opacity));
   }
 
-  .dark\:bg-gray-700 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(55 65 81 / var(--tw-bg-opacity));
-  }
-
   .dark\:fill-gray-400 {
     fill: #9ca3af;
   }
@@ -8777,10 +8782,6 @@ video {
     --tw-shadow: 0 4px 9px -4px rgba(59,113,202,0.5);
     --tw-shadow-colored: 0 4px 9px -4px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  }
-
-  .dark\:ring-offset-gray-800 {
-    --tw-ring-offset-color: #1f2937;
   }
 
   .dark\:placeholder\:text-gray-200::-moz-placeholder {

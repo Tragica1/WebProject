@@ -1,6 +1,36 @@
+window.onload = function () {
+    console.log(localStorage)
+    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'])
+}
+document.getElementById('hideen').style.display = 'none'
+$('#isLocalContract').click(function () {
+    var elem = document.getElementById('hideen')
+    if (elem.style.display == 'none') {
+        elem.style.display = 'block'
+    } else {
+        elem.style.display = 'none'
+    }
+});
+
+$(document).ready(function () {
+    var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
+    var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
+
+    $(window).scroll(function () {
+        var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
+
+        if (windowTop > originalTop) {
+            $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
+        } else {
+            $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
+        }
+    });
+});
+
 
 var currentProvider = -1;
-function showContact(tmp) {
+function showContacts(tmp) {
     if (currentProvider != tmp.value) {
         var addr = $('#company' + tmp.value).data('address')
         $("#providerAddress").text(addr)
@@ -96,6 +126,15 @@ function saveContract() {
             type = types[i].id
         }
     }
+    // const fff = document.getElementById("contractNumber");
+    // fff.addEventListener("input", (event) => {
+    //     // console.log($('#contractNumber'))
+    //     if (fff.validity.tooShort) {
+    //         fff.setCustomValidity("ОЧЕНЬ КОРОТКИЙ");
+    //     } else {
+    //         fff.setCustomValidity("");
+    //     }
+    // });  
     var formData = {
         'number': $('#contractNumber').val(),
         'innerNumber': $('#contractInnerNumber').val(),
@@ -197,12 +236,16 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     if (isContract == 1) {
         document.getElementById('isLocalContract').checked = true
         $("#productProvider").val(provider)
+        showContacts(document.getElementById('productProvider'))
         $("#startDate").val(start)
         $("#endDate").val(end)
         document.getElementById('hideen').style.display = 'block'
     } else {
         document.getElementById('isLocalContract').checked = false
         $("#productProvider").val('')
+        var block = document.getElementById('contacts')
+        block.innerHTML = ""
+        $("#providerAddress").text('')
         $("#startDate").val('')
         $("#endDate").val('')
         document.getElementById('hideen').style.display = 'none'
@@ -292,17 +335,17 @@ function createTree(element, data, idd, i) {
             if (item.children.length != 0) {
                 var tmp = item.id + i
                 listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                    `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500 rounded-lg"` +
+                    `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500  rounded-lg"` +
                     `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                     item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
                     item.name + `</a>`
-                i+=1
+                i += 1
             } else {
                 listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                    `class="flex text-xl text-black items-center px-2 hover:bg-purple-300 rounded-lg"` +
+                    `class="flex text-xl text-black items-center px-2 hover:bg-purple-300  rounded-lg"` +
                     `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                     item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
                     item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
@@ -323,10 +366,9 @@ function startCreation(id) {
         .then(response => response.json())
         .then(data => {
             data = Array(data)
-            // localStorage.setItem("currentProductsData", JSON.stringify(data));
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
-            var i = 1   
+            var i = 1
             createTree(rootElement, data, null, i)
         });
 }
