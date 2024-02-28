@@ -38,7 +38,7 @@
                         <li>
                             <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-lg font-normal text-white hover:bg-neutral-100 hover:text-neutral-900 active:no-underline "
                                 data-te-dropdown-item-ref
-                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}')">Контракт
+                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}')">Контракт
                                 № {{contract[1]}}</a>
                         </li>
                         {% endfor %}
@@ -58,11 +58,12 @@
                     </button>
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-300 bg-white border border-gray-200 rounded-lg ">
-                        <div class="p-3 space-y-2 text-black bg-white ">
+                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-300  bg-white border border-gray-200 rounded-lg ">
+                        <div id="info" class="p-3 space-y-2 text-black bg-white">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
-                            <h3 id="cCity" class="font-semibold"></h3>
                             <h3 id="cType" class="font-semibold"></h3>
+                            <h3 id="cStatus" class="font-semibold"></h3>
+                            <h3 id="cCity" class="font-semibold"></h3>
                             <h3 id="cStart" class="font-semibold"></h3>
                             <h3 id="cEnd" class="font-semibold"></h3>
                         </div>
@@ -100,7 +101,7 @@
                                                 <h2 class="text-left font-medium text-black">Номер: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="number" id="contractNumber" minlength="1" maxlength="10"
+                                                <input type="number" id="contractNumber" minlength="1" maxlength="9"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -395,7 +396,7 @@
                                                 <h2 class="text-left font-medium text-black">Адрес: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <p id=" " class="text-left font-medium"></p>
+                                                <p id="providerAddress" class="text-left font-medium"></p>
                                             </div>
                                         </div>
                                         <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
@@ -449,8 +450,8 @@
             </div>
         </div>
     </div>
-    <script src="./static/js/jquery-3.3.1.slim.min.js"></script>
-    <script src="./static/js/inputmask.js"></script>
+    <!-- <script src="./static/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="./static/js/inputmask.js"></script> -->
 
     <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
     <script src="./static/js/jquery-3.6.4.min.js"></script>

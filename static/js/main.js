@@ -1,7 +1,7 @@
 window.onload = function () {
-    console.log(localStorage)
+    // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
-    getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'])
+    getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
 }
 document.getElementById('hideen').style.display = 'none'
 $('#isLocalContract').click(function () {
@@ -33,8 +33,9 @@ var currentProvider = -1;
 function showContacts(tmp) {
     if (currentProvider != tmp.value) {
         var addr = $('#company' + tmp.value).data('address')
+        console.log(addr)
         $("#providerAddress").text(addr)
-        fetch(`/contacts/${ tmp.value }`)
+        fetch(`/contacts/${tmp.value}`)
             .then(response => response.json())
             .then(data => {
                 contacts = data
@@ -53,7 +54,7 @@ function showContacts(tmp) {
 }
 
 
-function getContractInfo(id, number, innerNumber, city, startDate, endDate, type) {
+function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
     var currentConract = {
         'id': id,
         'number': number,
@@ -61,7 +62,8 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
         'city': city,
         'startDate': startDate,
         'endDate': endDate,
-        'type': type
+        'type': type,
+        'status': status
     }
     localStorage.setItem("currentConract", JSON.stringify(currentConract));
     $("#cNumber").text("Выбран контракт № " + number)
@@ -70,6 +72,7 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
     $("#cStart").text("Дата подписания: " + startDate)
     $("#cEnd").text("Дата сдачи: " + endDate)
     $("#cType").text("Тип контракта: " + type)
+    $("#cStatus").text("Статус: " + status)
     startCreation(id)
 };
 
@@ -142,6 +145,7 @@ function saveContract() {
         'startDate': $('#contractStartDate').val(),
         'endDate': $('#contractEndDate').val(),
         'contractType': type,
+        'contractStatus': 1,
         'products': pr
     };
     // console.log(formData)
@@ -191,7 +195,7 @@ function addContactBlock() {
         `<h2 class="text-left font-medium text-black">Телефон: </h2>` +
         `</div>` +
         `<div class="grid grid-rows-1">` +
-        `<input type="text" id="contactNumber` + counter + `"` + `data-inputmask="'mask': '+7(999)-999-9999', 'showMaskOnHover': false, 'placeholder': '#'"` +
+        `<input type="text" id="contactNumber` + counter + `"` + `data-inputmask="'mask': '+7(999)999-99-99', 'showMaskOnHover': false, 'placeholder': '#'"` +
         `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" maxlength="16" placeholder="+7(999)999-99-99" required>` +
         `</div>` +
         `</div>`
@@ -260,8 +264,8 @@ function changeProduct() {
         formData = {
             'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
-            'type': $("#productType").val(),
-            'state': $("#productState").val(),
+            'idType': $("#productType").val(),
+            'idState': $("#productState").val(),
             'number': $("#productNumber").val(),
             'count': $("#productCount").val(),
             'isContract': 1,
@@ -273,14 +277,14 @@ function changeProduct() {
         formData = {
             'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
-            'type': $("#productType").val(),
-            'state': $("#productState").val(),
+            'idType': $("#productType").val(),
+            'idState': $("#productState").val(),
             'number': $("#productNumber").val(),
             'count': $("#productCount").val(),
             'isContract': 0,
-            'idProvider': null,
-            'start': null,
-            'end': null,
+            'idProvider': 0,
+            'start': '',
+            'end': '',
         }
     }
 
@@ -334,26 +338,24 @@ function createTree(element, data, idd, i) {
     }
     data.forEach((item) => {
         const listItem = document.createElement('li')
-        if (item.id != 'root') {
-            if (item.children.length != 0) {
-                var tmp = item.id + i
-                listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                    `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500  rounded-lg"` +
-                    `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
-                    item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
-                    item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
-                    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
-                    `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
-                    item.name + `</a>`
-                i += 1
-            } else {
-                listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                    `class="flex text-xl text-black items-center px-2 hover:bg-purple-300  rounded-lg"` +
-                    `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
-                    item.number + `, ` + item.type + `, ` + item.count + `, ` + item.state + `, ` +
-                    item.isContract + `, ` + item.provider + `, '` + item.start + `', '` + item.end + `')">` +
-                    item.name + `</a>`
-            }
+        if (item.children.length != 0) {
+            var tmp = item.id + i
+            listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500  rounded-lg"` +
+                `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `')">` +
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+                `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
+                item.name + `</a>`
+            i += 1
+        } else {
+            listItem.innerHTML = `<a role="button" aria-expanded="false"` +
+                `class="flex text-xl text-black items-center px-2 hover:bg-purple-300  rounded-lg"` +
+                `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `')">` +
+                item.name + `</a>`
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
@@ -365,13 +367,13 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
-            data = Array(data)
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
             var i = 1
-            createTree(rootElement, data, null, i)
+            // console.log(data['data'])
+            createTree(rootElement, data['data'], null, i)
         });
 }

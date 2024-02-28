@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="123",
+    password="1234",
     host="localhost",
     port=3306
 )
@@ -117,8 +117,8 @@ def db_add_contact(data):
 
 def db_add_government_contract(data):
     cur = con.cursor()
-    sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive, type) VALUES (%s, %s, %s, %s, %s, %s, %s)'''
-    cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1, int(data['contractType'])))
+    sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive, idType, idStatus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+    cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1, int(data['contractType']), int(data['contractStatus'])))
     cur.execute('''SELECT LAST_INSERT_ID()''')
     contract_id = cur.fetchone()
     con.commit()
@@ -146,7 +146,7 @@ def db_get_product_contract_list(contract_id):
 
 def db_get_government_contracts():
     cur = con.cursor()
-    sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.type'''
+    sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name, contractstatus.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus'''
     cur.execute(sql)
     contracts = cur.fetchall()
     cur.close()

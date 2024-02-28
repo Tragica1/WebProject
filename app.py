@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from db import *
 
 
-def create_product(id, name, code, number, type, count, state):
+def create_product(id, name, code, number, count, type, state):
     # if idLocalContract:
     #     localContract = list(db_get_localcontract(idLocalContract))
     #     return {
@@ -34,10 +34,10 @@ def create_product(id, name, code, number, type, count, state):
         'code': code,
         'number': number,
         'count': count,
-        'type': type, 
-        'state': state,
+        'idType': type, 
+        'idState': state,
         'isContract': 0,
-        'provider': 0,
+        'idProvider': 0,
         'start': None,
         'end': None,
         'children': []
@@ -82,10 +82,14 @@ def send_products(contract_id):
     else:
         products_id = db_get_product_contract_list(contract_id)
         root_obj = create_product('root', '', '', '', '', '', '')
+        json_data = {
+            'data': []
+        }
         for pr_id in products_id:
             product_tree = create_product_tree(pr_id)
+            json_data['data'].append(product_tree)
             root_obj['children'].append(product_tree)
-        json_object = json.dumps(root_obj)
+        json_object = json.dumps(json_data)
         with open(os.path.join(contract_folder, 'contract' + contract_id + '.json'), 'x') as f:
             f.write(json_object)
         f.close()
@@ -96,6 +100,7 @@ def send_products(contract_id):
 def send_contacts(company_id):
     contacts = db_get_company_contacts(company_id)
     return json.dumps(contacts)
+
 
 @app.route('/')
 def index():
@@ -123,11 +128,11 @@ def index():
             contracts.append(list(c))
         return render_template('index.html', contracts=contracts, types=types, states=states, companies=companies, contractTypes=contractTypes)
     else:
-        return render_template('index.html')
+        return render_template('index.html', types=types, states=states, companies=companies, contractTypes=contractTypes)
 
 
 @app.route('/getSelector')
-def create_product_list():
+def create_product_selector():
     state, prods = db_get_products()
     res = []
     products = []
@@ -144,7 +149,7 @@ def create_product_list():
 def save_contract():
     try:
         data = request.get_json()
-        # print(data)
+        print(data)
         new_contract_id = int(db_add_government_contract(data)[0])
         products = data.get('products')
         for i in range(len(products)):
@@ -157,19 +162,39 @@ def save_contract():
         return jsonify({'status': 'error', 'message': str(e)})
 
 
+def change_product_in_json(contract_data, product_data):
+    for item in contract_data:
+        if int(product_data['id']) == item['id']:
+            item['number'] = int(product_data['number'])
+            item['count'] = int(product_data['count'])
+            item['idType'] = product_data['idType']
+            item['idState'] = product_data['idState']
+            item['isContract'] = int(product_data['isContract'])
+            item['idProvider'] = product_data['idProvider']
+            item['start'] = str(product_data['start'])
+            item['end'] = str(product_data['end'])
+            return 0
+        if len(item['children']) != 0:
+            change_product_in_json(item['children'], product_data)
+
+
 @app.route('/changeProduct', methods=['POST'])    
 def change_product():
     try:
         data = request.get_json()
-        print(data)
-        if data['isContract'] == 1:
-            id_localContract = int(db_add_localcontract(data['start'], data['end'])[0])
-            db_add_company_contract_list(int(data['idProvider']), id_localContract)
-        # else:
-        #     id_localContract = None
-        # db_update_product(data, id_localContract)
+        # print(data)
+        with open(os.path.join(contract_folder, 'contract' + data['contractId'] + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        change_product_in_json(contract_data['data'], data)
+        with open(os.path.join(contract_folder, 'contract' + data['contractId'] + '.json'), 'w') as f:
+            json_data = json.dumps(contract_data)
+            f.write(json_data)
+            f.close()
+        # print('Product changed successfully')
         return jsonify({'status': 'success', 'message': 'Product changed successfully'})
     except Exception as e:
+        # print(e)
         return jsonify({'status': 'error', 'message': str(e)})
     
 
