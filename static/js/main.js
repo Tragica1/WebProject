@@ -254,9 +254,11 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
 
 
 function changeProduct() {
+    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
     var formData = {}
     if (document.getElementById('isLocalContract').checked) {
         formData = {
+            'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
             'type': $("#productType").val(),
             'state': $("#productState").val(),
@@ -269,6 +271,7 @@ function changeProduct() {
         }
     } else {
         formData = {
+            'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
             'type': $("#productType").val(),
             'state': $("#productState").val(),
