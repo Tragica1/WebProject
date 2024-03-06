@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from db import *
 
 
-def create_product(id, name, code, number, count, type, state):
+def create_product(id, name, code, number, count, type, state, note):
     # if idLocalContract:
     #     localContract = list(db_get_localcontract(idLocalContract))
     #     return {
@@ -30,7 +30,7 @@ def create_product(id, name, code, number, count, type, state):
     # else:
     return {
         'id': id,
-        'name': name,
+        'name': fix_quotes(str(name)),
         'code': code,
         'number': number,
         'count': count,
@@ -40,25 +40,40 @@ def create_product(id, name, code, number, count, type, state):
         'idProvider': 0,
         'start': None,
         'end': None,
+        'note': note,
         'children': []
     }
 
+def fix_quotes(string):
+    counter = 1
+    new_string = ""
+    for i in range(len(string)):
+        if string[i] == '"':
+            if counter % 2 != 0:
+                counter+=1
+                new_string += "«"
+            else:
+                counter-=1
+                new_string += "»"
+        else:
+            new_string += string[i]
+    return new_string
 
 def add_product_child(product, child):
     product['children'].append(child)
     if len(db_get_product_children(child['id'])) > 0:
         children = db_get_product_children(child['id'])
         for ch in children:
-            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], ch[6], ch[7]))
+            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], ch[6], ch[7], ch[11]))
 
 
 def create_product_tree(input_id):
     prod_state, product = db_get_product(input_id)
     if prod_state:
-        product_root = create_product(product[0], product[1], product[2], product[3], product[5], product[6], product[7])
+        product_root = create_product(product[0], product[1], product[2], product[3], product[5], product[6], product[7], product[11])
         children = db_get_product_children(product[0])
         for child in children:
-            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], child[6], child[7]))
+            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], child[6], child[7], child[11]))
     return product_root
 
 
@@ -81,7 +96,7 @@ def send_products(contract_id):
         return json_object
     else:
         products_id = db_get_product_contract_list(contract_id)
-        root_obj = create_product('root', '', '', '', '', '', '')
+        root_obj = create_product('root', '', '', '', '', '', '', '')
         json_data = {
             'data': []
         }
@@ -155,10 +170,10 @@ def save_contract():
         for i in range(len(products)):
             products[i] = int(products[i])
         db_add_product_contract_list(new_contract_id, products)
-        # print('Contract added successfully')
+        print('Contract added successfully')
         return jsonify({'status': 'success', 'message': 'Contract added successfully'})
     except Exception as e:
-        # print(e)
+        print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
 
@@ -173,6 +188,7 @@ def change_product_in_json(contract_data, product_data):
             item['idProvider'] = product_data['idProvider']
             item['start'] = str(product_data['start'])
             item['end'] = str(product_data['end'])
+            item['note'] = str(product_data['note'])
             return 0
         if len(item['children']) != 0:
             change_product_in_json(item['children'], product_data)
@@ -182,7 +198,7 @@ def change_product_in_json(contract_data, product_data):
 def change_product():
     try:
         data = request.get_json()
-        # print(data)
+        print(data)
         with open(os.path.join(contract_folder, 'contract' + data['contractId'] + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
@@ -191,10 +207,10 @@ def change_product():
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
-        # print('Product changed successfully')
+        print('Product changed successfully')
         return jsonify({'status': 'success', 'message': 'Product changed successfully'})
     except Exception as e:
-        # print(e)
+        print(e)
         return jsonify({'status': 'error', 'message': str(e)})
     
 

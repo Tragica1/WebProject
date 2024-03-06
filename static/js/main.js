@@ -224,7 +224,7 @@ function deleteContactBlock(block_id) {
 }
 
 
-function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end) {
+function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list) {
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     if (code != 'null') {
@@ -237,6 +237,12 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#productType").val(type)
     $("#productCount").val(count)
     $("#productState").val(state)
+    if(note_list != 'null'){
+        $("#productNote").val(note_list.replaceAll("!@!", "\n"))
+    } else {
+        $("#productNote").val('')
+    }
+
     if (isContract == 1) {
         document.getElementById('isLocalContract').checked = true
         $("#productProvider").val(provider)
@@ -272,6 +278,7 @@ function changeProduct() {
             'idProvider': $("#productProvider").val(),
             'start': $("#startDate").val(),
             'end': $("#endDate").val(),
+            'note': $("#productNote").val()
         }
     } else {
         formData = {
@@ -285,6 +292,7 @@ function changeProduct() {
             'idProvider': 0,
             'start': '',
             'end': '',
+            'note': $("#productNote").val()
         }
     }
 
@@ -329,7 +337,7 @@ function addProductSelect() {
 
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
-    treeElement.className = 'ps-5 mt-2 space-y-1 list-none list-inside';
+    treeElement.className = 'ps-2 mt-2 space-y-1 list-none list-inside';
     if (idd != null && idd != 'root') {
         var tmp = idd + i - 1
         treeElement.id = 'collapse' + tmp;
@@ -338,23 +346,25 @@ function createTree(element, data, idd, i) {
     }
     data.forEach((item) => {
         const listItem = document.createElement('li')
+        var new_note = String(item.note)
+        note_lines = new_note.replaceAll("\n", "!@!")
         if (item.children.length != 0) {
-            var tmp = item.id + i
+            var tmp = item.id + i 
             listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-2xl text-black font-semibold items-center px-2 hover:bg-purple-500  rounded-lg"` +
+                `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500  rounded-lg"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `')">` +
+                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
                 item.name + `</a>`
             i += 1
         } else {
             listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                `class="flex text-xl text-black items-center px-2 hover:bg-purple-300  rounded-lg"` +
+                `class="flex text-m text-black items-center hover:bg-purple-300  rounded-lg"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `')">` +
+                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
                 item.name + `</a>`
         }
         if (item.children.length != 0) {
