@@ -13,20 +13,7 @@ $('#isLocalContract').click(function () {
     }
 });
 
-$(document).ready(function () {
-    var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
-    var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
 
-    $(window).scroll(function () {
-        var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
-
-        if (windowTop > originalTop) {
-            $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
-        } else {
-            $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
-        }
-    });
-});
 
 
 var currentProvider = -1;
@@ -35,7 +22,7 @@ function showContacts(tmp) {
         var addr = $('#company' + tmp.value).data('address')
         console.log(addr)
         $("#providerAddress").text(addr)
-        fetch(`/contacts/${tmp.value}`)
+        fetch(`/contacts/${ tmp.value }`)
             .then(response => response.json())
             .then(data => {
                 contacts = data
@@ -237,7 +224,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#productType").val(type)
     $("#productCount").val(count)
     $("#productState").val(state)
-    if(note_list != 'null'){
+    if (note_list != 'null') {
         $("#productNote").val(note_list.replaceAll("!@!", "\n"))
     } else {
         $("#productNote").val('')
@@ -349,7 +336,7 @@ function createTree(element, data, idd, i) {
         var new_note = String(item.note)
         note_lines = new_note.replaceAll("\n", "!@!")
         if (item.children.length != 0) {
-            var tmp = item.id + i 
+            var tmp = item.id + i
             listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                 `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500  rounded-lg"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
@@ -360,12 +347,34 @@ function createTree(element, data, idd, i) {
                 item.name + `</a>`
             i += 1
         } else {
-            listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                `class="flex text-m text-black items-center hover:bg-purple-300  rounded-lg"` +
+            listItem.innerHTML = `<div class="flex grid-cols-2 ">` +
+                `<a role="button" aria-expanded="false"` +
+                `class="flex text-lg text-black items-center hover:bg-purple-300 rounded-lg mr-2"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
-                item.name + `</a>`
+                item.name + `</a>` +
+                `<div class="flex bg-white border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-lg shadow">` +
+                `<button type="button" data-modal-target="product-modal" data-modal-toggle="product-modal"` +
+                `onclick="test(` + item.id + `, '` + item.name + `')">` +
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
+                `stroke-width="1.5" stroke="currentColor"` +
+                `class="w-5 h-5 text-left text-green-500 hover:text-green-800">` +
+                `<path stroke-linecap="round" stroke-linejoin="round"` +
+                `d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
+                `</svg>` +
+                `</button>` +
+                `<button type="button" data-modal-target="product-modal"` +
+                `data-modal-toggle="product-modal">` +
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
+                `stroke-width="1.5" stroke="currentColor"` +
+                `class="w-5 h-5 text-left text-red-500 hover:text-red-800">` +
+                `<path stroke-linecap="round" stroke-linejoin="round"` +
+                `d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
+                `</svg>` +
+                `</button>` +
+                `</div>` +
+                `</div>`
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
@@ -374,10 +383,13 @@ function createTree(element, data, idd, i) {
     });
     element.append(treeElement)
 };
+function test(a, b){
+    console.log(a, b)
+}
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
