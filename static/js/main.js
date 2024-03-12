@@ -3,9 +3,9 @@ window.onload = function () {
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
     getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
 }
-document.getElementById('hideen').style.display = 'none'
+document.getElementById('hideen1').style.display = 'none'
 $('#isLocalContract').click(function () {
-    var elem = document.getElementById('hideen')
+    var elem = document.getElementById('hideen1')
     if (elem.style.display == 'none') {
         elem.style.display = 'block'
     } else {
@@ -13,19 +13,14 @@ $('#isLocalContract').click(function () {
     }
 });
 
-$(document).ready(function () {
-    var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
-    var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
-
-    $(window).scroll(function () {
-        var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
-
-        if (windowTop > originalTop) {
-            $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
-        } else {
-            $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
-        }
-    });
+document.getElementById('hideen2').style.display = 'none'
+$('#newProductisLocalContract').click(function () {
+    var elem = document.getElementById('hideen2')
+    if (elem.style.display == 'none') {
+        elem.style.display = 'block'
+    } else {
+        elem.style.display = 'none'
+    }
 });
 
 
@@ -165,6 +160,7 @@ function saveContract() {
     });
 }
 
+
 var counter = 0;
 function addContactBlock() {
     counter += 1
@@ -224,9 +220,32 @@ function deleteContactBlock(block_id) {
 }
 
 
+function deleteProduct() {
+    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var formData = {
+        'contractId': contractInfo['id'],
+        'productId': $("#currentProduct").val().slice(14),
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/deleteProduct',
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(formData),
+        success: function (response) {
+            location.reload();
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list) {
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
+    $('#mainProduct').text($('#productName').text().slice(9))
     if (code != 'null') {
         document.getElementById('productCode').style.display = 'block'
         $("#productCode").text("Шифр: " + code)
@@ -237,7 +256,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#productType").val(type)
     $("#productCount").val(count)
     $("#productState").val(state)
-    if(note_list != 'null'){
+    if (note_list != 'null') {
         $("#productNote").val(note_list.replaceAll("!@!", "\n"))
     } else {
         $("#productNote").val('')
@@ -249,7 +268,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         showContacts(document.getElementById('productProvider'))
         $("#startDate").val(start)
         $("#endDate").val(end)
-        document.getElementById('hideen').style.display = 'block'
+        document.getElementById('hideen1').style.display = 'block'
     } else {
         document.getElementById('isLocalContract').checked = false
         $("#productProvider").val('')
@@ -258,16 +277,75 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         $("#providerAddress").text('')
         $("#startDate").val('')
         $("#endDate").val('')
-        document.getElementById('hideen').style.display = 'none'
+        document.getElementById('hideen1').style.display = 'none'
     }
+    $('#newProductName').val('')
+    $('#newProductCode').val('')
+    $('#newProductType').val('')
+    $('#newProductState').val('')
+    $('#newProductNumber').val('')
+    $('#newProductCount').val('')
+    document.getElementById('newProductisLocalContract').checked = false
+    document.getElementById('hideen2').style.display = 'none'
+    $('#newProductProvider').val('')
+    $('#newProductStartDate').val('')
+    $('#newProductEndDate').val('')
+    $("#newProductNote").val('')
+
+    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    $.ajax({
+        url: '/downloadFiles',
+        type: 'GET',
+        data: { contractId: contractInfo['id'], productId: id },
+        xhrFields: {
+            responseType: 'blob',
+            responseType: 'json'
+        },
+        success: function (response) {
+            if (response instanceof Blob) {
+                var zip = new JSZip();
+                zip.loadAsync(response).then(function (zip) {
+                    var fileListDiv = document.getElementById('fileList')
+                    fileListDiv.innerHTML = ''
+
+                    zip.forEach(function (relativePath, zipEntry) {
+                        zipEntry.async('blob').then(function (fileData) {
+                            var fileURL = URL.createObjectURL(fileData)
+                            var fileName = zipEntry.name
+
+                            // Создаем ссылку для скачивания файла
+                            var link = document.createElement('a');
+                            link.href = fileURL
+                            link.download = fileName
+                            link.textContent = fileName
+
+                            // Добавляем ссылку в список файлов
+                            fileListDiv.appendChild(link)
+                            fileListDiv.appendChild(document.createElement('br'))
+                        });
+                    });
+                });
+            } else {
+                var fileListDiv = document.getElementById('fileList')
+                fileListDiv.innerHTML = 'Файлы не найдены'
+            }
+        },
+        error: function (xhr, status, error) {
+            var fileListDiv = document.getElementById('fileList')
+            fileListDiv.innerHTML = 'Файлы не найдены'
+            console.error('Ошибка:', status, error)
+        }
+    });
 };
 
 
 function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
-    var formData = {}
+    var files = document.getElementById('productFile').files
+    var formData = new FormData()
+    var data = {}
     if (document.getElementById('isLocalContract').checked) {
-        formData = {
+        data = {
             'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
             'idType': $("#productType").val(),
@@ -281,7 +359,7 @@ function changeProduct() {
             'note': $("#productNote").val()
         }
     } else {
-        formData = {
+        data = {
             'contractId': contractInfo['id'],
             'id': $("#currentProduct").val().slice(14),
             'idType': $("#productType").val(),
@@ -295,12 +373,17 @@ function changeProduct() {
             'note': $("#productNote").val()
         }
     }
-
+    formData.append('data', JSON.stringify(data))
+    for (var i = 0; i < files.length; i++) {
+        console.log(files[i])
+        formData.append('files', files[i]);
+    }
     $.ajax({
         type: 'POST',
         url: '/changeProduct',
-        contentType: 'application/json;charset=UTF-8',
-        data: JSON.stringify(formData),
+        processData: false,
+        contentType: false,
+        data: formData,
         success: function (response) {
             location.reload();
             console.log(response);
@@ -345,11 +428,12 @@ function createTree(element, data, idd, i) {
         treeElement.setAttribute('data-te-collapse-item', '')
     }
     data.forEach((item) => {
+        console.log(item)
         const listItem = document.createElement('li')
         var new_note = String(item.note)
         note_lines = new_note.replaceAll("\n", "!@!")
         if (item.children.length != 0) {
-            var tmp = item.id + i 
+            var tmp = item.id + i
             listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                 `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500  rounded-lg"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
@@ -360,12 +444,14 @@ function createTree(element, data, idd, i) {
                 item.name + `</a>`
             i += 1
         } else {
-            listItem.innerHTML = `<a role="button" aria-expanded="false"` +
-                `class="flex text-m text-black items-center hover:bg-purple-300  rounded-lg"` +
+            listItem.innerHTML = `<div class="flex grid-cols-2 ">` +
+                `<a role="button" aria-expanded="false"` +
+                `class="flex text-lg text-black items-center hover:bg-purple-300 rounded-lg mr-2"` +
                 `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
-                item.name + `</a>`
+                item.name + `</a>` +
+                `</div>`
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
@@ -383,7 +469,6 @@ function startCreation(id) {
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
             var i = 1
-            // console.log(data['data'])
             createTree(rootElement, data['data'], null, i)
         });
 }

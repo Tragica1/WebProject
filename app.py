@@ -3,31 +3,15 @@ from printree import ptree
 import json
 from config import app, contract_folder
 # from models import Users, Recipes
-from flask import render_template, redirect, url_for, request, flash, jsonify
+from flask import render_template, redirect, url_for, request, flash, jsonify, send_file
 # from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from db import *
+from zipfile import ZipFile
 
 
 def create_product(id, name, code, number, count, type, state, note):
-    # if idLocalContract:
-    #     localContract = list(db_get_localcontract(idLocalContract))
-    #     return {
-    #         'id': id,
-    #         'name': name,
-    #         'code': code,
-    #         'number': number,
-    #         'type': type,
-    #         'count': count,
-    #         'state': state,
-    #         'isContract': 1,
-    #         'provider': localContract[2],
-    #         'start': str(localContract[0]).replace('.', '-'),
-    #         'end': str(localContract[1]).replace('.', '-'),
-    #         'children': []
-    #     }
-    # else:
     return {
         'id': id,
         'name': fix_quotes(str(name)),
@@ -41,6 +25,7 @@ def create_product(id, name, code, number, count, type, state, note):
         'start': None,
         'end': None,
         'note': note,
+        'files': [],
         'children': []
     }
 
@@ -79,15 +64,17 @@ def create_product_tree(input_id):
 
 def check_contract_file(contract_id):
     contract_file = 'contract' + contract_id + '.json'
-    for file in os.listdir(contract_folder):
+    for file in os.listdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
         if file == contract_file:
-            return [True, os.path.join(contract_folder, contract_file)]
+            return [True, os.path.join(contract_folder, 'contract_' + str(contract_id), contract_file)]
     return [False, None]
 
 
 @app.route('/products/<contract_id>')
 def send_products(contract_id):
     print(f'\nSelected contract: {contract_id}\n')
+    if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
+        os.mkdir(os.path.join(contract_folder, 'contract_' + str(contract_id)))
     file = check_contract_file(contract_id)
     if file[0]: 
         with open(file[1], 'r') as f:
@@ -105,7 +92,7 @@ def send_products(contract_id):
             json_data['data'].append(product_tree)
             root_obj['children'].append(product_tree)
         json_object = json.dumps(json_data)
-        with open(os.path.join(contract_folder, 'contract' + contract_id + '.json'), 'x') as f:
+        with open(os.path.join(contract_folder,'contract_' + str(contract_id), 'contract' + str(contract_id) + '.json'), 'x') as f:
             f.write(json_object)
         f.close()
         return json_object
@@ -166,6 +153,7 @@ def save_contract():
         data = request.get_json()
         print(data)
         new_contract_id = int(db_add_government_contract(data)[0])
+        os.mkdir(os.path.join(contract_folder, 'contract_' + str(new_contract_id)))
         products = data.get('products')
         for i in range(len(products)):
             products[i] = int(products[i])
@@ -177,11 +165,11 @@ def save_contract():
         return jsonify({'status': 'error', 'message': str(e)})
 
 
-def change_product_in_json(contract_data, product_data):
+def change_product_in_json(contract_data, product_data, file_pathes):
     for item in contract_data:
         if int(product_data['id']) == item['id']:
-            item['number'] = int(product_data['number'])
-            item['count'] = int(product_data['count'])
+            item['number'] = product_data['number']
+            item['count'] = product_data['count']
             item['idType'] = product_data['idType']
             item['idState'] = product_data['idState']
             item['isContract'] = int(product_data['isContract'])
@@ -189,30 +177,108 @@ def change_product_in_json(contract_data, product_data):
             item['start'] = str(product_data['start'])
             item['end'] = str(product_data['end'])
             item['note'] = str(product_data['note'])
+            if len(file_pathes) != 0:
+                for path in file_pathes:
+                    item['files'].append(path)
             return 0
         if len(item['children']) != 0:
-            change_product_in_json(item['children'], product_data)
+            change_product_in_json(item['children'], product_data, file_pathes)
 
 
 @app.route('/changeProduct', methods=['POST'])    
 def change_product():
     try:
-        data = request.get_json()
-        print(data)
-        with open(os.path.join(contract_folder, 'contract' + data['contractId'] + '.json'), 'r') as f:
+        data = json.loads(request.form['data'])
+        dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
+        file_pathes = []   
+        if request.files:
+            file_pathes = []
+            files = request.files.getlist('files')
+            print(files)
+            for file in files:
+                if file.filename != '':
+                    filepath = os.path.join(dir_path, secure_filename(file.filename))
+                    file.save(filepath)
+                    file_pathes.append(filepath)
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        change_product_in_json(contract_data['data'], data)
-        with open(os.path.join(contract_folder, 'contract' + data['contractId'] + '.json'), 'w') as f:
+        change_product_in_json(contract_data['data'], data, file_pathes)
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
+
         print('Product changed successfully')
         return jsonify({'status': 'success', 'message': 'Product changed successfully'})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
-    
+
+
+def delete_product_in_json(contract_data, product_id, index):
+    for item in contract_data:
+        if int(item['id']) == product_id:
+            # print(index)
+            # print(contract_data[index])
+            del contract_data[index]
+        index+=1
+        if len(item['children']) != 0:
+            delete_product_in_json(item['children'], product_id, 0)
+
+
+@app.route('/deleteProduct', methods=['POST'])
+def delete_product():
+    try:
+        data = request.get_json()
+        dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        index = 0
+        delete_product_in_json(contract_data['data'], int(data['productId']), index)
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
+            json_data = json.dumps(contract_data)
+            f.write(json_data)
+            f.close()
+        print('Product deleted successfully')
+        return jsonify({'status': 'success', 'message': 'Product deleted successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+def get_product_files_in_json(contract_data, product_id):
+    for item in contract_data:
+        if int(item['id']) == int(product_id):
+            return item['files']
+        if len(item['children']) != 0:
+            get_product_files_in_json(item['children'], product_id)
+
+
+@app.route('/downloadFiles', methods=['GET'])
+def get_product_files():
+    try:
+        contract_id = request.args.get('contractId')
+        product_id =  request.args.get('productId')
+
+        dir_path = os.path.join(contract_folder,'contract_' + str(contract_id))
+        with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        files = get_product_files_in_json(contract_data['data'], product_id)
+        if files:
+            with ZipFile(os.path.join(dir_path, 'product_files.zip'), 'w') as zip:
+                for file in files:
+                    zip.write(file)
+                zip.close()
+            return send_file(os.path.join(dir_path, 'product_files.zip'), as_attachment=True)
+        else:
+            return jsonify({'status': 'error', 'message': 'No files'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
 
 @app.route('/saveProvider', methods=['POST'])    
 def save_provider():
@@ -224,8 +290,10 @@ def save_provider():
             for contact in data['contacts']:
                 contact_id = db_add_contact(contact['name'], contact['number'])
                 db_add_contact_company_list(contact_id, company_id)
+        print('Provider added successfully')
         return jsonify({'status': 'success', 'message': 'Provider added successfully'})
     except Exception as e:
+        print(e)
         return jsonify({'status': 'error', 'message': str(e)})
     
 
