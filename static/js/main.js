@@ -3,6 +3,8 @@ window.onload = function () {
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
     getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
 }
+
+
 document.getElementById('hideen1').style.display = 'none'
 $('#isLocalContract').click(function () {
     var elem = document.getElementById('hideen1')
@@ -13,7 +15,7 @@ $('#isLocalContract').click(function () {
     }
 });
 
-<<<<<<< HEAD
+
 document.getElementById('hideen2').style.display = 'none'
 $('#newProductisLocalContract').click(function () {
     var elem = document.getElementById('hideen2')
@@ -23,9 +25,6 @@ $('#newProductisLocalContract').click(function () {
         elem.style.display = 'none'
     }
 });
-=======
-
->>>>>>> c1f0d6308692ac4fff302306a84035d89b3a7cb7
 
 
 var currentProvider = -1;
@@ -246,7 +245,7 @@ function deleteProduct() {
     });
 }
 
-function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list) {
+function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     $('#mainProduct').text($('#productName').text().slice(9))
@@ -297,49 +296,44 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#newProductNote").val('')
 
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
-    $.ajax({
-        url: '/downloadFiles',
-        type: 'GET',
-        data: { contractId: contractInfo['id'], productId: id },
-        xhrFields: {
-            responseType: 'blob',
-            responseType: 'json'
-        },
-        success: function (response) {
-            if (response instanceof Blob) {
-                var zip = new JSZip();
-                zip.loadAsync(response).then(function (zip) {
-                    var fileListDiv = document.getElementById('fileList')
-                    fileListDiv.innerHTML = ''
+    console.log(files)
+    
+    // $.ajax({
+    //     url: '/downloadFiles',
+    //     type: 'GET',
+    //     data: { contractId: contractInfo['id'], productId: id },
+    //     xhrFields: {
+    //         responseType: 'blob'
+    //     },
+    //     success: function (response) {
+    //         if (response instanceof Blob) {
+    //             var zip = new JSZip();
+    //             zip.loadAsync(response).then(function (zip) {
+    //                 var fileListDiv = document.getElementById('fileList')
+    //                 fileListDiv.innerHTML = ''
 
-                    zip.forEach(function (relativePath, zipEntry) {
-                        zipEntry.async('blob').then(function (fileData) {
-                            var fileURL = URL.createObjectURL(fileData)
-                            var fileName = zipEntry.name
+    //                 zip.forEach(function (relativePath, zipEntry) {
+    //                     zipEntry.async('blob').then(function (fileData) {
+    //                         var fileURL = URL.createObjectURL(fileData)
+    //                         var tmp = zipEntry.name.split('/')
+    //                         var fileName = tmp[tmp.length-1]
+                            
+    //                         // Создаем ссылку для скачивания файла
 
-                            // Создаем ссылку для скачивания файла
-                            var link = document.createElement('a');
-                            link.href = fileURL
-                            link.download = fileName
-                            link.textContent = fileName
-
-                            // Добавляем ссылку в список файлов
-                            fileListDiv.appendChild(link)
-                            fileListDiv.appendChild(document.createElement('br'))
-                        });
-                    });
-                });
-            } else {
-                var fileListDiv = document.getElementById('fileList')
-                fileListDiv.innerHTML = 'Файлы не найдены'
-            }
-        },
-        error: function (xhr, status, error) {
-            var fileListDiv = document.getElementById('fileList')
-            fileListDiv.innerHTML = 'Файлы не найдены'
-            console.error('Ошибка:', status, error)
-        }
-    });
+    //                     });
+    //                 });
+    //             });
+    //         } else {
+    //             var fileListDiv = document.getElementById('fileList')
+    //             fileListDiv.innerHTML = 'Файлы не найдены'
+    //         }
+    //     },
+    //     error: function (xhr, status, error) {
+    //         var fileListDiv = document.getElementById('fileList')
+    //         fileListDiv.innerHTML = 'Файлы не найдены'
+    //         // console.error('Ошибка:', status, error)
+    //     }
+    // });
 };
 
 
@@ -440,9 +434,9 @@ function createTree(element, data, idd, i) {
             var tmp = item.id + i
             listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                 `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500  rounded-lg"` +
-                `onclick="showProduct(` + item.id + `, '` + item.name + `', '` + item.code + `', ` +
+                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
+                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) +`)'>` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
                 item.name + `</a>`
@@ -455,29 +449,6 @@ function createTree(element, data, idd, i) {
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
                 item.name + `</a>` +
-<<<<<<< HEAD
-=======
-                `<div class="flex bg-white border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-lg shadow">` +
-                `<button type="button" data-modal-target="product-modal" data-modal-toggle="product-modal"` +
-                `onclick="test(` + item.id + `, '` + item.name + `')">` +
-                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
-                `stroke-width="1.5" stroke="currentColor"` +
-                `class="w-5 h-5 text-left text-green-500 hover:text-green-800">` +
-                `<path stroke-linecap="round" stroke-linejoin="round"` +
-                `d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
-                `</svg>` +
-                `</button>` +
-                `<button type="button" data-modal-target="product-modal"` +
-                `data-modal-toggle="product-modal">` +
-                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
-                `stroke-width="1.5" stroke="currentColor"` +
-                `class="w-5 h-5 text-left text-red-500 hover:text-red-800">` +
-                `<path stroke-linecap="round" stroke-linejoin="round"` +
-                `d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
-                `</svg>` +
-                `</button>` +
-                `</div>` +
->>>>>>> c1f0d6308692ac4fff302306a84035d89b3a7cb7
                 `</div>`
         }
         if (item.children.length != 0) {

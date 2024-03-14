@@ -272,8 +272,10 @@ def get_product_files():
                 for file in files:
                     zip.write(file)
                 zip.close()
+            print(f'Files: {files}')
             return send_file(os.path.join(dir_path, 'product_files.zip'), as_attachment=True)
         else:
+            print('No files')
             return jsonify({'status': 'error', 'message': 'No files'})
     except Exception as e:
         print(e)
