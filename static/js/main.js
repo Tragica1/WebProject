@@ -13,6 +13,7 @@ $('#isLocalContract').click(function () {
     }
 });
 
+<<<<<<< HEAD
 document.getElementById('hideen2').style.display = 'none'
 $('#newProductisLocalContract').click(function () {
     var elem = document.getElementById('hideen2')
@@ -22,6 +23,9 @@ $('#newProductisLocalContract').click(function () {
         elem.style.display = 'none'
     }
 });
+=======
+
+>>>>>>> c1f0d6308692ac4fff302306a84035d89b3a7cb7
 
 
 var currentProvider = -1;
@@ -30,7 +34,7 @@ function showContacts(tmp) {
         var addr = $('#company' + tmp.value).data('address')
         console.log(addr)
         $("#providerAddress").text(addr)
-        fetch(`/contacts/${tmp.value}`)
+        fetch(`/contacts/${ tmp.value }`)
             .then(response => response.json())
             .then(data => {
                 contacts = data
@@ -451,6 +455,29 @@ function createTree(element, data, idd, i) {
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, '` + item.start + `', '` + item.end + `', '` + note_lines + `')">` +
                 item.name + `</a>` +
+<<<<<<< HEAD
+=======
+                `<div class="flex bg-white border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-lg shadow">` +
+                `<button type="button" data-modal-target="product-modal" data-modal-toggle="product-modal"` +
+                `onclick="test(` + item.id + `, '` + item.name + `')">` +
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
+                `stroke-width="1.5" stroke="currentColor"` +
+                `class="w-5 h-5 text-left text-green-500 hover:text-green-800">` +
+                `<path stroke-linecap="round" stroke-linejoin="round"` +
+                `d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
+                `</svg>` +
+                `</button>` +
+                `<button type="button" data-modal-target="product-modal"` +
+                `data-modal-toggle="product-modal">` +
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"` +
+                `stroke-width="1.5" stroke="currentColor"` +
+                `class="w-5 h-5 text-left text-red-500 hover:text-red-800">` +
+                `<path stroke-linecap="round" stroke-linejoin="round"` +
+                `d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />` +
+                `</svg>` +
+                `</button>` +
+                `</div>` +
+>>>>>>> c1f0d6308692ac4fff302306a84035d89b3a7cb7
                 `</div>`
         }
         if (item.children.length != 0) {
@@ -460,10 +487,13 @@ function createTree(element, data, idd, i) {
     });
     element.append(treeElement)
 };
+function test(a, b){
+    console.log(a, b)
+}
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
