@@ -197,7 +197,7 @@ def change_product():
             print(files)
             for file in files:
                 if file.filename != '':
-                    filepath = os.path.join(dir_path, secure_filename(file.filename))
+                    filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
                     file_pathes.append(filepath)
         with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
@@ -208,7 +208,6 @@ def change_product():
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
-
         print('Product changed successfully')
         return jsonify({'status': 'success', 'message': 'Product changed successfully'})
     except Exception as e:
@@ -219,9 +218,8 @@ def change_product():
 def delete_product_in_json(contract_data, product_id, index):
     for item in contract_data:
         if int(item['id']) == product_id:
-            # print(index)
-            # print(contract_data[index])
             del contract_data[index]
+            return 0
         index+=1
         if len(item['children']) != 0:
             delete_product_in_json(item['children'], product_id, 0)
@@ -248,39 +246,49 @@ def delete_product():
         return jsonify({'status': 'error', 'message': str(e)})
 
 
-def get_product_files_in_json(contract_data, product_id):
-    for item in contract_data:
-        if int(item['id']) == int(product_id):
-            return item['files']
-        if len(item['children']) != 0:
-            get_product_files_in_json(item['children'], product_id)
-
-
-@app.route('/downloadFiles', methods=['GET'])
-def get_product_files():
+@app.route('/downloadFile', methods=['GET'])
+def send_product_file():
     try:
-        contract_id = request.args.get('contractId')
-        product_id =  request.args.get('productId')
-
-        dir_path = os.path.join(contract_folder,'contract_' + str(contract_id))
-        with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
-            contract_data = json.load(f)
-            f.close()
-        files = get_product_files_in_json(contract_data['data'], product_id)
-        if files:
-            with ZipFile(os.path.join(dir_path, 'product_files.zip'), 'w') as zip:
-                for file in files:
-                    zip.write(file)
-                zip.close()
-            print(f'Files: {files}')
-            return send_file(os.path.join(dir_path, 'product_files.zip'), as_attachment=True)
-        else:
-            print('No files')
-            return jsonify({'status': 'error', 'message': 'No files'})
+        file_name = request.args.get('filePath')
+        print(file_name)
+        return send_file(file_name, as_attachment=True)
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
+
+def delete_file_in_json(contract_data, product_id, file_name):
+    for item in contract_data:
+        if int(item['id']) == int(product_id):
+            for i in range(len(item['files'])):
+                if file_name == item['files'][i]:
+                    item['files'].pop(i)
+                    return 0
+        if len(item['children']) != 0:
+            delete_file_in_json(item['children'], product_id, file_name)
+
+
+@app.route('/deleteFile', methods=['GET'])
+def delete_product_file():
+    try:
+        file_name = request.args.get('filePath')
+        product_id = request.args.get('productId')
+        contract_id = request.args.get('contractId')
+        print(file_name, product_id, contract_id)
+        dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
+        with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        delete_file_in_json(contract_data['data'], product_id, file_name)
+        with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'w') as f:
+            json_data = json.dumps(contract_data)
+            f.write(json_data)
+            f.close()
+        return jsonify({'status': 'success', 'message': 'File deleted successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+    
 
 @app.route('/saveProvider', methods=['POST'])    
 def save_provider():

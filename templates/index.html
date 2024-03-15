@@ -228,11 +228,18 @@
             </a>
         </div>
         <div id="currentDetal">
-
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
-                class="w-full max-w-xl bg-white border border-black rounded-lg shadow sm:p-6 md:p-8">
+                class="w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8">
                 <div class="flex justify-end">
+                    <button type="button" onclick="editProduct()">
+                        <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
+                        </svg>
+
+                    </button>
                     <button type="button" data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
@@ -242,7 +249,7 @@
                     </button>
                     <button type="button" data-modal-target="product-delete-modal"
                         data-modal-toggle="product-delete-modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5" 
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -516,7 +523,7 @@
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="productType"
+                            <select id="productType" disabled
                                 class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for type in types %}
@@ -744,7 +751,7 @@
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
                         </div>
-                        <div id="fileList" class="grid grid-rows-1 text-center">
+                        <div id="fileList" class="grid grid-rows-1">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 py-2">
