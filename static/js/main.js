@@ -29,27 +29,25 @@ $('#newProductisLocalContract').click(function () {
 
 var currentProvider = -1;
 function showContacts(tmp) {
-    if (currentProvider != tmp.value) {
-        var addr = $('#company' + tmp.value).data('address')
-        console.log(addr)
-        $("#providerAddress").text(addr)
-        fetch(`/contacts/${ tmp.value }`)
-            .then(response => response.json())
-            .then(data => {
-                contacts = data
-                var block = document.getElementById('contacts')
-                block.innerHTML = ""
-                for (var i = 0; i < contacts.length; i++) {
-                    var d = document.createElement('div')
-                    d.className = "pb-2"
-                    d.innerHTML = `<p class="font-semibold">` + contacts[i][1] + `</p>` +
-                        `<p class="font-semibold">` + contacts[i][2] + `</p>`
-                    block.appendChild(d)
-                }
-            });
-    }
-    currentProvider = tmp.value
+    var addr = $('#company' + tmp.value).data('address')
+    $("#providerAddress").text(addr)
+    fetch(`/contacts/${tmp.value}`)
+        .then(response => response.json())
+        .then(data => {
+            contacts = data
+            // console.log(contacts)
+            var block = document.getElementById('contacts')
+            block.innerHTML = ""
+            for (var i = 0; i < contacts.length; i++) {
+                var d = document.createElement('div')
+                d.className = "pb-2"
+                d.innerHTML = `<p class="font-semibold">` + contacts[i][1] + `</p>` +
+                    `<p class="font-semibold">` + contacts[i][2] + `</p>`
+                block.appendChild(d)
+            }
+        });
 }
+
 
 
 function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
@@ -245,16 +243,50 @@ function deleteProduct() {
     });
 }
 
+
 function editProduct() {
-    document.getElementById('currentProduct').className = 'w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8 shadow-orange-400 shadow-lg'
+    document.getElementById('currentProduct').className = 'w-full max-w-xl border-2 border-green-700/25 rounded-lg shadow-xl sm:p-6 md:p-8 hover:shadow-green-800 duration-500'
     document.getElementById('productType').removeAttribute('disabled')
+    document.getElementById('productState').removeAttribute('disabled')
+    document.getElementById('productNumber').removeAttribute('disabled')
+    document.getElementById('productCount').removeAttribute('disabled')
+    document.getElementById('productNote').removeAttribute('disabled')
+    document.getElementById('isLocalContract').removeAttribute('disabled')
+    document.getElementById('productProvider').removeAttribute('disabled')
+    document.getElementById('startDate').removeAttribute('disabled')
+    document.getElementById('endDate').removeAttribute('disabled')
+    document.getElementById('productFile').removeAttribute('disabled')
+    document.getElementById('changeButton').innerHTML = `<div class="grid grid-rows-1 py-2 text-center">` +
+        `<button data-modal-hide="company-modal" type="button" onclick="changeProduct()"` +
+        `class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">` +
+        `Сохранить</button>` +
+        `</div>`
 }
 
 
+var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
+    document.getElementById('currentProduct').className = 'w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8'
+    var currentElem = document.getElementById('element' + id)
+    if (currentElem != previousElem && previousElem) {
+        if (previousElem.className.indexOf('text-xl') != -1) {
+            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"
+        } else {
+            previousElem.className = "flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-2"
+        }
+
+        if (currentElem.className.indexOf('text-xl') != -1) {
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-purple-500 rounded-lg"
+        } else {
+            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-2"
+        }
+    }
+    previousElem = currentElem
+    document.getElementById('changeButton').innerHTML = ''
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     $('#mainProduct').text($('#productName').text().slice(9))
+    $("#mainProduct").val("mainProduct" + id)
     if (code != 'null') {
         document.getElementById('productCode').style.display = 'block'
         $("#productCode").text("Шифр: " + code)
@@ -262,15 +294,21 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         document.getElementById('productCode').style.display = 'none'
     }
     $("#productNumber").val(number)
+    document.getElementById('productNumber').setAttribute('disabled', '')
     $("#productType").val(type)
+    document.getElementById('productType').setAttribute('disabled', '')
     $("#productCount").val(count)
+    document.getElementById('productCount').setAttribute('disabled', '')
     $("#productState").val(state)
+    document.getElementById('productState').setAttribute('disabled', '')
     if (note_list != 'null') {
         $("#productNote").val(note_list.replaceAll("!@!", "\n"))
     } else {
         $("#productNote").val('')
     }
-
+    document.getElementById('productNote').setAttribute('disabled', '')
+    document.getElementById('isLocalContract').setAttribute('disabled', '')
+    document.getElementById('productFile').setAttribute('disabled', '')
     if (isContract == 1) {
         document.getElementById('isLocalContract').checked = true
         $("#productProvider").val(provider)
@@ -288,6 +326,11 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
+    document.getElementById('productProvider').setAttribute('disabled', '')
+    document.getElementById('startDate').setAttribute('disabled', '')
+    document.getElementById('endDate').setAttribute('disabled', '')
+    createFileList(id, files)
+
     $('#newProductName').val('')
     $('#newProductCode').val('')
     $('#newProductType').val('')
@@ -301,21 +344,86 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $('#newProductEndDate').val('')
     $("#newProductNote").val('')
 
+};
+
+
+function addNewProduct() {
+    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var files = document.getElementById('newProductFiles').files
+    var formData = new FormData()
+    var data = {}
+    if (document.getElementById('newProductisLocalContract').checked) {
+        data = {
+            'contractId': contractInfo['id'],
+            'mainProductId': $("#mainProduct").val().slice(11),
+            'name': $('#newProductName').val(),
+            'code': $('#newProductCode').val(),
+            'idType': $("#newProductType").val(),
+            'idState': $("#newProductState").val(),
+            'number': $("#newProductNumber").val(),
+            'count': $("#newProductCount").val(),
+            'isContract': 1,
+            'idProvider': $("#newProductProvider").val(),
+            'start': $("#newProductStartDate").val(),
+            'end': $("#newProductEndDate").val(),
+            'note': $("#newProductNote").val()
+        }
+    } else {
+        data = {
+            'contractId': contractInfo['id'],
+            'mainProductId': $("#mainProduct").val().slice(11),
+            'name': $('#newProductName').val(),
+            'code': $('#newProductCode').val(),
+            'idType': $("#newProductType").val(),
+            'idState': $("#newProductState").val(),
+            'number': $("#newProductNumber").val(),
+            'count': $("#newProductCount").val(),
+            'isContract': 0,
+            'idProvider': 0,
+            'start': '',
+            'end': '',
+            'note': $("#newProductNote").val()
+        }
+    }
+    formData.append('data', JSON.stringify(data))
+    for (var i = 0; i < files.length; i++) {
+        console.log(files[i])
+        formData.append('files', files[i]);
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/addNewProduct',
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function (response) {
+            location.reload();
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+
+function createFileList(id, files) {
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
     var fileListDiv = document.getElementById('fileList')
     if (files.length != 0) {
         var ul = document.createElement('ul')
-        ul.className = 'ps-2 mt-2 space-y-1 list-none list-inside text-sm'
+        ul.className = 'inline-grid ps-2 mt-2 space-y-1 list-none list-inside text-sm'
         fileListDiv.innerHTML = ''
         for (var i = 0; i < files.length; i++) {
             var a = document.createElement('li')
             a.className = 'inline-flex'
-            // console.log(files[i])
             var tmp = files[i].split('\\')
 
-            a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 items-center" role="button" onclick='downloadFile(` + JSON.stringify(files[i]) + `, "`+ tmp[tmp.length - 1] +`")'> ` + tmp[tmp.length - 1] + ` ` +
+            a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 items-center" role="button" ` +
+                `onclick='downloadFile(` + JSON.stringify(files[i]) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
                 `</a>` +
-                `<button onclick='deleteFile(`+ JSON.stringify(files[i]) +`, `+ id +`, "`+ contractInfo['id'] +`")'>` +
+                `<button onclick='deleteFile(` + JSON.stringify(files[i]) + `, ` + id + `, "` + contractInfo['id'] + `")'>` +
                 `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
                 `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
                 `</svg>` +
@@ -326,7 +434,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     } else {
         fileListDiv.innerHTML = 'Файлы не найдены'
     }
-};
+}
 
 
 function deleteFile(filePath, product_id, contract_id) {
@@ -334,10 +442,11 @@ function deleteFile(filePath, product_id, contract_id) {
         url: '/deleteFile',
         type: 'GET',
         contentType: false,
-        data: { 'filePath': filePath, 'productId': product_id , 'contractId': contract_id},
+        data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id },
         success: function (response) {
-            location.reload()
             console.log(response)
+            createFileList(product_id, response['files'])
+            
         },
         error: function (response) {
             location.reload()
@@ -462,8 +571,8 @@ function createTree(element, data, idd, i) {
         note_lines = new_note.replaceAll("\n", "!@!")
         if (item.children.length != 0) {
             var tmp = item.id + i
-            listItem.innerHTML = `<a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500  rounded-lg"` +
+            listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
@@ -472,14 +581,12 @@ function createTree(element, data, idd, i) {
                 item.name + `</a>`
             i += 1
         } else {
-            listItem.innerHTML = `<div class="flex grid-cols-2 ">` +
-                `<a role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-purple-300 rounded-lg mr-2"` +
+            listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
+                `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-2"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", ` +
                 item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
-                item.name + `</a>` +
-                `</div>`
+                item.name + `</a>`
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
@@ -494,7 +601,7 @@ function test(a, b) {
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')

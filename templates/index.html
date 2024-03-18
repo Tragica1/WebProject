@@ -57,7 +57,7 @@
                     </button>
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-300  bg-white border border-gray-200 rounded-lg ">
+                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500  bg-white border border-gray-200 rounded-lg ">
                         <div id="info" class="p-3 space-y-2 text-black bg-white">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
                             <h3 id="cType" class="font-semibold"></h3>
@@ -100,7 +100,8 @@
                                                 <h2 class="text-left font-medium text-black">Номер: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="number" id="contractNumber" minlength="1" maxlength="9"
+                                                <input type="number" id="contractNumber" name="contractNumber"
+                                                    minlength="1" maxlength="9"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -112,7 +113,7 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="number" id="contractInnerNumber"
+                                                <input type="number" id="contractInnerNumber" name="contractInnerNumber"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -122,7 +123,7 @@
                                                 <h2 class="text-left font-medium text-black">Город: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="text" id="contractCity"
+                                                <input type="text" id="contractCity" name="contractCity"
                                                     class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -133,7 +134,7 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="date" id="contractStartDate"
+                                                <input type="date" id="contractStartDate" name="contractStartDate"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -144,7 +145,7 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="date" id="contractEndDate"
+                                                <input type="date" id="contractEndDate" name="contractEndDate"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -229,8 +230,7 @@
         </div>
         <div id="currentDetal">
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
-            <div id="currentProduct"
-                class="w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8">
+            <div id="currentProduct" class="w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8">
                 <div class="flex justify-end">
                     <button type="button" onclick="editProduct()">
                         <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
@@ -319,7 +319,7 @@
                                         <h2 class="text-left font-medium text-black">Название: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="text" id="newProductName"
+                                        <input type="text" id="newProductName" required
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -330,7 +330,7 @@
                                         <h2 class="text-left font-medium text-black">Шифр: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="text" id="newProductCode"
+                                        <input type="text" id="newProductCode" required
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -341,7 +341,7 @@
                                         <h2 class="text-left font-medium text-black">Тип: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <select id="newProductType"
+                                        <select id="newProductType" required
                                             class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                             <option value="" selected disabled hidden></option>
                                             {% for type in types %}
@@ -373,7 +373,7 @@
                                         <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="text" id="newProductNumber"
+                                        <input type="number" id="newProductNumber"
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -384,7 +384,7 @@
                                         <h2 class="text-left font-medium text-black">Кол-во: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="text" id="newProductCount"
+                                        <input type="number" id="newProductCount"
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -408,37 +408,16 @@
                                             <h2 class="text-left font-medium text-black">Поставщик: </h2>
                                         </div>
                                         <div class="grid grid-rows-1">
-                                            <div data-popover-target="popover-description-provider-2"
-                                                data-popover-placement="left" type="button">
-                                                <select id="newProductProvider" onchange="showContacts(this)"
-                                                    class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                                    <option value="" selected disabled hidden></option>
-                                                    {% for company in companies %}
-                                                    <option id="company{{company[0]}}" data-address="{{company[2]}}"
-                                                        data-contacts="{{company[3]}}" value="{{company[0]}}">
-                                                        {{company[1]}}
-                                                    </option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <div data-popover id="popover-description-provider-2" role="tooltip"
-                                                class="absolute z-10 invisible inline-block text-sm text-gray-700 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-                                                <div class="p-3 space-y-2">
-                                                    <div class="grid grid-cols-2">
-                                                        <div class="grid grid-rows-1 py-2 text-center">
-                                                            <h2 class="text-left font-medium text-black">Адрес: </h2>
-                                                        </div>
-                                                        <div class="grid grid-rows-1">
-                                                            <p id="providerAddress" class="text-left font-medium"></p>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
-                                                    <div id="contacts">
-
-                                                    </div>
-                                                </div>
-                                                <div data-popper-arrow></div>
-                                            </div>
+                                            <select id="newProductProvider"
+                                                class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                                <option value="" selected disabled hidden></option>
+                                                {% for company in companies %}
+                                                <option id="company{{company[0]}}" data-address="{{company[2]}}"
+                                                    data-contacts="{{company[3]}}" value="{{company[0]}}">
+                                                    {{company[1]}}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -483,7 +462,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <div class="flex items-center justify-center w-full">
-                                            <label for="dropzone-file"
+                                            <label for="newProductFiles"
                                                 class="flex flex-col items-center justify-center w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 ">
                                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                                     <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
@@ -499,7 +478,7 @@
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">DOC, DOCX,
                                                         PDF</p>
                                                 </div>
-                                                <input id="dropzone-file" type="file" class="hidden" />
+                                                <input id="newProductFiles" type="file" class="hidden" multiple />
                                             </label>
                                         </div>
                                     </div>
@@ -507,7 +486,7 @@
                             </div>
                             <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <button data-modal-hide="company-modal" type="button" id="saveContact"
-                                    onclick="saveProduct()"
+                                    onclick="addNewProduct()"
                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                     Сохранить</button>
                             </div>
@@ -537,7 +516,7 @@
                             <h2 class="text-left font-medium text-black ">Состояние: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="productState"
+                            <select id="productState" disabled
                                 class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for state in states %}
@@ -551,7 +530,7 @@
                             <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="text" id="productNumber"
+                            <input type="number" id="productNumber" disabled
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
@@ -560,7 +539,7 @@
                             <h2 class="text-left font-medium text-black">Кол-во: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="text" id="productCount"
+                            <input type="number" id="productCount" disabled
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
@@ -569,7 +548,7 @@
                             <h2 class="text-left font-medium text-black">Покупное изделие:</h2>
                         </div>
                         <div class="grid grid-rows-1 pt-3 text-center">
-                            <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox"
+                            <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox" disabled
                                 class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                         </div>
                     </div>
@@ -666,7 +645,7 @@
                                         <option value="" selected disabled hidden></option>
                                         {% for company in companies %}
                                         <option id="company{{company[0]}}" data-address="{{company[2]}}"
-                                            data-contacts="{{company[3]}}" value="{{company[0]}}">{{company[1]}}
+                                            value="{{company[0]}}">{{company[1]}}
                                         </option>
                                         {% endfor %}
                                     </select>
@@ -698,7 +677,7 @@
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
-                                <input type="date" id="startDate"
+                                <input type="date" id="startDate" disabled
                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -708,7 +687,7 @@
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
-                                <input type="date" id="endDate"
+                                <input type="date" id="endDate" disabled
                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -718,7 +697,7 @@
                             <h2 class="text-left font-medium text-black">Примечание:</h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <textarea id="productNote" rows="4"
+                            <textarea id="productNote" rows="4" disabled
                                 class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
                     </div>
@@ -741,7 +720,7 @@
                                                 upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-500 ">DOC, DOCX, PDF</p>
                                     </div>
-                                    <input id="productFile" type="file" class="hidden" multiple />
+                                    <input id="productFile" type="file" class="hidden" multiple disabled />
                                 </label>
                                 <a id="linkForSavingFiles" style="display:none"></a>
                             </div>
@@ -754,12 +733,12 @@
                         <div id="fileList" class="grid grid-rows-1">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 py-2">
-                        <div class="grid grid-rows-1 py-2 text-center">
+                    <div id="changeButton" class="grid grid-cols-2 gap-4 py-2">
+                        <!-- <div class="grid grid-rows-1 py-2 text-center">
                             <button data-modal-hide="company-modal" type="button" onclick="changeProduct()"
                                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                 Сохранить</button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -771,8 +750,9 @@
     <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
     <script src="./static/js/jquery-3.6.4.min.js"></script>
     <script src="./static/js/jszip.min.js"></script>
-    <script src="./static/js/tw-elements.umd.min.js"></script>
     <script src="./static/js/main.js"></script>
+    <script src="./static/js/tw-elements.umd.min.js"></script>
+
     <script src="./static/js/flowbite.min.js"></script>
 
 

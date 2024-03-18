@@ -192,7 +192,6 @@ def change_product():
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
         file_pathes = []   
         if request.files:
-            file_pathes = []
             files = request.files.getlist('files')
             print(files)
             for file in files:
@@ -218,11 +217,12 @@ def change_product():
 def delete_product_in_json(contract_data, product_id, index):
     for item in contract_data:
         if int(item['id']) == product_id:
+            files = item['files']
             del contract_data[index]
-            return 0
+            return files
         index+=1
         if len(item['children']) != 0:
-            delete_product_in_json(item['children'], product_id, 0)
+            return delete_product_in_json(item['children'], product_id, 0)
 
 
 @app.route('/deleteProduct', methods=['POST'])
@@ -234,7 +234,9 @@ def delete_product():
             contract_data = json.load(f)
             f.close()
         index = 0
-        delete_product_in_json(contract_data['data'], int(data['productId']), index)
+        files = delete_product_in_json(contract_data['data'], int(data['productId']), index)
+        for file in files:
+            os.remove(file)
         with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
@@ -245,6 +247,71 @@ def delete_product():
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
+
+def get_new_product_id(contract_data, max_id):
+    for item in contract_data:
+        if int(item['id']) > max_id:
+            max_id = int(item['id'])
+        if len(item['children']) != 0:
+            return get_new_product_id(item['children'], max_id)
+    return max_id
+
+
+def add_product_in_json(contract_data, product_data, file_pathes):
+    for item in contract_data:
+        if int(product_data['mainProductId']) == item['id']:
+            new_id = get_new_product_id(contract_data, -1) + 1
+            item['children'].append({
+                'id': new_id,
+                'name': product_data['name'],
+                'code': product_data['code'],
+                'number': product_data['number'],
+                'count': product_data['count'],
+                'idType': product_data['idType'],
+                'idState': product_data['idState'],
+                'isContract': int(product_data['isContract']),
+                'idProvider': product_data['idProvider'],
+                'start': str(product_data['start']),
+                'end': str(product_data['end']),
+                'note': str(product_data['note']),
+                'files': file_pathes,
+                'children': []
+            })
+            print(f'\n______new product {new_id}______\n')
+            return 0
+        if len(item['children']) != 0:
+            add_product_in_json(item['children'], product_data, file_pathes)
+
+
+@app.route('/addNewProduct', methods=['POST'])
+def add_new_product():
+    try:
+        data = json.loads(request.form['data'])
+        print(data)
+        files = request.files.getlist('files')
+        dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
+        file_pathes = []   
+        if request.files:
+            files = request.files.getlist('files')
+            print(files)
+            for file in files:
+                if file.filename != '':
+                    filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
+                    file.save(filepath)
+                    file_pathes.append(filepath)
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        add_product_in_json(contract_data['data'], data, file_pathes)
+        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
+            json_data = json.dumps(contract_data)
+            f.write(json_data)
+            f.close()
+        return jsonify({'status': 'success', 'message': 'Product added successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+    
 
 @app.route('/downloadFile', methods=['GET'])
 def send_product_file():
@@ -263,9 +330,12 @@ def delete_file_in_json(contract_data, product_id, file_name):
             for i in range(len(item['files'])):
                 if file_name == item['files'][i]:
                     item['files'].pop(i)
-                    return 0
+                    print(item['files'])
+                    return item['files']
         if len(item['children']) != 0:
-            delete_file_in_json(item['children'], product_id, file_name)
+            return delete_file_in_json(item['children'], product_id, file_name)
+
+        
 
 
 @app.route('/deleteFile', methods=['GET'])
@@ -279,12 +349,14 @@ def delete_product_file():
         with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        delete_file_in_json(contract_data['data'], product_id, file_name)
+        file_list = delete_file_in_json(contract_data['data'], product_id, file_name)
+        print(file_list)
         with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
-        return jsonify({'status': 'success', 'message': 'File deleted successfully'})
+        os.remove(file_name)
+        return jsonify({'status': 'success', 'message': 'File deleted successfully', 'files': file_list})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
