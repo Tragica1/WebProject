@@ -232,22 +232,22 @@
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct" class="w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8">
                 <div class="flex justify-end">
-                    <button type="button" onclick="editProduct()">
+                    <!-- <button id="editButton" type="button" onclick="editProduct()" disabled>
                         <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
                         </svg>
-
-                    </button>
-                    <button type="button" data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
+                    </button> -->
+                    <button id="addButton" type="button" disabled data-modal-target="product-add-modal"
+                        data-modal-toggle="product-add-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
-                    <button type="button" data-modal-target="product-delete-modal"
+                    <button id="deleteButton" type="button" disabled data-modal-target="product-delete-modal"
                         data-modal-toggle="product-delete-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
@@ -296,7 +296,7 @@
                             <div class=" p-4 md:p-2 border-b rounded-t">
                                 <div class="flex items-center justify-between">
                                     <h4 class="text-xl font-semibold text-black ">
-                                        Добавление изделия в:
+                                        Добавление изделие в:
                                     </h4>
                                     <button type="button"
                                         class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
@@ -330,7 +330,7 @@
                                         <h2 class="text-left font-medium text-black">Шифр: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="text" id="newProductCode" required
+                                        <input type="text" id="newProductCode" value="н/б" required
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -343,7 +343,7 @@
                                     <div class="grid grid-rows-1">
                                         <select id="newProductType" required
                                             class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                            <option value="" selected disabled hidden></option>
+                                            <!-- <option value="1" selected></option> -->
                                             {% for type in types %}
                                             <option value="{{type[0]}}">{{type[1]}}</option>
                                             {% endfor %}
@@ -359,9 +359,13 @@
                                     <div class="grid grid-rows-1">
                                         <select id="newProductState"
                                             class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                            <option value="" selected disabled hidden></option>
+                                            <!-- <option value="1" selected></option> -->
                                             {% for state in states %}
-                                            <option value="{{state[0]}}">{{state[1]}}</option>
+                                            {% if state[0] == 1 %}
+                                                <option value="{{state[0]}}" selected>{{state[1]}}</option>
+                                            {%else%}
+                                                <option value="{{state[0]}}">{{state[1]}}</option>
+                                            {%endif%}
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -373,7 +377,7 @@
                                         <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-                                        <input type="number" id="newProductNumber"
+                                        <input type="text" id="newProductNumber"
                                             class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                     </div>
                                 </div>
@@ -502,11 +506,15 @@
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="productType" disabled
+                            <select id="productType" onfocus="editProduct()" disabled
                                 class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for type in types %}
-                                <option value="{{type[0]}}">{{type[1]}}</option>
+                                {%if type[0] == 1%}
+                                    <option value="{{type[0]}}" selected>{{type[1]}}</option>
+                                {%else%}
+                                    <option value="{{type[0]}}">{{type[1]}}</option>
+                                {%endif%}
                                 {% endfor %}
                             </select>
                         </div>
@@ -520,7 +528,12 @@
                                 class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for state in states %}
-                                <option value="{{state[0]}}">{{state[1]}}</option>
+                                {%if state[0] == 1%}
+                                    <option value="{{state[0]}}" selected>{{state[1]}}</option>
+                                {%else%}
+                                    <option value="{{state[0]}}">{{state[1]}}</option>
+                                {%endif%}
+                                
                                 {% endfor %}
                             </select>
                         </div>
@@ -530,7 +543,7 @@
                             <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="number" id="productNumber" disabled
+                            <input type="text" id="productNumber" disabled
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
@@ -539,7 +552,7 @@
                             <h2 class="text-left font-medium text-black">Кол-во: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="number" id="productCount" disabled
+                            <input type="number" id="productCount" value="1" disabled
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>

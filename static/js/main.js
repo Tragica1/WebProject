@@ -266,6 +266,9 @@ function editProduct() {
 
 var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
+    // document.getElementById('editButton').removeAttribute('disabled')
+    document.getElementById('addButton').removeAttribute('disabled')
+    document.getElementById('deleteButton').removeAttribute('disabled')
     document.getElementById('currentProduct').className = 'w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     if (currentElem != previousElem && previousElem) {
