@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <nav class="relative flex w-full flex-wrap items-center justify-between bg-neutral-900 py-2 text-white shadow-lg lg:py-4 "
+    <nav class="relative flex w-full flex-wrap items-center justify-between bg-gray-800 py-2 text-white shadow-lg lg:py-4 "
         data-te-navbar-ref>
         <div class="flex justify-between items-center w-full px-3">
             <div>
@@ -31,14 +31,25 @@
                             </svg>
                         </span>
                     </a>
-                    <ul class="absolute z-[1000] float-left m-0 hidden min-w-full list-none overflow-hidden rounded-lg border-none bg-neutral-800 bg-clip-padding text-left text-base shadow-lg [&[data-te-dropdown-show]]:block"
+                    <ul id="contractList"
+                        class="absolute z-[1000] float-left m-0 hidden min-w-full list-none overflow-hidden rounded-lg border-none bg-gray-900 bg-clip-padding text-left text-base shadow-lg [&[data-te-dropdown-show]]:block"
                         aria-labelledby="dropdownMenuButton2" data-te-dropdown-menu-ref>
                         {% for contract in contracts %}
-                        <li>
-                            <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-lg font-normal text-white hover:bg-neutral-100 hover:text-neutral-900 active:no-underline "
+                        <li class="flex grid-cols-2 gap-2 mx-2 rounded-lg">
+                            <button
+                                class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline "
                                 data-te-dropdown-item-ref
                                 onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}')">Контракт
-                                № {{contract[1]}}</a>
+                                № {{contract[1]}}
+                            </button>
+                            <button type="button" onclick="deleteContract('{{ contract[0] }}')">
+                                <svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 22 22">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                </svg>
+                            </button>
                         </li>
                         {% endfor %}
                     </ul>
@@ -57,7 +68,7 @@
                     </button>
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500  bg-white border border-gray-200 rounded-lg ">
+                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500  bg-white rounded-lg ">
                         <div id="info" class="p-3 space-y-2 text-black bg-white">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
                             <h3 id="cType" class="font-semibold"></h3>
@@ -113,7 +124,7 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <input type="number" id="contractInnerNumber" name="contractInnerNumber"
+                                                <input type="text" id="contractInnerNumber" name="contractInnerNumber"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                                     required>
                                             </div>
@@ -239,22 +250,32 @@
                                 d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
                         </svg>
                     </button> -->
-                    <button id="addButton" type="button" disabled data-modal-target="product-add-modal"
-                        data-modal-toggle="product-add-modal">
+                    <button id="addButton" type="button" data-popover-target="popover-addButton" disabled
+                        data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
-                    <button id="deleteButton" type="button" disabled data-modal-target="product-delete-modal"
-                        data-modal-toggle="product-delete-modal">
+                    <div data-popover id="popover-addButton" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                        <h3 class="text-sm font-semibold text-center text-white p-2">Добавить изделие</h3>
+                        <div data-popper-arrow></div>
+                    </div>
+                    <button id="deleteButton" type="button" data-popover-target="popover-deleteButton" disabled
+                        data-modal-target="product-delete-modal" data-modal-toggle="product-delete-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
+                    <div data-popover id="popover-deleteButton" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                        <h3 class="text-sm font-semibold text-center text-white p-2">Удалить изделие</h3>
+                        <div data-popper-arrow></div>
+                    </div>
                 </div>
                 <hr class="mt-1 mx-auto h-px bg-black border-blue-800 border-2">
                 <div id="product-delete-modal" tabindex="-1"
@@ -277,8 +298,8 @@
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
-                                <h3 class="mb-5 text-lg font-normal text-gray-500">Вы действительно хотите удалить этот
-                                    продукт?</h3>
+                                <h3 id="productToDelete" class="mb-5 text-lg font-normal text-gray-500">Вы действительно
+                                    хотите удалить изделие </h3>
                                 <button onclick="deleteProduct()" type="button"
                                     class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                                     Да
@@ -362,9 +383,9 @@
                                             <!-- <option value="1" selected></option> -->
                                             {% for state in states %}
                                             {% if state[0] == 1 %}
-                                                <option value="{{state[0]}}" selected>{{state[1]}}</option>
+                                            <option value="{{state[0]}}" selected>{{state[1]}}</option>
                                             {%else%}
-                                                <option value="{{state[0]}}">{{state[1]}}</option>
+                                            <option value="{{state[0]}}">{{state[1]}}</option>
                                             {%endif%}
                                             {% endfor %}
                                         </select>
@@ -414,13 +435,13 @@
                                         <div class="grid grid-rows-1">
                                             <select id="newProductProvider"
                                                 class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                                <option value="" selected disabled hidden></option>
+                                                <!-- <option value="" selected disabled hidden></option>
                                                 {% for company in companies %}
                                                 <option id="company{{company[0]}}" data-address="{{company[2]}}"
                                                     data-contacts="{{company[3]}}" value="{{company[0]}}">
                                                     {{company[1]}}
                                                 </option>
-                                                {% endfor %}
+                                                {% endfor %} -->
                                             </select>
                                         </div>
                                     </div>
@@ -506,14 +527,14 @@
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="productType" onfocus="editProduct()" disabled
+                            <select id="productType"
                                 class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for type in types %}
                                 {%if type[0] == 1%}
-                                    <option value="{{type[0]}}" selected>{{type[1]}}</option>
+                                <option value="{{type[0]}}" selected>{{type[1]}}</option>
                                 {%else%}
-                                    <option value="{{type[0]}}">{{type[1]}}</option>
+                                <option value="{{type[0]}}">{{type[1]}}</option>
                                 {%endif%}
                                 {% endfor %}
                             </select>
@@ -524,16 +545,16 @@
                             <h2 class="text-left font-medium text-black ">Состояние: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <select id="productState" disabled
+                            <select id="productState"
                                 class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for state in states %}
                                 {%if state[0] == 1%}
-                                    <option value="{{state[0]}}" selected>{{state[1]}}</option>
+                                <option value="{{state[0]}}" selected>{{state[1]}}</option>
                                 {%else%}
-                                    <option value="{{state[0]}}">{{state[1]}}</option>
+                                <option value="{{state[0]}}">{{state[1]}}</option>
                                 {%endif%}
-                                
+
                                 {% endfor %}
                             </select>
                         </div>
@@ -543,7 +564,7 @@
                             <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="text" id="productNumber" disabled
+                            <input type="text" id="productNumber"
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
@@ -552,7 +573,7 @@
                             <h2 class="text-left font-medium text-black">Кол-во: </h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <input type="number" id="productCount" value="1" disabled
+                            <input type="number" id="productCount" value="1"
                                 class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         </div>
                     </div>
@@ -561,7 +582,7 @@
                             <h2 class="text-left font-medium text-black">Покупное изделие:</h2>
                         </div>
                         <div class="grid grid-rows-1 pt-3 text-center">
-                            <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox" disabled
+                            <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox"
                                 class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                         </div>
                     </div>
@@ -570,7 +591,7 @@
                             <div class="inline-flex grid-rows-1 py-2">
                                 <div class="flex grid-cols-2 gap-4 py-2">
                                     <button type="button" data-modal-target="company-modal"
-                                        data-modal-toggle="company-modal">
+                                        data-popover-target="popover-addProvider" data-modal-toggle="company-modal">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"
                                             stroke-width="1.5" stroke="currentColor"
                                             class="w-5 h-5  text-left text-green-500 hover:text-green-800">
@@ -578,6 +599,12 @@
                                                 d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                         </svg>
                                     </button>
+                                    <div data-popover id="popover-addProvider" role="tooltip"
+                                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                                        <h3 class="text-sm font-semibold text-center text-white p-2">Добавить поставщика
+                                        </h3>
+                                        <div data-popper-arrow></div>
+                                    </div>
                                     <div id="company-modal" data-modal-backdrop="static" tabindex="-1"
                                         aria-hidden="true"
                                         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -655,12 +682,12 @@
                                     type="button">
                                     <select id="productProvider" onchange="showContacts(this)"
                                         class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                        <option value="" selected disabled hidden></option>
-                                        {% for company in companies %}
+                                        <!-- <option value="" selected disabled hidden></option> -->
+                                        <!-- {% for company in companies %}
                                         <option id="company{{company[0]}}" data-address="{{company[2]}}"
                                             value="{{company[0]}}">{{company[1]}}
                                         </option>
-                                        {% endfor %}
+                                        {% endfor %} -->
                                     </select>
                                 </div>
                                 <div data-popover id="popover-description-provider-1" role="tooltip"
@@ -690,7 +717,7 @@
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
-                                <input type="date" id="startDate" disabled
+                                <input type="date" id="startDate"
                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -700,7 +727,7 @@
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
-                                <input type="date" id="endDate" disabled
+                                <input type="date" id="endDate"
                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
                         </div>
@@ -710,7 +737,7 @@
                             <h2 class="text-left font-medium text-black">Примечание:</h2>
                         </div>
                         <div class="grid grid-rows-1">
-                            <textarea id="productNote" rows="4" disabled
+                            <textarea id="productNote" rows="4"
                                 class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
                     </div>
@@ -733,7 +760,7 @@
                                                 upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-500 ">DOC, DOCX, PDF</p>
                                     </div>
-                                    <input id="productFile" type="file" class="hidden" multiple disabled />
+                                    <input id="productFile" type="file" class="hidden" multiple />
                                 </label>
                                 <a id="linkForSavingFiles" style="display:none"></a>
                             </div>

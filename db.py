@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="123",
+    password="1234",
     host="localhost",
     port=3306
 )
@@ -142,6 +142,18 @@ def db_get_product_contract_list(contract_id):
     result = cur.fetchall()
     cur.close()
     return result
+
+
+def db_get_government_contract(id):
+    cur = con.cursor()
+    sql = '''SELECT governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, contracttype.name, contractstatus.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus WHERE governmentcontract.id=%s'''
+    cur.execute(sql, (id,))
+    contract = cur.fetchone()
+    cur.close()
+    if contract:
+        return [True, contract]
+    else:
+        return [False, None]
 
 
 def db_get_government_contracts():
@@ -306,5 +318,15 @@ def db_add_contact_company_list(contact_id, company_id):
     cur = con.cursor()
     sql = '''INSERT INTO contactcompanylist (idContact, idCompany) VALUES (%s, %s)'''
     cur.execute(sql, (contact_id, company_id))
+    cur.close()
+    con.commit()
+
+
+def db_delete_contract(contract_id):
+    cur = con.cursor()
+    sql = '''DELETE FROM productcontractlist WHERE idGovernmentContract=%s'''
+    cur.execute(sql, (contract_id,))
+    sql = '''DELETE FROM governmentcontract WHERE id=%s'''
+    cur.execute(sql, (contract_id,))
     cur.close()
     con.commit()

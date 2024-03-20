@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from db import *
 from zipfile import ZipFile
+import datetime
 
 
 def create_product(id, name, code, number, count, type, state, note):
@@ -29,6 +30,7 @@ def create_product(id, name, code, number, count, type, state, note):
         'children': []
     }
 
+
 def fix_quotes(string):
     counter = 1
     new_string = ""
@@ -43,6 +45,7 @@ def fix_quotes(string):
         else:
             new_string += string[i]
     return new_string
+
 
 def add_product_child(product, child):
     product['children'].append(child)
@@ -111,26 +114,48 @@ def index():
     contractTypes = []
     types = []
     states = []
-    companies = []
     tps = db_get_types()
     sts = db_get_states()
-    comps = db_get_companies()
     contrs_types = db_get_contract_types()
     for t in tps:
         types.append(list(t))
     for s in sts:
         states.append(list(s))
-    for c in comps:
-        tmp = list(c)
-        companies.append(tmp)
     for ct in contrs_types:
         contractTypes.append(list(ct))
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('index.html', contracts=contracts, types=types, states=states, companies=companies, contractTypes=contractTypes)
+        return render_template('index.html', contracts=contracts, types=types, states=states, contractTypes=contractTypes)
     else:
-        return render_template('index.html', types=types, states=states, companies=companies, contractTypes=contractTypes)
+        return render_template('index.html', types=types, states=states, contractTypes=contractTypes)
+
+
+@app.route('/getProdivers', methods=['GET'])
+def get_providers():
+    try:
+        companies = []
+        comps = db_get_companies()
+        for c in comps:
+            tmp = list(c)
+            companies.append(tmp)
+        print(companies)
+        return jsonify({'status': 'success', 'data': companies})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+def get_contracts():
+    state, contrs = db_get_government_contracts()
+    contracts = []
+    if state:
+        for c in contrs:
+            tmp = list(c)
+            tmp[4] = str(tmp[4])
+            tmp[5] = str(tmp[5])
+            contracts.append(list(tmp))
+    return contracts
 
 
 @app.route('/getSelector')
@@ -159,7 +184,13 @@ def save_contract():
             products[i] = int(products[i])
         db_add_product_contract_list(new_contract_id, products)
         print('Contract added successfully')
-        return jsonify({'status': 'success', 'message': 'Contract added successfully'})
+        new_contract = list(db_get_government_contract(new_contract_id)[1])
+        print(new_contract)
+        new_contract[3] = str(new_contract[3])
+        new_contract[4] = str(new_contract[4])
+        contracts = get_contracts()
+        if new_contract[0]:
+            return jsonify({'status': 'success', 'message': 'Contract added successfully', 'contractId': new_contract_id, 'data': new_contract, 'contracts': contracts})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -335,8 +366,6 @@ def delete_file_in_json(contract_data, product_id, file_name):
         if len(item['children']) != 0:
             return delete_file_in_json(item['children'], product_id, file_name)
 
-        
-
 
 @app.route('/deleteFile', methods=['GET'])
 def delete_product_file():
@@ -378,6 +407,37 @@ def save_provider():
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
     
+
+@app.route('/deleteContract', methods=['GET'])
+def delete_contract():
+    try:
+        id = request.args.get('contractId')
+        db_delete_contract(id)
+        dir_path = os.path.join(contract_folder, 'contract_' + str(id))
+        files = os.listdir(dir_path)
+        for file in files:
+            os.remove(os.path.join(dir_path, file))
+        os.rmdir(dir_path)
+        # file_name = request.args.get('filePath')
+        # product_id = request.args.get('productId')
+        # contract_id = request.args.get('contractId')
+        # print(file_name, product_id, contract_id)
+        # dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
+        # with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'r') as f:
+        #     contract_data = json.load(f)
+        #     f.close()
+        # file_list = delete_file_in_json(contract_data['data'], product_id, file_name)
+        # print(file_list)
+        # with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'w') as f:
+        #     json_data = json.dumps(contract_data)
+        #     f.write(json_data)
+        #     f.close()
+        # os.remove(file_name)
+        return jsonify({'status': 'success', 'message': 'Contract deleted successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
 
 if __name__ == '__main__':
     app.run()

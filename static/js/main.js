@@ -1,7 +1,25 @@
-window.onload = function () {
+// window.onload = getContractFromStorage();
+window.onload = getProdivers();
+// window.onload = getContracts();
+
+function getContractFromStorage() {
     // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
     getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
+}
+
+
+function updateContactList(contracts) {
+    var list = document.getElementById('contractList')
+    list.innerHTML = ''
+    contracts.forEach((contract) =>{
+        var listElem = document.createElement('li')
+        listElem.innerHTML = `<a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-lg font-normal text-white hover:bg-neutral-100 hover:text-neutral-900 active:no-underline"`+
+        `data-te-dropdown-item-ref ` +
+        `onclick="getContractInfo('`+ contract[0] + `', '`+ contract[1] + `', '`+ contract[2] + `', '`+ contract[3] + `', '`+ contract[4] + `', '`+ contract[5] + `', '`+ contract[7] + `', '`+ contract[8] + `')">Контракт` +
+        ` № `+ contract[1] + `</a>` 
+        list.appendChild(listElem)
+    })
 }
 
 
@@ -49,8 +67,25 @@ function showContacts(tmp) {
 }
 
 
+function deleteContract(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/deleteContract',
+        contentType: false,
+        data: { 'contractId': id },
+        success: function (response) {
+            // location.reload();
+            console.log(response);
+        },
+        error: function (error) {
+            // location.reload();
+            console.log(error);
+        }
+    });
+}
 
 function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
+    console.log(startDate, endDate)
     var currentConract = {
         'id': id,
         'number': number,
@@ -90,15 +125,43 @@ function saveProvider() {
         'address': $('#companyAddress').val(),
         'contacts': contacts
     }
-    // console.log(formData)
     $.ajax({
         type: 'POST',
         url: '/saveProvider',
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-            location.reload();
+            getProdivers()
             console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+function createProviderOptionList(providers, elemId){
+    var providerSelect = document.getElementById(elemId)
+    providerSelect.innerHTML = `<option value="" selected disabled hidden></option>`
+    providers.forEach((item) => {
+        var opt = document.createElement('option')
+        opt.id = 'company' + item[0]
+        opt.value = item[0]
+        opt.setAttribute('data-address', item[2])
+        opt.textContent = item[1]
+        providerSelect.appendChild(opt)
+    })
+}
+
+function getProdivers() {
+    $.ajax({
+        type: 'GET',
+        url: '/getProdivers',
+        success: function (response) {
+            providers = response['data']
+            createProviderOptionList(providers, 'productProvider')
+            createProviderOptionList(providers, 'newProductProvider')
         },
         error: function (error) {
             location.reload();
@@ -109,6 +172,7 @@ function saveProvider() {
 
 
 function saveContract() {
+   
     var products = document.getElementById('productsSelector').getElementsByTagName('input')
     var pr = []
     var j = 0
@@ -151,7 +215,10 @@ function saveContract() {
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-            location.reload();
+
+            getContractInfo(response['contractId'], response['data'][0], response['data'][1], response['data'][2],
+                            response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
+            updateContactList(response['contracts'])
             console.log(response);
         },
         error: function (error) {
@@ -159,6 +226,7 @@ function saveContract() {
             console.log(error);
         }
     });
+    // getContracts()
 }
 
 
@@ -266,6 +334,7 @@ function editProduct() {
 
 var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
+    $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
     // document.getElementById('editButton').removeAttribute('disabled')
     document.getElementById('addButton').removeAttribute('disabled')
     document.getElementById('deleteButton').removeAttribute('disabled')
@@ -297,21 +366,21 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         document.getElementById('productCode').style.display = 'none'
     }
     $("#productNumber").val(number)
-    document.getElementById('productNumber').setAttribute('disabled', '')
+    //document.getElementById('productNumber').setAttribute('disabled', '')
     $("#productType").val(type)
-    document.getElementById('productType').setAttribute('disabled', '')
+    // document.getElementById('productType').setAttribute('disabled', '')
     $("#productCount").val(count)
-    document.getElementById('productCount').setAttribute('disabled', '')
+    // document.getElementById('productCount').setAttribute('disabled', '')
     $("#productState").val(state)
-    document.getElementById('productState').setAttribute('disabled', '')
+    // document.getElementById('productState').setAttribute('disabled', '')
     if (note_list != 'null') {
         $("#productNote").val(note_list.replaceAll("!@!", "\n"))
     } else {
         $("#productNote").val('')
     }
-    document.getElementById('productNote').setAttribute('disabled', '')
-    document.getElementById('isLocalContract').setAttribute('disabled', '')
-    document.getElementById('productFile').setAttribute('disabled', '')
+    // document.getElementById('productNote').setAttribute('disabled', '')
+    // document.getElementById('isLocalContract').setAttribute('disabled', '')
+    // document.getElementById('productFile').setAttribute('disabled', '')
     if (isContract == 1) {
         document.getElementById('isLocalContract').checked = true
         $("#productProvider").val(provider)
@@ -329,9 +398,9 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
-    document.getElementById('productProvider').setAttribute('disabled', '')
-    document.getElementById('startDate').setAttribute('disabled', '')
-    document.getElementById('endDate').setAttribute('disabled', '')
+    // document.getElementById('productProvider').setAttribute('disabled', '')
+    // document.getElementById('startDate').setAttribute('disabled', '')
+    // document.getElementById('endDate').setAttribute('disabled', '')
     createFileList(id, files)
 
     $('#newProductName').val('')
