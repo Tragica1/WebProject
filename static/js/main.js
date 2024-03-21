@@ -9,15 +9,24 @@ function getContractFromStorage() {
 }
 
 
-function updateContactList(contracts) {
+function updateContractList(contracts) {
     var list = document.getElementById('contractList')
     list.innerHTML = ''
-    contracts.forEach((contract) =>{
+    contracts.forEach((contract) => {
         var listElem = document.createElement('li')
-        listElem.innerHTML = `<a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-lg font-normal text-white hover:bg-neutral-100 hover:text-neutral-900 active:no-underline"`+
-        `data-te-dropdown-item-ref ` +
-        `onclick="getContractInfo('`+ contract[0] + `', '`+ contract[1] + `', '`+ contract[2] + `', '`+ contract[3] + `', '`+ contract[4] + `', '`+ contract[5] + `', '`+ contract[7] + `', '`+ contract[8] + `')">Контракт` +
-        ` № `+ contract[1] + `</a>` 
+        listElem.className = 'flex grid-cols-2 gap-2 mx-2 rounded-lg'
+        listElem.innerHTML = `<button class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline"` +
+            `data-te-dropdown-item-ref ` +
+            `onclick="getContractInfo('` + contract[0] + `', '` + contract[1] + `', '` + contract[2] + `', '` + contract[3] + `', '` + contract[4] + `', '` + contract[5] + `', '` + contract[7] + `', '` + contract[8] + `')">Контракт` +
+            ` № ` + contract[1] + `</button>` +
+            `<button type="button" onclick="deleteContract('` + contract[0] + `')">` +
+            `<svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+            `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+            `viewBox="0 0 22 22">` +
+            `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+            `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+            `</svg>` +
+            `</button>`
         list.appendChild(listElem)
     })
 }
@@ -49,7 +58,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${tmp.value}`)
+    fetch(`/contacts/${ tmp.value }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -74,11 +83,15 @@ function deleteContract(id) {
         contentType: false,
         data: { 'contractId': id },
         success: function (response) {
-            // location.reload();
+            contracts = response['contracts']
+            if (contracts) {
+                updateContractList(contracts)
+                getContractInfo(contracts[0][0], contracts[0][1], contracts[0][2], contracts[0][3], contracts[0][4], contracts[0][5], contracts[0][7], contracts[0][8])
+            }
             console.log(response);
         },
         error: function (error) {
-            // location.reload();
+            location.reload();
             console.log(error);
         }
     });
@@ -108,6 +121,26 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
 };
 
 
+function setDeafults(){
+    $('#newProductCode').val('н/б')
+    $('#newProductCount').val('1')
+    $('#newProductState').val(1)
+    $('#newProductType').val(1)
+}
+
+
+function cleanInputWindow(id_modal) {
+    var modal = document.getElementById(id_modal)
+    var inputs = modal.getElementsByTagName('input')
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date' || inputs[i].type == 'file'){
+            inputs[i].value = ''
+        } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox') {
+            inputs[i].checked = false
+        }
+    }
+}
+
 function saveProvider() {
     var contacts = []
     if (counter > 0) {
@@ -132,6 +165,7 @@ function saveProvider() {
         data: JSON.stringify(formData),
         success: function (response) {
             getProdivers()
+            
             console.log(response);
         },
         error: function (error) {
@@ -141,7 +175,7 @@ function saveProvider() {
     });
 }
 
-function createProviderOptionList(providers, elemId){
+function createProviderOptionList(providers, elemId) {
     var providerSelect = document.getElementById(elemId)
     providerSelect.innerHTML = `<option value="" selected disabled hidden></option>`
     providers.forEach((item) => {
@@ -172,7 +206,6 @@ function getProdivers() {
 
 
 function saveContract() {
-   
     var products = document.getElementById('productsSelector').getElementsByTagName('input')
     var pr = []
     var j = 0
@@ -215,10 +248,10 @@ function saveContract() {
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-
             getContractInfo(response['contractId'], response['data'][0], response['data'][1], response['data'][2],
-                            response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
-            updateContactList(response['contracts'])
+                response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
+            updateContractList(response['contracts'])
+            cleanInputWindow('contract-modal')
             console.log(response);
         },
         error: function (error) {
@@ -301,7 +334,8 @@ function deleteProduct() {
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-            location.reload();
+            startCreation(contractInfo['id'])
+            cleanInputWindow('product-change-modal')
             console.log(response);
         },
         error: function (error) {
@@ -354,7 +388,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         }
     }
     previousElem = currentElem
-    document.getElementById('changeButton').innerHTML = ''
+    // document.getElementById('changeButton').innerHTML = ''
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     $('#mainProduct').text($('#productName').text().slice(9))
@@ -469,7 +503,8 @@ function addNewProduct() {
         contentType: false,
         data: formData,
         success: function (response) {
-            location.reload();
+            startCreation(contractInfo['id'])
+            cleanInputWindow('product-add-modal')
             console.log(response);
         },
         error: function (error) {
@@ -518,7 +553,7 @@ function deleteFile(filePath, product_id, contract_id) {
         success: function (response) {
             console.log(response)
             createFileList(product_id, response['files'])
-            
+
         },
         error: function (response) {
             location.reload()
@@ -594,7 +629,8 @@ function changeProduct() {
         contentType: false,
         data: formData,
         success: function (response) {
-            location.reload();
+            startCreation(contractInfo['id'])
+            cleanInputWindow('product-change-modal')
             console.log(response);
         },
         error: function (error) {
@@ -645,8 +681,8 @@ function createTree(element, data, idd, i) {
             var tmp = item.id + i
             listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                 `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"` +
-                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", ` +
-                item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
@@ -655,8 +691,8 @@ function createTree(element, data, idd, i) {
         } else {
             listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
                 `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-2"` +
-                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", ` +
-                item.number + `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
                 item.name + `</a>`
         }
@@ -673,7 +709,7 @@ function test(a, b) {
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')

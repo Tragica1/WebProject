@@ -418,22 +418,8 @@ def delete_contract():
         for file in files:
             os.remove(os.path.join(dir_path, file))
         os.rmdir(dir_path)
-        # file_name = request.args.get('filePath')
-        # product_id = request.args.get('productId')
-        # contract_id = request.args.get('contractId')
-        # print(file_name, product_id, contract_id)
-        # dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
-        # with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'r') as f:
-        #     contract_data = json.load(f)
-        #     f.close()
-        # file_list = delete_file_in_json(contract_data['data'], product_id, file_name)
-        # print(file_list)
-        # with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'w') as f:
-        #     json_data = json.dumps(contract_data)
-        #     f.write(json_data)
-        #     f.close()
-        # os.remove(file_name)
-        return jsonify({'status': 'success', 'message': 'Contract deleted successfully'})
+        contracts = get_contracts()
+        return jsonify({'status': 'success', 'message': 'Contract deleted successfully', 'contracts': contracts})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
