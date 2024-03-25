@@ -1,10 +1,10 @@
-// window.onload = getContractFromStorage();
+window.onload = getContractFromStorage();
 window.onload = getProdivers();
 // window.onload = getContracts();
 
 function getContractFromStorage() {
     // console.log(localStorage)
-    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
 }
 
@@ -58,7 +58,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${ tmp.value }`)
+    fetch(`/contacts/${tmp.value}`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -99,7 +99,7 @@ function deleteContract(id) {
 
 function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
     console.log(startDate, endDate)
-    var currentConract = {
+    var currentContract = {
         'id': id,
         'number': number,
         'innerNumber': innerNumber,
@@ -109,7 +109,7 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
         'type': type,
         'status': status
     }
-    localStorage.setItem("currentConract", JSON.stringify(currentConract));
+    localStorage.setItem("currentContract", JSON.stringify(currentContract));
     $("#cNumber").text("Выбран контракт № " + number)
     $("#cInnerNumber").text("Внутренний номер: " + innerNumber)
     $("#cCity").text("Город: " + city)
@@ -120,12 +120,13 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
     startCreation(id)
 };
 
-
-function setDeafults(){
+var products = []
+function setDeafults() {
     $('#newProductCode').val('н/б')
     $('#newProductCount').val('1')
     $('#newProductState').val(1)
     $('#newProductType').val(1)
+    getProductList()
 }
 
 
@@ -133,7 +134,7 @@ function cleanInputWindow(id_modal) {
     var modal = document.getElementById(id_modal)
     var inputs = modal.getElementsByTagName('input')
     for (var i = 0; i < inputs.length; i++) {
-        if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date' || inputs[i].type == 'file'){
+        if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date' || inputs[i].type == 'file') {
             inputs[i].value = ''
         } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox') {
             inputs[i].checked = false
@@ -165,7 +166,7 @@ function saveProvider() {
         data: JSON.stringify(formData),
         success: function (response) {
             getProdivers()
-            
+
             console.log(response);
         },
         error: function (error) {
@@ -174,6 +175,7 @@ function saveProvider() {
         }
     });
 }
+
 
 function createProviderOptionList(providers, elemId) {
     var providerSelect = document.getElementById(elemId)
@@ -187,6 +189,7 @@ function createProviderOptionList(providers, elemId) {
         providerSelect.appendChild(opt)
     })
 }
+
 
 function getProdivers() {
     $.ajax({
@@ -323,7 +326,7 @@ function deleteContactBlock(block_id) {
 
 
 function deleteProduct() {
-    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var formData = {
         'contractId': contractInfo['id'],
         'productId': $("#currentProduct").val().slice(14),
@@ -454,7 +457,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
 
 
 function addNewProduct() {
-    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = document.getElementById('newProductFiles').files
     var formData = new FormData()
     var data = {}
@@ -516,7 +519,7 @@ function addNewProduct() {
 
 
 function createFileList(id, files) {
-    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var fileListDiv = document.getElementById('fileList')
     if (files.length != 0) {
         var ul = document.createElement('ul')
@@ -584,7 +587,7 @@ function downloadFile(filePath) {
 
 
 function changeProduct() {
-    var contractInfo = JSON.parse(localStorage.getItem("currentConract"))
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = document.getElementById('productFile').files
     var formData = new FormData()
     var data = {}
@@ -690,7 +693,7 @@ function createTree(element, data, idd, i) {
             i += 1
         } else {
             listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-2"` +
+                `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-4"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
@@ -703,13 +706,10 @@ function createTree(element, data, idd, i) {
     });
     element.append(treeElement)
 };
-function test(a, b) {
-    console.log(a, b)
-}
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
@@ -717,4 +717,133 @@ function startCreation(id) {
             var i = 1
             createTree(rootElement, data['data'], null, i)
         });
+}
+
+
+function getProductList() {
+    var productList = []
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+    // console.log(contractInfo)
+    $.ajax({
+        type: 'GET',
+        url: '/getProductList',
+        contentType: false,
+        data: { 'contractId': contractInfo['id'] },
+        success: function (response) {
+            productList = response['products']
+            productAutocomplete(productList)
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+function productAutocomplete(productList) {
+    var inp = document.getElementById("productInput")
+    console.log(productList)
+    inp.addEventListener('input', function () {
+        console.log(this.value)
+       
+    })
+}
+
+
+var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Канада","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","Франция","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Германия","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Мужчина","Israel","Италия","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Швеция","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+function autocomplete(inp, arr) {
+    /* функция автозаполнения принимает два аргумента,
+    элемент текстового поля и массив возможных значений автозаполнения: */
+    var currentFocus;
+    /* выполнение функции, когда кто-то пишет в текстовом поле: */
+    inp.addEventListener("input", function (e) {
+        var a, b, i, val = this.value;
+        /* закрыть все уже открытые списки значений автозаполнения */
+        closeAllLists();
+        if (!val) { return false; }
+        currentFocus = -1;
+        /* создайте элемент DIV, который будет содержать элементы (значения): */
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        /* добавьте элемент DIV в качестве дочернего элемента контейнера автозаполнения: */
+        this.parentNode.appendChild(a);
+        /* для каждого элемента в массиве... */
+        for (i = 0; i < arr.length; i++) {
+            /* проверьте, начинается ли элемент с тех же букв, что и значение текстового поля: */
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                /* создайте элемент DIV для каждого соответствующего элемента: */
+                b = document.createElement("DIV");
+                /* сделайте соответствующие буквы жирным шрифтом: */
+                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                b.innerHTML += arr[i].substr(val.length);
+                /* вставьте поле ввода, которое будет содержать значение текущего элемента массива: */
+                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                /* выполнение функции, когда кто-то нажимает на значение элемента (элемент DIV): */
+                b.addEventListener("click", function (e) {
+                    /* вставьте значение для текстового поля автозаполнения: */
+                    inp.value = this.getElementsByTagName("input")[0].value;
+                    /* закройте список значений автозаполнения,
+                    (или любые другие открытые списки значений автозаполнения : */
+                    closeAllLists();
+                });
+                a.appendChild(b);
+            }
+        }
+    });
+    /* выполнение функции нажимает клавишу на клавиатуре: */
+    inp.addEventListener("keydown", function (e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+            /* Если нажата клавиша со стрелкой вниз,
+            увеличение текущей переменной фокуса: */
+            currentFocus++;
+            /* и сделать текущий элемент более видимым: */
+            addActive(x);
+        } else if (e.keyCode == 38) { //вверх
+            /* Если нажата клавиша со стрелкой вверх,
+            уменьшите текущую переменную фокуса: */
+            currentFocus--;
+            /* и сделать текущий элемент более видимым: */
+            addActive(x);
+        } else if (e.keyCode == 13) {
+            /* Если нажата клавиша ENTER, предотвратите отправку формы, */
+            e.preventDefault();
+            if (currentFocus > -1) {
+                /* и имитировать щелчок по элементу "active": */
+                if (x) x[currentFocus].click();
+            }
+        }
+    });
+    function addActive(x) {
+        /* функция для классификации элемента как "active": */
+        if (!x) return false;
+        /* начните с удаления "активного" класса для всех элементов: */
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        /*добавить класса "autocomplete-active": */
+        x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x) {
+        /* функция для удаления "активного" класса из всех элементов автозаполнения: */
+        for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+        }
+    }
+    function closeAllLists(elmnt) {
+        /* закройте все списки автозаполнения в документе,
+        кроме того, который был передан в качестве аргумента: */
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+            }
+        }
+    }
+    /* выполнение функции, когда кто-то щелкает в документе: */
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
 }

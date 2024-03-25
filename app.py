@@ -139,7 +139,7 @@ def get_providers():
         for c in comps:
             tmp = list(c)
             companies.append(tmp)
-        print(companies)
+        # print(companies)
         return jsonify({'status': 'success', 'data': companies})
     except Exception as e:
         print(e)
@@ -423,6 +423,36 @@ def delete_contract():
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
+
+
+def get_products_from_json(contract_data, products):
+    for item in contract_data:
+        tmp = {
+            'id': int(item['id']),
+            'name': item['name']
+        }
+        products.append(tmp)
+        if len(item['children']) != 0:
+            get_products_from_json(item['children'], products)
+    
+
+
+@app.route('/getProductList', methods=['GET'])
+def get_product_list():
+    try:
+        id = request.args.get('contractId')
+        dir_path = os.path.join(contract_folder, 'contract_' + str(id))
+        with open(os.path.join(dir_path, 'contract' + str(id) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        products = []
+        get_products_from_json(contract_data['data'], products)
+        return jsonify({'status': 'success', 'message': 'Contract deleted successfully', 'products': products})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)}) 
+
+
 
 
 if __name__ == '__main__':
