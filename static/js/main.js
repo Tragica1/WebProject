@@ -5,7 +5,12 @@ window.onload = getProdivers();
 function getContractFromStorage() {
     // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
+    if (contractInfo['id'] != -1) {
+        getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
+    } else {
+        getContractInfo(-1, '', '', '', '', '', '', '')
+    }
+
 }
 
 
@@ -58,7 +63,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${tmp.value}`)
+    fetch(`/contacts/${ tmp.value }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -84,11 +89,17 @@ function deleteContract(id) {
         data: { 'contractId': id },
         success: function (response) {
             contracts = response['contracts']
-            if (contracts) {
+            console.log(response);
+            if (contracts.length != 0) {
                 updateContractList(contracts)
                 getContractInfo(contracts[0][0], contracts[0][1], contracts[0][2], contracts[0][3], contracts[0][4], contracts[0][5], contracts[0][7], contracts[0][8])
             }
-            console.log(response);
+            else {
+                getContractInfo(-1, '', '', '', '', '', '', '')
+                document.getElementById('mainTree').innerHTML = ""
+                document.getElementById('contractList').innerHTML = ""
+            }
+
         },
         error: function (error) {
             location.reload();
@@ -98,26 +109,40 @@ function deleteContract(id) {
 }
 
 function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
-    console.log(startDate, endDate)
-    var currentContract = {
-        'id': id,
-        'number': number,
-        'innerNumber': innerNumber,
-        'city': city,
-        'startDate': startDate,
-        'endDate': endDate,
-        'type': type,
-        'status': status
+    if (id == -1) {
+        var currentContract = {
+            'id': id,
+            'number': '',
+            'innerNumber': '',
+            'city': '',
+            'startDate': '',
+            'endDate': '',
+            'type': '',
+            'status': ''
+        }
+        localStorage.setItem("currentContract", JSON.stringify(currentContract));
+        document.getElementById('info').innerHTML = ""
+    } else {
+        var currentContract = {
+            'id': id,
+            'number': number,
+            'innerNumber': innerNumber,
+            'city': city,
+            'startDate': startDate,
+            'endDate': endDate,
+            'type': type,
+            'status': status
+        }
+        localStorage.setItem("currentContract", JSON.stringify(currentContract));
+        $("#cNumber").text("Выбран контракт № " + number)
+        $("#cInnerNumber").text("Внутренний номер: " + innerNumber)
+        $("#cCity").text("Город: " + city)
+        $("#cStart").text("Дата подписания: " + startDate)
+        $("#cEnd").text("Дата сдачи: " + endDate)
+        $("#cType").text("Тип контракта: " + type)
+        $("#cStatus").text("Статус: " + status)
+        startCreation(id)
     }
-    localStorage.setItem("currentContract", JSON.stringify(currentContract));
-    $("#cNumber").text("Выбран контракт № " + number)
-    $("#cInnerNumber").text("Внутренний номер: " + innerNumber)
-    $("#cCity").text("Город: " + city)
-    $("#cStart").text("Дата подписания: " + startDate)
-    $("#cEnd").text("Дата сдачи: " + endDate)
-    $("#cType").text("Тип контракта: " + type)
-    $("#cStatus").text("Статус: " + status)
-    startCreation(id)
 };
 
 var products = []
@@ -652,7 +677,7 @@ function addProductSelect() {
             .then(data => {
                 const selector = document.getElementById('productsSelector')
                 data.forEach((item) => {
-                    console.log(item)
+                    // console.log(item)
                     const opt = document.createElement('li')
                     opt.innerHTML = `<div class="flex items-baseline" >` +
                         `<input id="` + item.id + `" type="checkbox" value=""` +
@@ -709,7 +734,7 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
@@ -723,7 +748,7 @@ function startCreation(id) {
 function getProductList() {
     var productList = []
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    // console.log(contractInfo)
+
     $.ajax({
         type: 'GET',
         url: '/getProductList',
@@ -740,78 +765,90 @@ function getProductList() {
     });
 }
 
-function productAutocomplete(productList) {
-    var inp = document.getElementById("productInput")
-    console.log(productList)
-    inp.addEventListener('input', function () {
-        console.log(this.value)
-       
-    })
+function autocomplete(id) {
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+
+    $.ajax({
+        type: 'GET',
+        url: '/getProductInfo',
+        contentType: false,
+        data: { 'contractId': contractInfo['id'], 'productId': id.slice(13) },
+        success: function (response) {
+            product = response['product']
+            $('#newProductName').val(product.name)
+            $('#newProductCode').val(product.code)
+            $('#newProductType').val(product.idType)
+            $('#newProductState').val(product.idState)
+            $('#newProductNumber').val(product.number)
+            $('#newProductCount').val(product.count)
+            if (product.isContract == 1) {
+                document.getElementById('newProductisLocalContract').checked = true
+                $("#newProductProvider").val(product.idProvider)
+                showContacts(document.getElementById('productProvider'))
+                $("#newProductStartDate").val(product.start)
+                $("#newProductEndDate").val(product.end)
+                document.getElementById('hideen2').style.display = 'block'
+            } else {
+                document.getElementById('newProductisLocalContract').checked = false
+                $("#newProductProvider").val('')
+                document.getElementById('hideen2').style.display = 'none'
+            }
+            if (product.note != null) {
+                $("#newProductNote").val(product.note)
+            } else {
+                $("#productNote").val('')
+            }
+            
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+
 }
 
-
-var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Канада","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","Франция","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Германия","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Мужчина","Israel","Италия","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Швеция","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
-function autocomplete(inp, arr) {
-    /* функция автозаполнения принимает два аргумента,
-    элемент текстового поля и массив возможных значений автозаполнения: */
+function productAutocomplete(productList) {
+    var inp = document.getElementById("productInput")
     var currentFocus;
-    /* выполнение функции, когда кто-то пишет в текстовом поле: */
-    inp.addEventListener("input", function (e) {
-        var a, b, i, val = this.value;
-        /* закрыть все уже открытые списки значений автозаполнения */
+    console.log(productList)
+    inp.addEventListener('input', function (e) { 
+        var a, b, i, val = this.value
         closeAllLists();
         if (!val) { return false; }
         currentFocus = -1;
-        /* создайте элемент DIV, который будет содержать элементы (значения): */
-        a = document.createElement("DIV");
-        a.setAttribute("id", this.id + "autocomplete-list");
-        a.setAttribute("class", "autocomplete-items");
-        /* добавьте элемент DIV в качестве дочернего элемента контейнера автозаполнения: */
+        a = document.createElement("div");
+        a.setAttribute("id", "product-autocomplete-list");
+        a.setAttribute("class", "absolute border rounded-lg bg-white");
         this.parentNode.appendChild(a);
-        /* для каждого элемента в массиве... */
-        for (i = 0; i < arr.length; i++) {
-            /* проверьте, начинается ли элемент с тех же букв, что и значение текстового поля: */
-            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-                /* создайте элемент DIV для каждого соответствующего элемента: */
-                b = document.createElement("DIV");
-                /* сделайте соответствующие буквы жирным шрифтом: */
-                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                b.innerHTML += arr[i].substr(val.length);
-                /* вставьте поле ввода, которое будет содержать значение текущего элемента массива: */
-                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                /* выполнение функции, когда кто-то нажимает на значение элемента (элемент DIV): */
+        for (i = 0; i < productList.length; i++) {
+            if (productList[i]['name'].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                b = document.createElement("div");
+                b.setAttribute('class', 'text-black text-sm border-b p-1 cursor-pointer hover:bg-gray-200')
+                b.innerHTML = "<strong>" + productList[i]['name'].substr(0, val.length) + "</strong>";
+                b.innerHTML += productList[i]['name'].substr(val.length);
+                b.innerHTML += "<input type='hidden' id='product-item-"+ productList[i]['id'] +"' value='" + productList[i]['name'] + "'>";
                 b.addEventListener("click", function (e) {
-                    /* вставьте значение для текстового поля автозаполнения: */
                     inp.value = this.getElementsByTagName("input")[0].value;
-                    /* закройте список значений автозаполнения,
-                    (или любые другие открытые списки значений автозаполнения : */
+                    autocomplete(this.getElementsByTagName("input")[0].id)
                     closeAllLists();
-                });
+                }); 
                 a.appendChild(b);
             }
         }
-    });
-    /* выполнение функции нажимает клавишу на клавиатуре: */
+    })
     inp.addEventListener("keydown", function (e) {
-        var x = document.getElementById(this.id + "autocomplete-list");
+        var x = document.getElementById("product-autocomplete-list");
         if (x) x = x.getElementsByTagName("div");
         if (e.keyCode == 40) {
-            /* Если нажата клавиша со стрелкой вниз,
-            увеличение текущей переменной фокуса: */
             currentFocus++;
-            /* и сделать текущий элемент более видимым: */
             addActive(x);
-        } else if (e.keyCode == 38) { //вверх
-            /* Если нажата клавиша со стрелкой вверх,
-            уменьшите текущую переменную фокуса: */
+        } else if (e.keyCode == 38) {
             currentFocus--;
-            /* и сделать текущий элемент более видимым: */
             addActive(x);
         } else if (e.keyCode == 13) {
-            /* Если нажата клавиша ENTER, предотвратите отправку формы, */
             e.preventDefault();
             if (currentFocus > -1) {
-                /* и имитировать щелчок по элементу "active": */
                 if (x) x[currentFocus].click();
             }
         }
@@ -823,26 +860,23 @@ function autocomplete(inp, arr) {
         removeActive(x);
         if (currentFocus >= x.length) currentFocus = 0;
         if (currentFocus < 0) currentFocus = (x.length - 1);
-        /*добавить класса "autocomplete-active": */
-        x[currentFocus].classList.add("autocomplete-active");
+        x[currentFocus].classList.remove('hover:bg-gray-200')
+        x[currentFocus].classList.add("bg-blue-500", "text-white");
     }
     function removeActive(x) {
-        /* функция для удаления "активного" класса из всех элементов автозаполнения: */
         for (var i = 0; i < x.length; i++) {
-            x[i].classList.remove("autocomplete-active");
+            x[i].classList.remove("bg-blue-500", "text-white");
+            x[i].classList.add('hover:bg-gray-200')
         }
     }
     function closeAllLists(elmnt) {
-        /* закройте все списки автозаполнения в документе,
-        кроме того, который был передан в качестве аргумента: */
-        var x = document.getElementsByClassName("autocomplete-items");
+        var x = document.getElementsByClassName("absolute border bg-white");
         for (var i = 0; i < x.length; i++) {
             if (elmnt != x[i] && elmnt != inp) {
                 x[i].parentNode.removeChild(x[i]);
             }
         }
     }
-    /* выполнение функции, когда кто-то щелкает в документе: */
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });

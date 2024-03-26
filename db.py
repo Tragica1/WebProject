@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="1234",
+    password="123",
     host="localhost",
     port=3306
 )

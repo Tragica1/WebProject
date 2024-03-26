@@ -447,12 +447,48 @@ def get_product_list():
             f.close()
         products = []
         get_products_from_json(contract_data['data'], products)
-        return jsonify({'status': 'success', 'message': 'Contract deleted successfully', 'products': products})
+        return jsonify({'status': 'success', 'message': 'Product list got successfully', 'products': products})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)}) 
 
 
+def get_product_from_json(contract_data, product_id):
+    for item in contract_data:
+        if product_id == int(item['id']):
+            return {
+                'name': item['name'],
+                'code': item['code'],
+                'number': item['number'],
+                'count': item['count'],
+                'idType': item['idType'],
+                'idState': item['idState'],
+                'isContract': int(item['isContract']),
+                'idProvider': item['idProvider'],
+                'start': str(item['start']),
+                'end': str(item['end']),
+                'note': str(item['note']),
+                'files': item['files'],
+            }
+        if len(item['children']) != 0:
+            return get_product_from_json(item['children'], product_id)
+
+
+@app.route('/getProductInfo', methods=['GET'])
+def get_product_info():
+    try:
+        contract_id = request.args.get('contractId')
+        product_id = request.args.get('productId')
+        dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
+        with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        product = get_product_from_json(contract_data['data'], int(product_id))
+        print(product)
+        return jsonify({'status': 'success', 'message': 'Product got successfully', 'product': product})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)}) 
 
 
 if __name__ == '__main__':
