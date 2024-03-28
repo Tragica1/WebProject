@@ -211,9 +211,9 @@ def change_product_in_json(contract_data, product_data, file_pathes):
             if len(file_pathes) != 0:
                 for path in file_pathes:
                     item['files'].append(path)
-            return 0
+            return item['files']
         if len(item['children']) != 0:
-            change_product_in_json(item['children'], product_data, file_pathes)
+            return change_product_in_json(item['children'], product_data, file_pathes)
 
 
 @app.route('/changeProduct', methods=['POST'])    
@@ -230,16 +230,16 @@ def change_product():
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
                     file_pathes.append(filepath)
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        change_product_in_json(contract_data['data'], data, file_pathes)
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
+        files = change_product_in_json(contract_data['data'], data, file_pathes)
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
         print('Product changed successfully')
-        return jsonify({'status': 'success', 'message': 'Product changed successfully'})
+        return jsonify({'status': 'success', 'message': 'Product changed successfully', 'files': files})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -261,14 +261,14 @@ def delete_product():
     try:
         data = request.get_json()
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
         index = 0
         files = delete_product_in_json(contract_data['data'], int(data['productId']), index)
         for file in files:
             os.remove(file)
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
@@ -330,11 +330,11 @@ def add_new_product():
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
                     file_pathes.append(filepath)
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'r') as f:
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
         add_product_in_json(contract_data['data'], data, file_pathes)
-        with open(os.path.join(dir_path, 'contract' + data['contractId'] + '.json'), 'w') as f:
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
@@ -348,8 +348,9 @@ def add_new_product():
 def send_product_file():
     try:
         file_name = request.args.get('filePath')
-        print(file_name)
-        return send_file(file_name, as_attachment=True)
+        # print(file_name.split('\\')[-1])
+        name = file_name.split('\\')[-1]
+        return send_file(file_name, as_attachment=True, download_name=name)
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -360,7 +361,7 @@ def delete_file_in_json(contract_data, product_id, file_name):
         if int(item['id']) == int(product_id):
             for i in range(len(item['files'])):
                 if file_name == item['files'][i]:
-                    item['files'].pop(i)
+                    item['files'].remove(file_name)
                     print(item['files'])
                     return item['files']
         if len(item['children']) != 0:
@@ -375,12 +376,12 @@ def delete_product_file():
         contract_id = request.args.get('contractId')
         print(file_name, product_id, contract_id)
         dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
-        with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'r') as f:
+        with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
         file_list = delete_file_in_json(contract_data['data'], product_id, file_name)
         print(file_list)
-        with open(os.path.join(dir_path, 'contract' + contract_id + '.json'), 'w') as f:
+        with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
@@ -436,7 +437,6 @@ def get_products_from_json(contract_data, products):
             get_products_from_json(item['children'], products)
     
 
-
 @app.route('/getProductList', methods=['GET'])
 def get_product_list():
     try:
@@ -453,10 +453,11 @@ def get_product_list():
         return jsonify({'status': 'error', 'message': str(e)}) 
 
 
-def get_product_from_json(contract_data, product_id):
+def get_product_from_json(contract_data, product_id, product):
     for item in contract_data:
         if product_id == int(item['id']):
-            return {
+            print('---------------- ', item['name'])
+            product['product'] = {
                 'name': item['name'],
                 'code': item['code'],
                 'number': item['number'],
@@ -469,10 +470,13 @@ def get_product_from_json(contract_data, product_id):
                 'end': str(item['end']),
                 'note': str(item['note']),
                 'files': item['files'],
+                'children': item['children'],
             }
+            print(product)
+            # return product
         if len(item['children']) != 0:
-            return get_product_from_json(item['children'], product_id)
-
+            get_product_from_json(item['children'], product_id, product)
+        # print(item['id'], item['name'])
 
 @app.route('/getProductInfo', methods=['GET'])
 def get_product_info():
@@ -480,12 +484,16 @@ def get_product_info():
         contract_id = request.args.get('contractId')
         product_id = request.args.get('productId')
         dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
+        print(contract_id, product_id, dir_path)
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        product = get_product_from_json(contract_data['data'], int(product_id))
+        product = {
+            'product': {}
+        }
+        get_product_from_json(contract_data['data'], int(product_id), product)
         print(product)
-        return jsonify({'status': 'success', 'message': 'Product got successfully', 'product': product})
+        return jsonify({'status': 'success', 'message': 'Product got successfully', 'product': product['product']})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)}) 

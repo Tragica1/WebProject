@@ -5,7 +5,7 @@ window.onload = getProdivers();
 function getContractFromStorage() {
     // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    if (contractInfo['id'] != -1) {
+    if (contractInfo && contractInfo['id'] != -1) {
         getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
     } else {
         getContractInfo(-1, '', '', '', '', '', '', '')
@@ -396,7 +396,7 @@ function editProduct() {
 
 var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
-    $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
+    cleanInputWindow('product-add-modal')
     // document.getElementById('editButton').removeAttribute('disabled')
     document.getElementById('addButton').removeAttribute('disabled')
     document.getElementById('deleteButton').removeAttribute('disabled')
@@ -406,13 +406,13 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         if (previousElem.className.indexOf('text-xl') != -1) {
             previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"
         } else {
-            previousElem.className = "flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-2"
+            previousElem.className = "flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-4"
         }
 
         if (currentElem.className.indexOf('text-xl') != -1) {
             currentElem.className = "flex text-xl text-black font-semibold items-center bg-purple-500 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-2"
+            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-4"
         }
     }
     previousElem = currentElem
@@ -463,6 +463,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     // document.getElementById('productProvider').setAttribute('disabled', '')
     // document.getElementById('startDate').setAttribute('disabled', '')
     // document.getElementById('endDate').setAttribute('disabled', '')
+    $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
     createFileList(id, files)
 
     $('#newProductName').val('')
@@ -546,7 +547,8 @@ function addNewProduct() {
 function createFileList(id, files) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var fileListDiv = document.getElementById('fileList')
-    if (files.length != 0) {
+    console.log("Create file list - ",files)
+    if (files && files.length != 0) {
         var ul = document.createElement('ul')
         ul.className = 'inline-grid ps-2 mt-2 space-y-1 list-none list-inside text-sm'
         fileListDiv.innerHTML = ''
@@ -554,7 +556,6 @@ function createFileList(id, files) {
             var a = document.createElement('li')
             a.className = 'inline-flex'
             var tmp = files[i].split('\\')
-
             a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 items-center" role="button" ` +
                 `onclick='downloadFile(` + JSON.stringify(files[i]) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
                 `</a>` +
@@ -581,6 +582,7 @@ function deleteFile(filePath, product_id, contract_id) {
         success: function (response) {
             console.log(response)
             createFileList(product_id, response['files'])
+            startCreation(contract_id)
 
         },
         error: function (response) {
@@ -591,7 +593,7 @@ function deleteFile(filePath, product_id, contract_id) {
 }
 
 
-function downloadFile(filePath) {
+function downloadFile(filePath, filename) {
     $.ajax({
         url: '/downloadFile',
         type: 'GET',
@@ -601,8 +603,17 @@ function downloadFile(filePath) {
             responseType: 'blob'
         },
         success: function (response) {
-            const url = URL.createObjectURL(response)
-            window.location = url
+            // const main = document.getElementById('file-' + filename);
+            const elem = document.createElement('a')
+            elem.href = URL.createObjectURL(response);
+            elem.download = filename;
+            elem.style.display = 'none';
+            document.body.appendChild(elem)
+            elem.click()
+            document.body.removeChild(elem)
+            
+            // const url = URL.createObjectURL(response)
+            // window.open(url)
         },
         error: function (response) {
             console.log(response)
@@ -687,7 +698,7 @@ function changeProduct() {
         success: function (response) {
             startCreation(contractInfo['id'])
             cleanInputWindow('product-change-modal')
-            updateProduct(data, files)
+            updateProduct(data, response['files'])
             console.log(response);
         },
         error: function (error) {
@@ -839,6 +850,8 @@ function autocomplete(id) {
 function productAutocomplete(productList) {
     var inp = document.getElementById("productInput")
     var currentFocus;
+    const styleSheet = document.styleSheets[0]
+    styleSheet.insertRule('.auto-list { position: absolute; border-radius: 0.5rem; border-width: 1px; --tw-bg-opacity: 1; background-color: rgb(255 255 255 / var(--tw-bg-opacity)); }', styleSheet.cssRules.length)
     console.log(productList)
     inp.addEventListener('input', function (e) {
         var a, b, i, val = this.value
@@ -847,7 +860,7 @@ function productAutocomplete(productList) {
         currentFocus = -1;
         a = document.createElement("div");
         a.setAttribute("id", "product-autocomplete-list");
-        a.setAttribute("class", "absolute border rounded-lg bg-white");
+        a.setAttribute("class", "auto-list");
         this.parentNode.appendChild(a);
         for (i = 0; i < productList.length; i++) {
             if (productList[i]['name'].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
@@ -896,7 +909,8 @@ function productAutocomplete(productList) {
         }
     }
     function closeAllLists(elmnt) {
-        var x = document.getElementsByClassName("absolute border bg-white");
+        
+        var x = document.getElementsByClassName("auto-list");
         for (var i = 0; i < x.length; i++) {
             if (elmnt != x[i] && elmnt != inp) {
                 x[i].parentNode.removeChild(x[i]);
