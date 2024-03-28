@@ -55,8 +55,8 @@ CREATE TABLE `file` (
 
 CREATE TABLE `governmentcontract` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `number` int DEFAULT NULL,
-  `innerNumber` int DEFAULT NULL,
+  `number` varchar(255) DEFAULT NULL,
+  `innerNumber` varchar(255) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
   `startDate` date DEFAULT NULL,
   `endDate` date DEFAULT NULL,

@@ -63,7 +63,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${ tmp.value }`)
+    fetch(`/contacts/${tmp.value}`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -610,6 +610,34 @@ function downloadFile(filePath) {
     })
 }
 
+function updateProduct(data, files) {
+    $("#productNumber").val(data.number)
+    $("#productType").val(data.idType)
+    $("#productCount").val(data.count)
+    $("#productState").val(data.idState)
+    $("#productNote").val(data.note)
+
+    if (data.isContract == 1) {
+        document.getElementById('isLocalContract').checked = true
+        $("#productProvider").val(data.idProvider)
+        showContacts(document.getElementById('productProvider'))
+        $("#startDate").val(data.start)
+        $("#endDate").val(data.end)
+        document.getElementById('hideen1').style.display = 'block'
+    } else {
+        document.getElementById('isLocalContract').checked = false
+        $("#productProvider").val('')
+        var block = document.getElementById('contacts')
+        block.innerHTML = ""
+        $("#providerAddress").text('')
+        $("#startDate").val('')
+        $("#endDate").val('')
+        document.getElementById('hideen1').style.display = 'none'
+    }
+    if (files){
+        createFileList(data.id, files)
+    }
+}
 
 function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
@@ -659,6 +687,7 @@ function changeProduct() {
         success: function (response) {
             startCreation(contractInfo['id'])
             cleanInputWindow('product-change-modal')
+            updateProduct(data, files)
             console.log(response);
         },
         error: function (error) {
@@ -734,7 +763,7 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
@@ -798,7 +827,6 @@ function autocomplete(id) {
             } else {
                 $("#productNote").val('')
             }
-            
         },
         error: function (error) {
             location.reload();
@@ -812,7 +840,7 @@ function productAutocomplete(productList) {
     var inp = document.getElementById("productInput")
     var currentFocus;
     console.log(productList)
-    inp.addEventListener('input', function (e) { 
+    inp.addEventListener('input', function (e) {
         var a, b, i, val = this.value
         closeAllLists();
         if (!val) { return false; }
@@ -827,12 +855,12 @@ function productAutocomplete(productList) {
                 b.setAttribute('class', 'text-black text-sm border-b p-1 cursor-pointer hover:bg-gray-200')
                 b.innerHTML = "<strong>" + productList[i]['name'].substr(0, val.length) + "</strong>";
                 b.innerHTML += productList[i]['name'].substr(val.length);
-                b.innerHTML += "<input type='hidden' id='product-item-"+ productList[i]['id'] +"' value='" + productList[i]['name'] + "'>";
+                b.innerHTML += "<input type='hidden' id='product-item-" + productList[i]['id'] + "' value='" + productList[i]['name'] + "'>";
                 b.addEventListener("click", function (e) {
                     inp.value = this.getElementsByTagName("input")[0].value;
                     autocomplete(this.getElementsByTagName("input")[0].id)
                     closeAllLists();
-                }); 
+                });
                 a.appendChild(b);
             }
         }
@@ -854,9 +882,7 @@ function productAutocomplete(productList) {
         }
     });
     function addActive(x) {
-        /* функция для классификации элемента как "active": */
         if (!x) return false;
-        /* начните с удаления "активного" класса для всех элементов: */
         removeActive(x);
         if (currentFocus >= x.length) currentFocus = 0;
         if (currentFocus < 0) currentFocus = (x.length - 1);
