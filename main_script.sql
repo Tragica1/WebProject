@@ -90,7 +90,7 @@ CREATE TABLE `product` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
-  `number` int DEFAULT '0',
+  `number` varchar(255) DEFAULT '0',
   `isMain` tinyint DEFAULT '0',
   `count` int DEFAULT '1',
   `idType` int DEFAULT NULL,

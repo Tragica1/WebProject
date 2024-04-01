@@ -68,8 +68,8 @@
                     </button>
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500  bg-white rounded-lg ">
-                        <div id="info" class="p-3 space-y-2 text-black bg-white">
+                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500 rounded-lg bg-gray-500 border-gray-700">
+                        <div id="info" class="p-3 space-y-2 text-white bg-gray-500 border-gray-700 rounded-lg">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
                             <h3 id="cType" class="font-semibold"></h3>
                             <h3 id="cStatus" class="font-semibold"></h3>
@@ -241,7 +241,7 @@
         </div>
         <div id="currentDetal">
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
-            <div id="currentProduct" class="w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8">
+            <div id="currentProduct" class="w-full max-w-2xl border border-black rounded-lg shadow sm:p-6 md:p-8">
                 <div class="flex justify-end">
                     <!-- <button id="editButton" type="button" onclick="editProduct()" disabled>
                         <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
@@ -317,47 +317,47 @@
                             <div class=" p-4 md:p-2 border-b rounded-t">
                                 <div class="flex items-center justify-between">
                                     <h4 class="text-xl font-semibold text-black ">
-                                        Добавление изделие в:
+                                        Добавление изделия в:
                                     </h4>
-                                    <button type="button"
-                                        class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
-                                        data-modal-hide="product-add-modal">
-                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            fill="none" viewBox="0 0 14 14">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                        </svg>
-                                    </button>
+                                    <div class="float-right inline-flex items-center">
+                                        <label class="cursor-pointer" data-popover-target="popover-addInDB">
+                                            <input id="addInDB" type="checkbox" value="" class="sr-only peer" onclick="saveInDB()">
+                                            <div class="relative w-11 h-6 bg-gray-200 hover:ring-teal-800 ring-2 ring-gray-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-700 peer-checked:bg-teal-700">
+                                            </div>
+                                        </label>
+                                        <div data-popover id="popover-addInDB" role="tooltip"
+                                            class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                                            <h3 class="text-sm font-semibold text-center text-white p-2">Добавить 
+                                                изделие в шаблон</h3>
+                                            <div data-popper-arrow></div>
+                                        </div>
+                                        <button type="button"
+                                            class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                                            data-modal-hide="product-add-modal">
+                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                fill="none" viewBox="0 0 14 14">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2"
+                                                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div>
+                                <div id="addDiv1">
                                     <h4 id="mainProduct" class="text-xl text-black ">
                                     </h4>
                                 </div>
                             </div>
-                            <div class=" p-4 md:p-2 border-b rounded-t">
+                            <div id="addDiv2" class=" p-4 md:p-2 border-b rounded-t">
                                 <div class="flex items-center justify-between">
                                     <h4 class="text-xl font-semibold text-black ">
                                         Список существующих изделий:
                                     </h4>
-
-                                        <div class="relative inline-block w-full">
-                                            <input type="text" id="productInput"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-2 p-2.5  "
-                                                placeholder="Поиск по изделиям..." required />
-                                        </div>
-                                        <!-- <button type="submit" 
-                                            class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 20 20">
-                                                <path stroke="currentColor" stroke-linecap="round"
-                                                    stroke-linejoin="round" stroke-width="2"
-                                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                            </svg>
-                                        </button> -->
-                                </div>
-                                <div>
-                                    <h4 id="mainProduct" class="text-xl text-black ">
-                                    </h4>
+                                    <div id="autocompleteDiv" class="relative inline-block w-full">
+                                        <input type="text" id="productInput"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-2 p-2.5  "
+                                            placeholder="Поиск по изделиям..." required />
+                                    </div>
                                 </div>
                             </div>
                             <div class="p-4 md:p-2 space-y-4 text-xl">
@@ -436,12 +436,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id="hideen3" class="p-4 md:p-2 space-y-4 text-xl">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-rows-1 py-2 text-center">
+                                        <h2 class="text-left font-medium text-black">Головное изделие: </h2>
+                                    </div>
+                                    <div class="grid grid-rows-1 items-center">
+                                        <input id="newProductIsMain" type="checkbox" value=""
+                                            name="bordered-checkbox"
+                                            class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="p-4 md:p-2 space-y-4 text-xl">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="grid grid-rows-1 py-2 text-center">
                                         <h2 class="text-left font-medium text-black">Покупное изделие: </h2>
                                     </div>
-                                    <div class="grid grid-rows-1">
+                                    <div class="grid grid-rows-1 items-center">
                                         <input id="newProductisLocalContract" type="checkbox" value=""
                                             name="bordered-checkbox"
                                             class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
@@ -508,24 +520,29 @@
                                         <h2 class="text-left font-medium text-black">Документы: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
+
                                         <div class="flex items-center justify-center w-full">
                                             <label for="newProductFiles"
-                                                class="flex flex-col items-center justify-center w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 ">
-                                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none" viewBox="0 0 20 16">
+                                                class="flex flex-col items-center justify-center w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-300">
+                                                <div id="newProductFilesList"
+                                                    class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 20 16">
                                                         <path stroke="currentColor" stroke-linecap="round"
                                                             stroke-linejoin="round" stroke-width="2"
                                                             d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                                                     </svg>
-                                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
+                                                    <p class="mb-2 text-sm text-gray-500 "><span
                                                             class="font-semibold">Click to upload</span> or drag and
                                                         drop</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">DOC, DOCX,
+                                                    <p class="text-xs text-gray-500 ">DOC, DOCX,
                                                         PDF</p>
                                                 </div>
-                                                <input id="newProductFiles" type="file" class="hidden" multiple />
+                                                <!-- oninput="showFileList('newProductFiles', 'newProductFilesList')" -->
+                                                <input id="newProductFiles"
+                                                    oninput="showFileList('newProductFiles', 'newProductFilesList')"
+                                                    type="file" class="hidden" multiple />
                                             </label>
                                         </div>
                                     </div>
@@ -713,17 +730,17 @@
                                     </select>
                                 </div>
                                 <div data-popover id="popover-description-provider-1" role="tooltip"
-                                    class="absolute z-10 invisible inline-block text-sm text-gray-700 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+                                    class="absolute z-10 invisible inline-block text-sm text-white transition-opacity duration-300 bg-gray-500 border border-gray-700 rounded-lg shadow-sm opacity-0 w-72">
                                     <div class="p-3 space-y-2">
                                         <div class="grid grid-cols-2">
                                             <div class="grid grid-rows-1 py-2 text-center">
-                                                <h2 class="text-left font-medium text-black">Адрес: </h2>
+                                                <h2 class="text-left font-medium text-white">Адрес: </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <p id="providerAddress" class="text-left font-medium"></p>
                                             </div>
                                         </div>
-                                        <hr class="mx-auto my-1 h-px bg-black border-grey-300 border">
+                                        <hr class="mx-auto my-1 h-px bg-gray-700 border-gray-700 border">
                                         <div id="contacts">
 
                                         </div>
@@ -770,8 +787,9 @@
                         <div class="grid grid-rows-1">
                             <div class="flex items-center justify-center w-full">
                                 <label for="productFile"
-                                    class="flex flex-col items-center justify-center w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-300">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    class="flex flex-col items-center justify-center max-w-full w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-300">
+                                    <div id="productFilesList"
+                                        class="flex flex-col items-center justify-center pt-5 pb-6">
                                         <svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -782,9 +800,10 @@
                                                 upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-500 ">DOC, DOCX, PDF</p>
                                     </div>
-                                    <input id="productFile" type="file" class="hidden" multiple />
+                                    <input id="productFile" oninput="showFileList('productFile', 'productFilesList')"
+                                        type="file" class="hidden" multiple />
                                 </label>
-                                <a id="linkForSavingFiles" style="display:none"></a>
+                                <!-- <a id="linkForSavingFiles" style="display:none"></a> -->
                             </div>
                         </div>
                     </div>
@@ -792,7 +811,7 @@
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
                         </div>
-                        <div id="fileList" class="grid grid-rows-1">
+                        <div id="fileList" class="relative grid grid-rows-1"> Файлы не найдены
                         </div>
                     </div>
                     <div id="changeButton" class="grid grid-cols-2 gap-4 py-2">

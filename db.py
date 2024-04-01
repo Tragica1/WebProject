@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="123",
+    password="1234",
     host="localhost",
     port=3306
 )
@@ -167,6 +167,7 @@ def db_get_government_contracts():
     else:
         return [False, None]
 
+
 def db_get_contract(id):
     cur = con.cursor()
     sql = '''SELECT * FROM contract WHERE idContract=%s'''
@@ -189,6 +190,41 @@ def db_get_products():
         return [True, product]
     else:
         return [False, None]
+    
+
+def db_get_products_for_autocomplete():
+    cur = con.cursor()
+    sql = '''SELECT id, name FROM product'''
+    cur.execute(sql)
+    products = cur.fetchall()
+    result = []
+    for p in products:
+        result.append({'id': int(p[0]), 'name': p[1], 'type': 'db'})
+    cur.close()
+    return result
+
+
+def db_get_product_for_autocomplete(id):
+    cur = con.cursor()
+    sql = '''SELECT * FROM product WHERE id=%s'''
+    cur.execute(sql, (id,))
+    product = cur.fetchone()
+    cur.close()
+    return {
+        'name': product[1],
+        'code': product[2],
+        'number': product[3],
+        'count': product[5],
+        'idType': product[6],
+        'idState': product[7],
+        'isContract': product[8],
+        'idProvider': None,
+        'start': product[9],
+        'end': product[10],
+        'note': product[11],
+        'files': [],
+        'children': []
+    }
 
 
 def db_get_product(id):
@@ -226,7 +262,8 @@ def db_has_children(id):
         return True
     else:
         return False
-    
+
+
 def db_is_child(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist'''
@@ -239,6 +276,7 @@ def db_is_child(id):
         return True
     else:
         return False
+
 
 def db_get_product_child():
     cur = con.cursor()
@@ -259,21 +297,24 @@ def db_add_company_contract_list(company_id, contract_id):
     con.commit()
 
 
-def db_add_product(data, parentId=None):
+def db_add_product(data):
     cur = con.cursor()
-    sql = '''INSERT INTO product (name, code, number, companyId, idType, idState, count, description)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
-    cur.execute(sql, (data[0], data[1], data[2], data[3],
-                data[4], data[5], data[6], data[7]))
-    if parentId:
-        sql = '''SELECT idProduct FROM product WHERE name=%s'''
-        cur.execute(sql, (data[0],))
-        childId = cur.fetchone()
-
-        sql = '''INSERT INTO parentchildlist (idParent, idChild) VALUES (%s, %s)'''
-        cur.execute(sql, (parentId, childId))
+    if  data['start'] == '':
+        data['start'] = None
+    if  data['end'] == '':
+        data['end'] = None
+    if data['idProvider'] == 0:
+        data['idProvider'] = None
+    sql = '''INSERT INTO product (name, code, number, isMain, count, idType, idState, idCompany, startDate, endDate, note)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+    cur.execute(sql, (str(data['name']), str(data['code']), str(data['number']), int(data['isMain']),
+                int(data['count']), int(data['idType']), int(data['idState']), data['idProvider'],
+                data['start'], data['end'], data['note']))
+    cur.execute('''SELECT LAST_INSERT_ID()''')
+    product_id = cur.fetchone()
     cur.close()
     con.commit()
+    return product_id
 
 
 def db_update_product(data, contract_id=None):
@@ -328,5 +369,24 @@ def db_delete_contract(contract_id):
     cur.execute(sql, (contract_id,))
     sql = '''DELETE FROM governmentcontract WHERE id=%s'''
     cur.execute(sql, (contract_id,))
+    cur.close()
+    con.commit()
+
+
+def db_add_files(name):
+    cur = con.cursor()
+    sql = '''INSERT INTO file (name) VALUES (%s)'''
+    cur.execute(sql, (name,))
+    cur.execute('''SELECT LAST_INSERT_ID()''')
+    file_id = cur.fetchone()
+    cur.close()
+    con.commit()
+    return file_id
+
+
+def db_add_product_file_list(file_id, prod_id):
+    cur = con.cursor()
+    sql = '''INSERT INTO productfilelist (idProduct, idFile) VALUES (%s, %s)'''
+    cur.execute(sql, (prod_id, file_id))
     cur.close()
     con.commit()

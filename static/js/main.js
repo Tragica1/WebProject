@@ -1,5 +1,6 @@
 window.onload = getContractFromStorage();
 window.onload = getProdivers();
+// window.onload = getProductList(false)
 // window.onload = getContracts();
 
 function getContractFromStorage() {
@@ -10,7 +11,6 @@ function getContractFromStorage() {
     } else {
         getContractInfo(-1, '', '', '', '', '', '', '')
     }
-
 }
 
 
@@ -151,7 +151,7 @@ function setDeafults() {
     $('#newProductCount').val('1')
     $('#newProductState').val(1)
     $('#newProductType').val(1)
-    getProductList()
+    getProductList(false)
 }
 
 
@@ -161,10 +161,11 @@ function cleanInputWindow(id_modal) {
     for (var i = 0; i < inputs.length; i++) {
         if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date' || inputs[i].type == 'file') {
             inputs[i].value = ''
-        } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox') {
+        } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox' && inputs[i].id != 'addInDB') {
             inputs[i].checked = false
         }
     }
+    document.getElementById('hideen2').style.display = 'none'
 }
 
 function saveProvider() {
@@ -191,7 +192,6 @@ function saveProvider() {
         data: JSON.stringify(formData),
         success: function (response) {
             getProdivers()
-
             console.log(response);
         },
         error: function (error) {
@@ -250,15 +250,6 @@ function saveContract() {
             type = types[i].id
         }
     }
-    // const fff = document.getElementById("contractNumber");
-    // fff.addEventListener("input", (event) => {
-    //     // console.log($('#contractNumber'))
-    //     if (fff.validity.tooShort) {
-    //         fff.setCustomValidity("ОЧЕНЬ КОРОТКИЙ");
-    //     } else {
-    //         fff.setCustomValidity("");
-    //     }
-    // });  
     var formData = {
         'number': $('#contractNumber').val(),
         'innerNumber': $('#contractInnerNumber').val(),
@@ -269,7 +260,6 @@ function saveContract() {
         'contractStatus': 1,
         'products': pr
     };
-    // console.log(formData)
     $.ajax({
         type: 'POST',
         url: '/saveContract',
@@ -287,7 +277,6 @@ function saveContract() {
             console.log(error);
         }
     });
-    // getContracts()
 }
 
 
@@ -362,8 +351,10 @@ function deleteProduct() {
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
-            startCreation(contractInfo['id'])
+            // startCreation(contractInfo['id'])
+            document.getElementById('element' + $("#currentProduct").val().slice(14)).remove()
             cleanInputWindow('product-change-modal')
+            getProductList(false)
             console.log(response);
         },
         error: function (error) {
@@ -394,13 +385,71 @@ function editProduct() {
 }
 
 
+var my_files = []
+function showFileList(inpName, fileList) {
+    var files = document.getElementById(inpName).files
+    // console.log(files)
+    for (var i = 0; i < files.length; i++) {
+        my_files.push(files[i])
+    }
+    // console.log(my_files)
+    // console.log('##################################################')
+    var list = document.getElementById(fileList)
+    list.innerHTML = `<svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"` +
+        `d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />` +
+        `</svg>`
+    for (var i = 0; i < my_files.length; i++) {
+        list.innerHTML += `<div id="file-list-` + i + `" class="inline-flex items-center p-2">` +
+            `<p class="text-gray-800 text-sm" >` + my_files[i].name +
+            `</p>` +
+            `<button onclick='deleteFileFromList(` + i + `, "` + fileList + `")'>` +
+            `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+            `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+            `</svg>` +
+            `</button>` +
+            `</div>`
+    }
+    updateDragAndDrop(fileList, false)
+}
+
+
+function deleteFileFromList(index, fileList) {
+    my_files.splice(index, 1)
+    var t = document.getElementById('file-list-' + index)
+    t.remove()
+    updateDragAndDrop(fileList, false)
+}
+
+
+function updateDragAndDrop(fileList, option) {
+    if (my_files.length == 0 || option) {
+        var list = document.getElementById(fileList)
+        list.innerHTML = `<svg class="w-8 h-8 mb-4 text-gray-500 " aria-hidden="true"` +
+            `xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">` +
+            `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"` +
+            `d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />` +
+            `</svg>` +
+            `<p class="mb-2 text-sm text-gray-500 "><span` +
+            `class="font-semibold">Click to upload</span> or drag and ` +
+            `drop</p>` +
+            `<p class="text-xs text-gray-500 ">DOC, DOCX, ` +
+            `PDF</p>`
+    }
+}
+
+
 var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
     cleanInputWindow('product-add-modal')
+    my_files = []
+    updateDragAndDrop("productFilesList", true)
+    updateDragAndDrop("newProductFilesList", true)
     // document.getElementById('editButton').removeAttribute('disabled')
     document.getElementById('addButton').removeAttribute('disabled')
     document.getElementById('deleteButton').removeAttribute('disabled')
-    document.getElementById('currentProduct').className = 'w-full max-w-xl border border-black rounded-lg shadow sm:p-6 md:p-8'
+    document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-black rounded-lg shadow sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-xl') != -1) {
@@ -414,8 +463,18 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         } else {
             currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-4"
         }
+    } else {
+        if (currentElem.className.indexOf('text-xl') != -1) {
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-purple-500 rounded-lg"
+        } else {
+            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-4"
+        }
     }
     previousElem = currentElem
+    document.getElementById('addInDB').checked = false
+    document.getElementById('addDiv1').innerHTML = inner_div1
+    document.getElementById('addDiv2').innerHTML = inner_div2
+    document.getElementById('addDiv2').className = div2_class
     // document.getElementById('changeButton').innerHTML = ''
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
@@ -436,7 +495,9 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#productState").val(state)
     // document.getElementById('productState').setAttribute('disabled', '')
     if (note_list != 'null') {
-        $("#productNote").val(note_list.replaceAll("!@!", "\n"))
+        // $("#productNote").val(note_list.replaceAll("!@!", "\n"))
+        $("#productNote").val(note_list)
+
     } else {
         $("#productNote").val('')
     }
@@ -460,12 +521,14 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
+
     // document.getElementById('productProvider').setAttribute('disabled', '')
     // document.getElementById('startDate').setAttribute('disabled', '')
     // document.getElementById('endDate').setAttribute('disabled', '')
+
     $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
     createFileList(id, files)
-
+    
     $('#newProductName').val('')
     $('#newProductCode').val('')
     $('#newProductType').val('')
@@ -486,39 +549,38 @@ function addNewProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = document.getElementById('newProductFiles').files
     var formData = new FormData()
-    var data = {}
+    var data = {
+        'contractId': contractInfo['id'],
+        'mainProductId': -1,
+        'name': $('#newProductName').val(),
+        'code': $('#newProductCode').val(),
+        'idType': $("#newProductType").val(),
+        'idState': $("#newProductState").val(),
+        'isMain': 0,
+        'number': $("#newProductNumber").val(),
+        'count': $("#newProductCount").val(),
+        'note': $("#newProductNote").val(),
+        'isContract': 0,
+        'idProvider': 0,
+        'start': '',
+        'end': ''
+        
+    }
     if (document.getElementById('newProductisLocalContract').checked) {
-        data = {
-            'contractId': contractInfo['id'],
-            'mainProductId': $("#mainProduct").val().slice(11),
-            'name': $('#newProductName').val(),
-            'code': $('#newProductCode').val(),
-            'idType': $("#newProductType").val(),
-            'idState': $("#newProductState").val(),
-            'number': $("#newProductNumber").val(),
-            'count': $("#newProductCount").val(),
-            'isContract': 1,
-            'idProvider': $("#newProductProvider").val(),
-            'start': $("#newProductStartDate").val(),
-            'end': $("#newProductEndDate").val(),
-            'note': $("#newProductNote").val()
+        data['isContract'] = 1
+        data['idProvider'] = $("#newProductProvider").val()
+        data['start'] = $("#newProductStartDate").val()
+        data['end'] = $("#newProductEndDate").val()
+    }
+    if (document.getElementById('addInDB').checked == true){
+        data['mainProductId'] = document.getElementById('productInput').getAttribute('m-prod-id')
+        if(document.getElementById('newProductIsMain').checked){
+            data['isMain'] = 1
         }
+        formData.append('to_db', 1)
     } else {
-        data = {
-            'contractId': contractInfo['id'],
-            'mainProductId': $("#mainProduct").val().slice(11),
-            'name': $('#newProductName').val(),
-            'code': $('#newProductCode').val(),
-            'idType': $("#newProductType").val(),
-            'idState': $("#newProductState").val(),
-            'number': $("#newProductNumber").val(),
-            'count': $("#newProductCount").val(),
-            'isContract': 0,
-            'idProvider': 0,
-            'start': '',
-            'end': '',
-            'note': $("#newProductNote").val()
-        }
+        data['mainProductId'] = $("#mainProduct").val().slice(11)
+        formData.append('to_db', 0)
     }
     formData.append('data', JSON.stringify(data))
     for (var i = 0; i < files.length; i++) {
@@ -534,6 +596,7 @@ function addNewProduct() {
         success: function (response) {
             startCreation(contractInfo['id'])
             cleanInputWindow('product-add-modal')
+            getProductList(false)
             console.log(response);
         },
         error: function (error) {
@@ -547,16 +610,15 @@ function addNewProduct() {
 function createFileList(id, files) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var fileListDiv = document.getElementById('fileList')
-    console.log("Create file list - ",files)
     if (files && files.length != 0) {
         var ul = document.createElement('ul')
         ul.className = 'inline-grid ps-2 mt-2 space-y-1 list-none list-inside text-sm'
         fileListDiv.innerHTML = ''
         for (var i = 0; i < files.length; i++) {
             var a = document.createElement('li')
-            a.className = 'inline-flex'
+            a.className = 'inline-flex items-center'
             var tmp = files[i].split('\\')
-            a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 items-center" role="button" ` +
+            a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 " role="button" ` +
                 `onclick='downloadFile(` + JSON.stringify(files[i]) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
                 `</a>` +
                 `<button onclick='deleteFile(` + JSON.stringify(files[i]) + `, ` + id + `, "` + contractInfo['id'] + `")'>` +
@@ -582,7 +644,7 @@ function deleteFile(filePath, product_id, contract_id) {
         success: function (response) {
             console.log(response)
             createFileList(product_id, response['files'])
-            startCreation(contract_id)
+            // startCreation(contract_id)
 
         },
         error: function (response) {
@@ -611,7 +673,7 @@ function downloadFile(filePath, filename) {
             document.body.appendChild(elem)
             elem.click()
             document.body.removeChild(elem)
-            
+
             // const url = URL.createObjectURL(response)
             // window.open(url)
         },
@@ -621,7 +683,9 @@ function downloadFile(filePath, filename) {
     })
 }
 
-function updateProduct(data, files) {
+
+function updateProduct(id, data, files) {
+    // console.log(data, files)
     $("#productNumber").val(data.number)
     $("#productType").val(data.idType)
     $("#productCount").val(data.count)
@@ -645,14 +709,22 @@ function updateProduct(data, files) {
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
-    if (files){
-        createFileList(data.id, files)
+    if (files) {
+        createFileList(id, files)
     }
+    var command = "showProduct(" + id + ", '" + data.name + "', '" + data.code + "', '" + data.number + "'" +
+        ", " + data.idType + ", " + data.count + ", " + data.idState + ", " + data.isContract + "" +
+        ", " + data.idProvider + ", '" + data.start + "', '" + data.end + "', " + JSON.stringify(data.note) + ", " + JSON.stringify(data.files) + ")"
+    var my_elem = document.getElementById('element' + id)
+    my_elem.setAttribute('onclick', command)
+    updateDragAndDrop("productFilesList", true)
+    my_files = []
 }
+
 
 function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    var files = document.getElementById('productFile').files
+    var files = my_files
     var formData = new FormData()
     var data = {}
     if (document.getElementById('isLocalContract').checked) {
@@ -686,7 +758,6 @@ function changeProduct() {
     }
     formData.append('data', JSON.stringify(data))
     for (var i = 0; i < files.length; i++) {
-        console.log(files[i])
         formData.append('files', files[i]);
     }
     $.ajax({
@@ -696,9 +767,10 @@ function changeProduct() {
         contentType: false,
         data: formData,
         success: function (response) {
-            startCreation(contractInfo['id'])
+            // startCreation(contractInfo['id'])
             cleanInputWindow('product-change-modal')
-            updateProduct(data, response['files'])
+            updateProduct(data['id'], response['product'], response['files'])
+            getProductList(false)
             console.log(response);
         },
         error: function (error) {
@@ -743,15 +815,13 @@ function createTree(element, data, idd, i) {
     data.forEach((item) => {
         // console.log(item)
         const listItem = document.createElement('li')
-        var new_note = String(item.note)
-        note_lines = new_note.replaceAll("\n", "!@!")
         if (item.children.length != 0) {
             var tmp = item.id + i
             listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                 `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
+                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>` +
                 item.name + `</a>`
@@ -761,7 +831,7 @@ function createTree(element, data, idd, i) {
                 `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-4"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", "` + note_lines + `", ` + JSON.stringify(item.files) + `)'>` +
+                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 item.name + `</a>`
         }
         if (item.children.length != 0) {
@@ -785,7 +855,7 @@ function startCreation(id) {
 }
 
 
-function getProductList() {
+function getProductList(only_db) {
     var productList = []
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
 
@@ -796,7 +866,23 @@ function getProductList() {
         data: { 'contractId': contractInfo['id'] },
         success: function (response) {
             productList = response['products']
-            productAutocomplete(productList)
+            // console.log(only_db)
+            db_productList = []
+            var j = 0
+            if (only_db) {
+                for (var i = 0; i < productList.length; i++){
+                    if (productList[i]['type'] == 'db') {
+                        // console.log()
+                        db_productList[j] = productList[i]
+                        j+=1
+                    }
+                }
+                console.log(db_productList)
+                productAutocomplete(db_productList, true)
+            } else {
+                console.log(productList)
+                productAutocomplete(productList, false)
+            }
         },
         error: function (error) {
             location.reload();
@@ -805,16 +891,18 @@ function getProductList() {
     });
 }
 
-function autocomplete(id) {
+
+function autocomplete(id, type) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
 
     $.ajax({
         type: 'GET',
         url: '/getProductInfo',
         contentType: false,
-        data: { 'contractId': contractInfo['id'], 'productId': id.slice(13) },
+        data: { 'contractId': contractInfo['id'], 'productId': id.slice(13), 'productType': type },
         success: function (response) {
             product = response['product']
+            console.log(product)
             $('#newProductName').val(product.name)
             $('#newProductCode').val(product.code)
             $('#newProductType').val(product.idType)
@@ -833,7 +921,7 @@ function autocomplete(id) {
                 $("#newProductProvider").val('')
                 document.getElementById('hideen2').style.display = 'none'
             }
-            if (product.note != null) {
+            if (product.note != "None") {
                 $("#newProductNote").val(product.note)
             } else {
                 $("#productNote").val('')
@@ -847,14 +935,16 @@ function autocomplete(id) {
 
 }
 
-function productAutocomplete(productList) {
+
+function productAutocomplete(productList, only_db) {
     var inp = document.getElementById("productInput")
     var currentFocus;
     const styleSheet = document.styleSheets[0]
     styleSheet.insertRule('.auto-list { position: absolute; border-radius: 0.5rem; border-width: 1px; --tw-bg-opacity: 1; background-color: rgb(255 255 255 / var(--tw-bg-opacity)); }', styleSheet.cssRules.length)
-    console.log(productList)
+    // console.log(productList)
     inp.addEventListener('input', function (e) {
         var a, b, i, val = this.value
+        console.log(val)
         closeAllLists();
         if (!val) { return false; }
         currentFocus = -1;
@@ -868,10 +958,20 @@ function productAutocomplete(productList) {
                 b.setAttribute('class', 'text-black text-sm border-b p-1 cursor-pointer hover:bg-gray-200')
                 b.innerHTML = "<strong>" + productList[i]['name'].substr(0, val.length) + "</strong>";
                 b.innerHTML += productList[i]['name'].substr(val.length);
-                b.innerHTML += "<input type='hidden' id='product-item-" + productList[i]['id'] + "' value='" + productList[i]['name'] + "'>";
+                if (productList[i]['type'] == 'db') {
+                    b.innerHTML += "<strong> (Из шаблона)</strong>"
+                } else {
+                    b.innerHTML += "<strong> (Из контракта)</strong>"
+                }
+                b.innerHTML += "<input type='hidden' id='product-item-" + productList[i]['id'] + "' value='" + productList[i]['name'] + "' data-type='" + productList[i]['type'] + "'>";
                 b.addEventListener("click", function (e) {
                     inp.value = this.getElementsByTagName("input")[0].value;
-                    autocomplete(this.getElementsByTagName("input")[0].id)
+                    if (!only_db) {
+                        autocomplete(this.getElementsByTagName("input")[0].id, this.getElementsByTagName("input")[0].getAttribute('data-type'))
+                        inp.setAttribute('m-prod-id', '-1')
+                    } else {
+                        inp.setAttribute('m-prod-id', this.getElementsByTagName("input")[0].id.slice(13))
+                    }
                     closeAllLists();
                 });
                 a.appendChild(b);
@@ -909,7 +1009,7 @@ function productAutocomplete(productList) {
         }
     }
     function closeAllLists(elmnt) {
-        
+
         var x = document.getElementsByClassName("auto-list");
         for (var i = 0; i < x.length; i++) {
             if (elmnt != x[i] && elmnt != inp) {
@@ -920,4 +1020,38 @@ function productAutocomplete(productList) {
     document.addEventListener("click", function (e) {
         closeAllLists(e.target);
     });
+}
+
+
+var inner_div1 = document.getElementById('addDiv1').innerHTML
+var inner_div2 = document.getElementById('addDiv2').innerHTML
+var div2_class = document.getElementById('addDiv2').className
+document.getElementById('hideen3').style.display = 'none'
+function saveInDB() {
+    var option = document.getElementById('addInDB').checked
+    var div1 = document.getElementById('addDiv1')
+    var div2 = document.getElementById('addDiv2')
+    var elem = document.getElementById('hideen3')
+    if (option){
+        document.getElementById('productInput').setAttribute('m-prod-id', '-1')
+        div1.innerHTML = document.getElementById('autocompleteDiv').innerHTML
+        div2.innerHTML = ''
+        div2.className = ''
+        getProductList(true)    
+        elem.style.display = 'block'
+    } else {
+        elem.style.display = 'none'
+        div1.innerHTML = inner_div1
+        div2.innerHTML = inner_div2
+        div2.className = div2_class
+        $('#mainProduct').text($('#productName').text().slice(9))
+        $("#mainProduct").val("mainProduct" + $("#currentProduct").val().slice(14))
+        getProductList(false)
+    }
+    cleanInputWindow('product-add-modal')
+    $('#newProductCode').val('н/б')
+    $('#newProductCount').val('1')
+    $('#newProductState').val(1)
+    $('#newProductType').val(1)
+    // setDeafults()
 }
