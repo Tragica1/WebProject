@@ -6,6 +6,7 @@ from flask import Flask
 app = Flask(__name__)
 # upl_folder = 'static/images'
 contract_folder = 'contracts'
+secret_folder = 'secret'
 app.config['SECRET_KEY'] = 'fjkisdjhfuih2jr_'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['UPLOAD_FOLDER'] = upl_folder

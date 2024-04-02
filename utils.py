@@ -1,7 +1,8 @@
 from db import *
-from config import contract_folder
+from config import contract_folder, secret_folder
 import os
 import datetime
+import shutil
 
 def create_product(id, name, code, number, count, type, state, idProvider, start, end, note):
     return {
@@ -165,7 +166,6 @@ def get_products_from_json(contract_data, products):
 def get_product_from_json(contract_data, product_id, product):
     for item in contract_data:
         if product_id == int(item['id']):
-            # print('---------------- ', item['name'])
             product['product'] = {
                 'name': item['name'],
                 'code': item['code'],
@@ -181,8 +181,19 @@ def get_product_from_json(contract_data, product_id, product):
                 'files': item['files'],
                 'children': item['children']
             }
-            # print(product)
-            # return product
         if len(item['children']) != 0:
             get_product_from_json(item['children'], product_id, product)
-        # print(item['id'], item['name'])
+
+
+def check_files(contract_id, files):
+    new_files = []
+    for file in files:
+        tmp = file.split('\\')[-1]
+        print(tmp)
+        my_file = os.path.join(contract_folder, 'contract_' + str(contract_id), tmp)
+        print(my_file)
+        if os.path.isfile(my_file) == False:
+            print('!!!!!!!!!!!!!!!')
+            shutil.copy(file, my_file)
+        new_files.append(my_file)
+    return new_files

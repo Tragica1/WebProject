@@ -122,6 +122,7 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
         }
         localStorage.setItem("currentContract", JSON.stringify(currentContract));
         document.getElementById('info').innerHTML = ""
+        $("#cNumber").text('Контракт не выбран')
     } else {
         var currentContract = {
             'id': id,
@@ -587,15 +588,19 @@ function addNewProduct() {
         console.log(files[i])
         formData.append('files', files[i]);
     }
-    if (mb_files) {
-        for (var i = 0; i < mb_files.length; i++) {
-            // console.log(mb_files[i])
-            formData.append('mb_files', JSON.stringify(mb_files[i]));
-        }
-        mb_files = []  
-    } else {
-        formData.append('mb_files', JSON.stringify([]));
+    if (static_files) {
+        console.log(static_files)
+        formData.append('static_files', JSON.stringify(static_files))
     }
+    // if (mb_files) {
+    //     for (var i = 0; i < mb_files.length; i++) {
+    //         // console.log(mb_files[i])
+    //         formData.append('mb_files', JSON.stringify(mb_files[i]));
+    //     }
+    //     mb_files = []  
+    // } else {
+    //     formData.append('mb_files', JSON.stringify([]));
+    // }
     $.ajax({
         type: 'POST',
         url: '/addNewProduct',
@@ -901,7 +906,7 @@ function getProductList(only_db) {
     });
 }
 
-var mb_files = []
+var static_files = []
 function autocomplete(id, type) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
 
@@ -922,9 +927,9 @@ function autocomplete(id, type) {
             // document.getElementById('newProductFiles').files = FileList(product.files)
             createFileList(id.slice(13), product.files, 'newFileList')
             if (product.files) {
-                mb_files = product.files
+                static_files = product.files
             }
-            // showFileList('newProductFiles', 'newProductFilesList')
+            showFileList('newProductFiles', 'newProductFilesList')
             if (product.isContract == 1) {
                 document.getElementById('newProductisLocalContract').checked = true
                 $("#newProductProvider").val(product.idProvider)

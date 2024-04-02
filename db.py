@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="123",
+    password="1234",
     host="localhost",
     port=3306
 )
@@ -210,21 +210,6 @@ def db_get_product_for_autocomplete(id):
     cur.execute(sql, (id,))
     product = cur.fetchone()
     cur.close()
-    print({
-        'name': product[1],
-        'code': product[2],
-        'number': product[3],
-        'count': product[5],
-        'idType': product[6],
-        'idState': product[7],
-        'isContract': 1 if product[8] != None else 0,
-        'idProvider': product[8] if product[8] != None else 0,
-        'start': product[9].strftime('%Y-%m-%d') if product[8] != None else None,
-        'end': product[10].strftime('%Y-%m-%d') if product[8] != None else None,
-        'note': product[11],
-        'files': db_get_product_files(id),
-        'children': []
-    })
     return {
         'name': product[1],
         'code': product[2],

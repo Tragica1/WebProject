@@ -187,30 +187,30 @@ def add_new_product():
         to_db = request.form['to_db']       
         files = request.files.getlist('files')
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
-        file_pathes = []
-        # mb_files = json.loads(request.form['mb_files'])
-        print(files)
-        print(json.loads(request.form['mb_files']))
+        json_file_pathes = []
+        db_file_pathes = []
+        static_files = json.loads(request.form['static_files'])
         if request.files:
             files = request.files.getlist('files')
-            # print(files)
             for file in files:
                 if file.filename != '':
+                    if (int(to_db) == 1):
+                        filepath = os.path.join(secret_folder, file.filename.replace(' ', '_'))
+                        file.save(filepath)
+                        db_file_pathes.append(filepath)
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
-                    file_pathes.append(filepath)
-        # if json.loads(request.form['mb_files']):
-        #     # print(mb_files)
-        #     # for f in mb_files:
-        #     mb_files = json.loads(request.form['mb_files'])
-        #     file_pathes.append(mb_files)
-        print(file_pathes)
+                    json_file_pathes.append(filepath)
+        if static_files:
+            for f in static_files:
+                json_file_pathes.append(f)
+        # print(file_pathes)
         if (int(to_db) == 1):
             new_prod_id = db_add_product(data)
             if int(data['mainProductId']) != -1:
                 db_add_child(int(data['mainProductId']), new_prod_id)
-            if file_pathes:
-                for filepath in file_pathes:
+            if db_file_pathes:
+                for filepath in db_file_pathes:
                     file_id = db_add_files(filepath)
                     db_add_product_file_list(file_id, new_prod_id)
         else:
@@ -218,7 +218,7 @@ def add_new_product():
                 contract_data = json.load(f)
                 f.close()
                 
-            add_product_in_json(contract_data['data'], data, file_pathes)
+            add_product_in_json(contract_data['data'], data, json_file_pathes)
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
                 json_data = json.dumps(contract_data)
                 f.write(json_data)
@@ -310,18 +310,8 @@ def get_product_list():
         products_from_json = []
         products_from_db = db_get_products_for_autocomplete()
         get_products_from_json(contract_data['data'], products_from_json)
-        # print(products_from_db)
-        # print('\n----\n')
-        # print(products_from_json)
         for p_json in products_from_json:
-            # cond = False
-            # for p_db in products_from_db:
-            #     if p_json['name'] == p_db['name']:
-            #         cond = True
-            # if not cond:
                 products_from_db.append(p_json)
-        # result_products = products_from_db.append(products_from_json)
-        # print(result_products)
         return jsonify({'status': 'success', 'message': 'Product list got successfully', 'products': products_from_db})
     except Exception as e:
         print(e)
@@ -335,7 +325,7 @@ def get_product_info():
         product_id = request.args.get('productId')
         product_type = request.args.get('productType')
         dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
-        print(contract_id, product_id, dir_path)
+        print(contract_id, product_id, product_type, dir_path)
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
@@ -344,6 +334,9 @@ def get_product_info():
             get_product_from_json(contract_data['data'], int(product_id), product)
         else:
             product['product'] = db_get_product_for_autocomplete(int(product_id))
+            print(product['product'])
+            product['product']['files'] = check_files(contract_id,  product['product']['files'])
+            print(product['product'])
         return jsonify({'status': 'success', 'message': 'Product got successfully', 'product': product['product']})
     except Exception as e:
         print(e)
