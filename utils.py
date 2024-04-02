@@ -1,8 +1,9 @@
 from db import *
 from config import contract_folder
 import os
+import datetime
 
-def create_product(id, name, code, number, count, type, state, note):
+def create_product(id, name, code, number, count, type, state, idProvider, start, end, note):
     return {
         'id': id,
         'name': fix_quotes(str(name)),
@@ -11,12 +12,12 @@ def create_product(id, name, code, number, count, type, state, note):
         'count': count,
         'idType': type, 
         'idState': state,
-        'isContract': 0,
-        'idProvider': 0,
-        'start': None,
-        'end': None,
+        'isContract': 1 if idProvider != None else 0,
+        'idProvider': idProvider if idProvider != None else 0,
+        'start': start.strftime('%Y-%m-%d') if idProvider != None else None,
+        'end': end.strftime('%Y-%m-%d') if idProvider != None else None,
         'note': note,
-        'files': [],
+        'files': db_get_product_files(id),
         'children': []
     }
 
@@ -26,16 +27,16 @@ def add_product_child(product, child):
     if len(db_get_product_children(child['id'])) > 0:
         children = db_get_product_children(child['id'])
         for ch in children:
-            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], ch[6], ch[7], ch[11]))
+            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], ch[6], ch[7], ch[8], ch[9], ch[10], ch[11]))
 
 
 def create_product_tree(input_id):
     prod_state, product = db_get_product(input_id)
     if prod_state:
-        product_root = create_product(product[0], product[1], product[2], product[3], product[5], product[6], product[7], product[11])
+        product_root = create_product(product[0], product[1], product[2], product[3], product[5], product[6], product[7], product[8], product[9], product[10], product[11])
         children = db_get_product_children(product[0])
         for child in children:
-            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], child[6], child[7], child[11]))
+            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], child[6], child[7], child[8], child[9], child[10], child[11]))
     return product_root
 
 
@@ -78,6 +79,7 @@ def check_contract_file(contract_id):
 def change_product_in_json(contract_data, product_data, file_pathes):
     for item in contract_data:
         if int(product_data['id']) == item['id']:
+            print(item['name'])
             item['number'] = product_data['number']
             item['count'] = product_data['count']
             item['idType'] = product_data['idType']
@@ -90,9 +92,9 @@ def change_product_in_json(contract_data, product_data, file_pathes):
             if len(file_pathes) != 0:
                 for path in file_pathes:
                     item['files'].append(path)
-            return item['files']
+            return 0
         if len(item['children']) != 0:
-            return change_product_in_json(item['children'], product_data, file_pathes)
+                change_product_in_json(item['children'], product_data, file_pathes)
 
 
 def delete_product_in_json(contract_data, product_id, index):

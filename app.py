@@ -8,6 +8,7 @@ from utils import *
 from config import app
 
 
+
 @app.route('/products/<contract_id>')
 def send_products(contract_id):
     print(f'\nSelected contract: {contract_id}\n')
@@ -21,14 +22,14 @@ def send_products(contract_id):
         return json_object
     else:
         products_id = db_get_product_contract_list(contract_id)
-        root_obj = create_product('root', '', '', '', '', '', '', '')
+        # root_obj = create_product('root', '', '', '', '', '', '', '')
         json_data = {
             'data': []
         }
         for pr_id in products_id:
             product_tree = create_product_tree(pr_id)
             json_data['data'].append(product_tree)
-            root_obj['children'].append(product_tree)
+            # root_obj['children'].append(product_tree)
         json_object = json.dumps(json_data)
         with open(os.path.join(contract_folder,'contract_' + str(contract_id), 'contract' + str(contract_id) + '.json'), 'x') as f:
             f.write(json_object)
@@ -88,6 +89,7 @@ def create_product_selector():
     products = []
     for p in prods:
         products.append(list(p))
+        print(p)
     if state:
         for product in products:
             if product[4] == 1:
@@ -137,15 +139,17 @@ def change_product():
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        files = change_product_in_json(contract_data['data'], data, file_pathes)
+        change_product_in_json(contract_data['data'], data, file_pathes)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
         product = {'product': {}}
         get_product_from_json(contract_data['data'], int(data['id']), product)
+        print(product['product'])
         print('Product changed successfully')
-        return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product'] ,  'files': files})
+        # print(files)
+        return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product']})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -161,8 +165,9 @@ def delete_product():
             f.close()
         index = 0
         files = delete_product_in_json(contract_data['data'], int(data['productId']), index)
-        for file in files:
-            os.remove(file)
+        if files:
+            for file in files:
+                os.remove(file)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
@@ -182,19 +187,27 @@ def add_new_product():
         to_db = request.form['to_db']       
         files = request.files.getlist('files')
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
-        file_pathes = [] 
+        file_pathes = []
+        # mb_files = json.loads(request.form['mb_files'])
+        print(files)
+        print(json.loads(request.form['mb_files']))
         if request.files:
             files = request.files.getlist('files')
-            print(files)
+            # print(files)
             for file in files:
                 if file.filename != '':
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
                     file_pathes.append(filepath)
-        # print(file_pathes)
+        # if json.loads(request.form['mb_files']):
+        #     # print(mb_files)
+        #     # for f in mb_files:
+        #     mb_files = json.loads(request.form['mb_files'])
+        #     file_pathes.append(mb_files)
+        print(file_pathes)
         if (int(to_db) == 1):
             new_prod_id = db_add_product(data)
-            if data['mainProductId'] != -1:
+            if int(data['mainProductId']) != -1:
                 db_add_child(int(data['mainProductId']), new_prod_id)
             if file_pathes:
                 for filepath in file_pathes:
@@ -204,6 +217,7 @@ def add_new_product():
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
                 contract_data = json.load(f)
                 f.close()
+                
             add_product_in_json(contract_data['data'], data, file_pathes)
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
                 json_data = json.dumps(contract_data)

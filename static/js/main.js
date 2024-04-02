@@ -527,7 +527,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     // document.getElementById('endDate').setAttribute('disabled', '')
 
     $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
-    createFileList(id, files)
+    createFileList(id, files, 'fileList')
     
     $('#newProductName').val('')
     $('#newProductCode').val('')
@@ -587,6 +587,15 @@ function addNewProduct() {
         console.log(files[i])
         formData.append('files', files[i]);
     }
+    if (mb_files) {
+        for (var i = 0; i < mb_files.length; i++) {
+            // console.log(mb_files[i])
+            formData.append('mb_files', JSON.stringify(mb_files[i]));
+        }
+        mb_files = []  
+    } else {
+        formData.append('mb_files', JSON.stringify([]));
+    }
     $.ajax({
         type: 'POST',
         url: '/addNewProduct',
@@ -607,9 +616,10 @@ function addNewProduct() {
 }
 
 
-function createFileList(id, files) {
+function createFileList(id, files, fileList) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    var fileListDiv = document.getElementById('fileList')
+    var fileListDiv = document.getElementById(fileList)
+
     if (files && files.length != 0) {
         var ul = document.createElement('ul')
         ul.className = 'inline-grid ps-2 mt-2 space-y-1 list-none list-inside text-sm'
@@ -643,7 +653,7 @@ function deleteFile(filePath, product_id, contract_id) {
         data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id },
         success: function (response) {
             console.log(response)
-            createFileList(product_id, response['files'])
+            createFileList(product_id, response['files'], 'fileList')
             // startCreation(contract_id)
 
         },
@@ -684,7 +694,7 @@ function downloadFile(filePath, filename) {
 }
 
 
-function updateProduct(id, data, files) {
+function updateProduct(id, data) {
     // console.log(data, files)
     $("#productNumber").val(data.number)
     $("#productType").val(data.idType)
@@ -709,8 +719,8 @@ function updateProduct(id, data, files) {
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
-    if (files) {
-        createFileList(id, files)
+    if (data.files) {
+        createFileList(id, data.files, 'fileList')
     }
     var command = "showProduct(" + id + ", '" + data.name + "', '" + data.code + "', '" + data.number + "'" +
         ", " + data.idType + ", " + data.count + ", " + data.idState + ", " + data.isContract + "" +
@@ -769,7 +779,7 @@ function changeProduct() {
         success: function (response) {
             // startCreation(contractInfo['id'])
             cleanInputWindow('product-change-modal')
-            updateProduct(data['id'], response['product'], response['files'])
+            updateProduct(data['id'], response['product'])
             getProductList(false)
             console.log(response);
         },
@@ -891,7 +901,7 @@ function getProductList(only_db) {
     });
 }
 
-
+var mb_files = []
 function autocomplete(id, type) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
 
@@ -909,6 +919,12 @@ function autocomplete(id, type) {
             $('#newProductState').val(product.idState)
             $('#newProductNumber').val(product.number)
             $('#newProductCount').val(product.count)
+            // document.getElementById('newProductFiles').files = FileList(product.files)
+            createFileList(id.slice(13), product.files, 'newFileList')
+            if (product.files) {
+                mb_files = product.files
+            }
+            // showFileList('newProductFiles', 'newProductFilesList')
             if (product.isContract == 1) {
                 document.getElementById('newProductisLocalContract').checked = true
                 $("#newProductProvider").val(product.idProvider)

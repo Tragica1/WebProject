@@ -321,13 +321,15 @@
                                     </h4>
                                     <div class="float-right inline-flex items-center">
                                         <label class="cursor-pointer" data-popover-target="popover-addInDB">
-                                            <input id="addInDB" type="checkbox" value="" class="sr-only peer" onclick="saveInDB()">
-                                            <div class="relative w-11 h-6 bg-gray-200 hover:ring-teal-800 ring-2 ring-gray-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-700 peer-checked:bg-teal-700">
+                                            <input id="addInDB" type="checkbox" value="" class="sr-only peer"
+                                                onclick="saveInDB()">
+                                            <div
+                                                class="relative w-11 h-6 bg-gray-200 hover:ring-teal-800 ring-2 ring-gray-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-700 peer-checked:bg-teal-700">
                                             </div>
                                         </label>
                                         <div data-popover id="popover-addInDB" role="tooltip"
                                             class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                                            <h3 class="text-sm font-semibold text-center text-white p-2">Добавить 
+                                            <h3 class="text-sm font-semibold text-center text-white p-2">Добавить
                                                 изделие в шаблон</h3>
                                             <div data-popper-arrow></div>
                                         </div>
@@ -442,8 +444,7 @@
                                         <h2 class="text-left font-medium text-black">Головное изделие: </h2>
                                     </div>
                                     <div class="grid grid-rows-1 items-center">
-                                        <input id="newProductIsMain" type="checkbox" value=""
-                                            name="bordered-checkbox"
+                                        <input id="newProductIsMain" type="checkbox" value="" name="bordered-checkbox"
                                             class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                                     </div>
                                 </div>
@@ -520,7 +521,6 @@
                                         <h2 class="text-left font-medium text-black">Документы: </h2>
                                     </div>
                                     <div class="grid grid-rows-1">
-
                                         <div class="flex items-center justify-center w-full">
                                             <label for="newProductFiles"
                                                 class="flex flex-col items-center justify-center w-full h-26 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-300">
@@ -545,6 +545,15 @@
                                                     type="file" class="hidden" multiple />
                                             </label>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 md:p-2 space-y-4 text-xl">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-rows-1 py-2 text-center">
+                                        <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
+                                    </div>
+                                    <div id="newFileList" class="relative grid grid-rows-1"> Файлы не найдены
                                     </div>
                                 </div>
                             </div>
