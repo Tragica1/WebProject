@@ -118,10 +118,28 @@ def get_new_product_id(contract_data, max_id):
     return max_id
 
 
-def add_product_in_json(contract_data, product_data, file_pathes):
+def get_product_children(contract_data, id):
+    for item in contract_data:
+        if int(id) == item['id']:
+            return item['children']
+        if len(item['children']) != 0:
+            return get_product_children(item['children'], id)
+
+
+def change_children(data, contract_data):
+    for item in data:
+        item['id'] = get_new_product_id(contract_data, -1) + 1
+        if len(item['children']) != 0:
+            return change_children(item['children'], contract_data)
+
+
+def add_product_in_json(contract_data, product_data, file_pathes, chl):
     for item in contract_data:
         if int(product_data['mainProductId']) == item['id']:
-            new_id = get_new_product_id(contract_data, -1) + 1
+            if len(chl) != 0:
+                new_id = get_new_product_id(contract_data, -1) + 2
+            else:
+                new_id = get_new_product_id(contract_data, -1) + 1
             item['children'].append({
                 'id': new_id,
                 'name': product_data['name'],
@@ -136,12 +154,12 @@ def add_product_in_json(contract_data, product_data, file_pathes):
                 'end': str(product_data['end']),
                 'note': str(product_data['note']),
                 'files': file_pathes,
-                'children': []
+                'children': chl
             })
             print(f'\n______new product {new_id}______\n')
             return 0
         if len(item['children']) != 0:
-            add_product_in_json(item['children'], product_data, file_pathes)
+            add_product_in_json(item['children'], product_data, file_pathes, chl)
 
 
 def delete_file_in_json(contract_data, product_id, file_name):

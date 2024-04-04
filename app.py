@@ -6,6 +6,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from utils import *
 from config import app
+from printree import ptree
+import copy
 
 
 
@@ -89,7 +91,6 @@ def create_product_selector():
     products = []
     for p in prods:
         products.append(list(p))
-        print(p)
     if state:
         for product in products:
             if product[4] == 1:
@@ -216,9 +217,17 @@ def add_new_product():
         else:
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
                 contract_data = json.load(f)
+                lol = copy.deepcopy(contract_data)
                 f.close()
-                
-            add_product_in_json(contract_data['data'], data, json_file_pathes)
+            condition = request.form['add_children']
+            chl = []
+            if int(condition) != -1:
+                chl = get_product_children(lol['data'], condition)
+                change_children(chl, lol['data'])
+                ptree(chl)
+                ptree(contract_data['data'])
+            add_product_in_json(contract_data['data'], data, json_file_pathes, chl)
+            # ptree(contract_data['data'])
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
                 json_data = json.dumps(contract_data)
                 f.write(json_data)
@@ -344,4 +353,4 @@ def get_product_info():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+   app.run(debug=True)

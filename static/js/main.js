@@ -447,6 +447,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     my_files = []
     updateDragAndDrop("productFilesList", true)
     updateDragAndDrop("newProductFilesList", true)
+    document.getElementById('hideen4').style.display = 'none'
     // document.getElementById('editButton').removeAttribute('disabled')
     document.getElementById('addButton').removeAttribute('disabled')
     document.getElementById('deleteButton').removeAttribute('disabled')
@@ -454,21 +455,21 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     var currentElem = document.getElementById('element' + id)
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-xl') != -1) {
-            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"
+            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-cyan-500 duration-300 rounded-lg"
         } else {
-            previousElem.className = "flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-4"
+            previousElem.className = "flex text-lg text-black items-center hover:bg-cyan-300 duration-300 rounded-lg ml-4"
         }
 
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-purple-500 rounded-lg"
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-cyan-500 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-cyan-300 rounded-lg ml-4"
         }
     } else {
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-purple-500 rounded-lg"
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-cyan-500 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-purple-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-cyan-300 rounded-lg ml-4"
         }
     }
     previousElem = currentElem
@@ -580,6 +581,11 @@ function addNewProduct() {
         }
         formData.append('to_db', 1)
     } else {
+        if (document.getElementById('addProductChildren').checked) {
+            formData.append('add_children', document.getElementById('productInput').getAttribute('ch-prod-id'))
+        } else {
+            formData.append('add_children', -1)
+        }
         data['mainProductId'] = $("#mainProduct").val().slice(11)
         formData.append('to_db', 0)
     }
@@ -592,15 +598,6 @@ function addNewProduct() {
         console.log(static_files)
         formData.append('static_files', JSON.stringify(static_files))
     }
-    // if (mb_files) {
-    //     for (var i = 0; i < mb_files.length; i++) {
-    //         // console.log(mb_files[i])
-    //         formData.append('mb_files', JSON.stringify(mb_files[i]));
-    //     }
-    //     mb_files = []  
-    // } else {
-    //     formData.append('mb_files', JSON.stringify([]));
-    // }
     $.ajax({
         type: 'POST',
         url: '/addNewProduct',
@@ -611,6 +608,7 @@ function addNewProduct() {
             startCreation(contractInfo['id'])
             cleanInputWindow('product-add-modal')
             getProductList(false)
+            // addProductSelect()
             console.log(response);
         },
         error: function (error) {
@@ -797,20 +795,21 @@ function changeProduct() {
 
 
 function addProductSelect() {
-    if (document.getElementById('unfilled')) {
-        document.getElementById('unfilled').id = 'filled'
+    if (document.getElementById('dropdownProducts')) {
+        // document.getElementById('dropdownProducts').innerHTML = 'dropdownProductsFilled'
         fetch('/getSelector')
             .then(response => response.json())
             .then(data => {
                 const selector = document.getElementById('productsSelector')
+                selector.innerHTML = ''
                 data.forEach((item) => {
                     // console.log(item)
                     const opt = document.createElement('li')
-                    opt.innerHTML = `<div class="flex items-baseline" >` +
+                    opt.innerHTML = `<div class="flex py-1 items-center border-b" >` +
                         `<input id="` + item.id + `" type="checkbox" value=""` +
-                        `class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">` +
+                        `class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">` +
                         `<label for="` + item.id + `"` +
-                        `class="ms-2 text-lg texl-left font-medium text-black ">` + item.name + `</label></div>`
+                        `class="ms-2 text-sm texl-left font-medium text-black ">` + item.name + `</label></div>`
                     selector.append(opt)
                 });
             });
@@ -833,7 +832,7 @@ function createTree(element, data, idd, i) {
         if (item.children.length != 0) {
             var tmp = item.id + i
             listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl text-black font-semibold items-center hover:bg-purple-500 duration-300 rounded-lg"` +
+                `class="flex text-xl text-black font-semibold items-center hover:bg-cyan-500 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
@@ -843,7 +842,7 @@ function createTree(element, data, idd, i) {
             i += 1
         } else {
             listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-purple-300 duration-300 rounded-lg ml-4"` +
+                `class="flex text-lg text-black items-center hover:bg-cyan-300 duration-300 rounded-lg ml-4"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
@@ -865,6 +864,7 @@ function startCreation(id) {
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
             var i = 1
+            console.log(data['data'])
             createTree(rootElement, data['data'], null, i)
         });
 }
@@ -907,9 +907,9 @@ function getProductList(only_db) {
 }
 
 var static_files = []
+document.getElementById('hideen4').style.display = 'none'
 function autocomplete(id, type) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-
     $.ajax({
         type: 'GET',
         url: '/getProductInfo',
@@ -947,6 +947,8 @@ function autocomplete(id, type) {
             } else {
                 $("#productNote").val('')
             }
+            var elem = document.getElementById('hideen4')
+            elem.style.display = 'flex'
         },
         error: function (error) {
             location.reload();
@@ -990,8 +992,10 @@ function productAutocomplete(productList, only_db) {
                     if (!only_db) {
                         autocomplete(this.getElementsByTagName("input")[0].id, this.getElementsByTagName("input")[0].getAttribute('data-type'))
                         inp.setAttribute('m-prod-id', '-1')
+                        inp.setAttribute('ch-prod-id', this.getElementsByTagName("input")[0].id.slice(13))
                     } else {
                         inp.setAttribute('m-prod-id', this.getElementsByTagName("input")[0].id.slice(13))
+                        inp.setAttribute('ch-prod-id', -1)
                     }
                     closeAllLists();
                 });
@@ -1060,6 +1064,7 @@ function saveInDB() {
         div2.className = ''
         getProductList(true)    
         elem.style.display = 'block'
+        document.getElementById('hideen4').style.display = 'none'
     } else {
         elem.style.display = 'none'
         div1.innerHTML = inner_div1

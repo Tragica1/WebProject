@@ -18,7 +18,7 @@
         <div class="flex justify-between items-center w-full px-3">
             <div>
                 <div class="relative ml-2" data-te-dropdown-ref>
-                    <a class="flex items-center text-white transition duration-200 hover:text-gray-400 focus:text-grey-400 motion-reduce:transition-none text-4xl font-bold whitespace-nowrap"
+                    <a class="flex items-center text-white transition duration-200 hover:text-gray-400 focus:text-grey-400 motion-reduce:transition-none text-5xl font-bold whitespace-nowrap"
                         href="#" type="button" id="dropdownMenuButton2" data-te-dropdown-toggle-ref
                         aria-expanded="false">
                         Контракты НПЦ-800
@@ -54,14 +54,13 @@
                         {% endfor %}
                     </ul>
                 </div>
-                <div class="items-center inline-flex ml-2">
+                <div class="items-center inline-flex ml-2 mt-2">
                     <p>
-                    <p id="cNumber" class="text-xl text-white">Контракт не выбран </p>
-                    <button
-                        data-popover-target="popover-description" data-popover-trigger="click"
+                    <p id="cNumber" class="text-2xl text-white">Контракт не выбран </p>
+                    <button data-popover-target="popover-description" data-popover-trigger="click"
                         data-popover-placement="bottom-end" type="button">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5 ms-2 text-cyan-500 hover:text-cyan-800">
+                            stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                         </svg>
@@ -70,7 +69,7 @@
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
                         class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500 rounded-lg bg-gray-500 border-gray-700">
-                        <div id="info" class="p-3 space-y-2 text-white bg-gray-500 border-gray-700 rounded-lg">
+                        <div id="info" class="p-3 space-y-2 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">
                             <h3 id="cInnerNumber" class="font-semibold"></h3>
                             <h3 id="cType" class="font-semibold"></h3>
                             <h3 id="cStatus" class="font-semibold"></h3>
@@ -80,13 +79,19 @@
                         </div>
                         <div data-popper-arrow></div>
                     </div>
-                    <button type="button" data-modal-target="contract-modal" data-modal-toggle="contract-modal">
+                    <button type="button" data-modal-target="contract-modal" data-popover-target="popover-AddContract"
+                        data-modal-toggle="contract-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5 ms-2 text-green-500 hover:text-green-800">
+                            stroke="currentColor" class="w-6 h-6 ms-2 text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
+                    <div data-popover id="popover-AddContract" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                        <h3 class="text-sm font-semibold text-center text-white p-2">Добавить контракт</h3>
+                        <div data-popper-arrow></div>
+                    </div>
                     <div id="contract-modal" tabindex="-1" aria-hidden="true"
                         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                         <div class="relative p-4 w-full max-w-2xl max-h-full">
@@ -184,9 +189,10 @@
                                                 </h2>
                                             </div>
                                             <div class="grid grid-rows-1">
-                                                <button id="unfilled" data-dropdown-toggle="dropdownDefaultCheckbox"
+                                                <!-- <button id="dropdownProductsButton" data-dropdown-toggle="dropdownProducts" data-dropdown-placement="bottom"
                                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-lg text-center inline-flex items-center"
-                                                    type="button" onclick="addProductSelect()">Изделия<svg
+                                                    type="button" onclick="addProductSelect()">Изделия
+                                                    <svg
                                                         class="w-2.5 h-2.5 ms-3" aria-hidden="true"
                                                         xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 10 6">
@@ -194,12 +200,35 @@
                                                             stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                                     </svg>
                                                 </button>
-                                                <div id="dropdownDefaultCheckbox"
+                                                <div id="dropdownProducts"
                                                     class="z-10 hidden w-72 bg-white divide-y divide-gray-700 rounded-lg shadow ">
                                                     <ul id="productsSelector" class="p-3 text-left space-y-3 text-black"
-                                                        aria-labelledby="unfilled">
+                                                    aria-labelledby="dropdownProductsButton">
                                                     </ul>
+                                                </div> -->
+
+                                                <button id="dropdownProductsButton"
+                                                    data-dropdown-toggle="dropdownProducts"
+                                                    data-dropdown-placement="bottom" onclick="addProductSelect()"
+                                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center "
+                                                    type="button">Изделия <svg class="w-2.5 h-2.5 ms-3"
+                                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none" viewBox="0 0 10 6">
+                                                        <path stroke="currentColor" stroke-linecap="round"
+                                                            stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Dropdown menu -->
+                                                <div id="dropdownProducts"
+                                                    class="z-10 hidden bg-white divide-y divide-gray-700 rounded-lg shadow w-72 ">
+                                                    <ul id="productsSelector"
+                                                        class="h-72 p-3 space-y-3 overflow-y-auto text-gray-700 "
+                                                        aria-labelledby="dropdownProductsButton">
+                                                    </ul>
+
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -213,8 +242,8 @@
                             </div>
                         </div>
                     </div>
-                    <a>
-                        <svg class="w-5 h-5 ms-2 text-orange-500 hover:text-orange-800" aria-hidden="true"
+                    <a data-popover-target="popover-ContractStat" class="cursor-pointer">
+                        <svg class="w-6 h-6 ms-2 text-orange-500 hover:text-orange-800" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="1.5" d="M10 6a7.5 7.5 0 1 0 8 8h-8V6Z" />
@@ -222,10 +251,15 @@
                                 stroke-width="1.5" d="M13.5 3H13v8h8v-.5A7.5 7.5 0 0 0 13.5 3Z" />
                         </svg>
                     </a>
+                    <div data-popover id="popover-ContractStat" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                        <h3 class="text-sm font-semibold text-center text-white p-2">Статистика</h3>
+                        <div data-popper-arrow></div>
+                    </div>
                 </div>
             </div>
             <div>
-                <a href="#" class="text-xl text-white  hover:underline">Вход/Регистрация</a>
+                <a href="#" class="text-2xl text-white  hover:underline">Вход/Регистрация</a>
             </div>
         </div>
     </nav>
@@ -277,6 +311,7 @@
                         <h3 class="text-sm font-semibold text-center text-white p-2">Удалить изделие</h3>
                         <div data-popper-arrow></div>
                     </div>
+
                 </div>
                 <hr class="mt-1 mx-auto h-px bg-black border-blue-800 border-2">
                 <div id="product-delete-modal" tabindex="-1"
@@ -313,7 +348,7 @@
                 </div>
                 <div id="product-add-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-2xl max-h-full">
+                    <div class="relative p-4 w-full max-w-3xl max-h-full">
                         <div class="relative bg-white rounded-lg shadow p-2">
                             <div class=" p-4 md:p-2 border-b rounded-t">
                                 <div class="flex items-center justify-between">
@@ -363,7 +398,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-4 md:p-2 space-y-4 text-xl">
+                            <div class="p-4 md:p-2 space-y-5 text-xl">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="grid grid-rows-1 py-2 text-center">
                                         <h2 class="text-left font-medium text-black">Название: </h2>
@@ -558,12 +593,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                <button data-modal-hide="product-add-modal" type="button" id="saveContact"
-                                    onclick="addNewProduct()"
-                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
-                                    Сохранить</button>
+                            <div class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
+                                <!-- <div class="flex items-center justify-between"> -->
+                                    <button data-modal-hide="product-add-modal" type="button" id="saveContact"
+                                        onclick="addNewProduct()"
+                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                        Сохранить</button>
+                                    
+                                    <div id="hideen4" class="float-right inline-flex items-center">
+                                        <h2 class="text-left font-medium pr-2 text-black">Давить входящие в состав изделия? </h2>
+                                        <input id="addProductChildren" type="checkbox" value=""
+                                            name="bordered-checkbox"
+                                            class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    </div>
+
+                                <!-- </div> -->
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -829,7 +876,9 @@
                             <button data-modal-hide="company-modal" type="button" onclick="changeProduct()"
                                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                 Сохранить</button>
+
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -850,20 +899,20 @@
 
 
     <script>
-        $(document).ready(function () {
-            var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
-            var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
+        // $(document).ready(function () {
+        //     var $sticky = $('#currentDetal'); // выбираем элемент div с классом 'sticky'
+        //     var originalTop = $sticky.offset().top; // запоминаем начальное положение элемента
 
-            $(window).scroll(function () {
-                var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
+        //     $(window).scroll(function () {
+        //         var windowTop = $(window).scrollTop(); // получаем текущую позицию прокрутки окна
 
-                if (windowTop > originalTop) {
-                    $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
-                } else {
-                    $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
-                }
-            });
-        });
+        //         if (windowTop > originalTop) {
+        //             $sticky.css({ 'position': 'sticky', 'top': '0' }); // делаем элемент 'sticky' фиксированным и устанавливаем его верхнюю границу на 0
+        //         } else {
+        //             $sticky.css({ 'position': 'static', 'top': '' }); // возвращаем элемент в исходное положение
+        //         }
+        //     });
+        // });
     </script>
 </body>
 
