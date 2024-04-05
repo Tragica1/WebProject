@@ -224,8 +224,8 @@ def add_new_product():
             if int(condition) != -1:
                 chl = get_product_children(lol['data'], condition)
                 change_children(chl, lol['data'])
-                ptree(chl)
-                ptree(contract_data['data'])
+                # ptree(chl)
+                # ptree(contract_data['data'])
             add_product_in_json(contract_data['data'], data, json_file_pathes, chl)
             # ptree(contract_data['data'])
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:

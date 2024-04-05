@@ -100,7 +100,7 @@
                                     <h3 class="text-2xl font-semibold text-black ">
                                         Добавление контракта
                                     </h3>
-                                    <button type="button"
+                                    <button type="button" id="closeContractModal"
                                         class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                                         data-modal-hide="contract-modal">
                                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -118,9 +118,9 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="text" id="contractNumber" name="contractNumber"
-                                                    minlength="1" maxlength="9"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg block w-full p-2.5"
                                                     required>
+                                                
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -234,7 +234,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                    <button data-modal-hide="contract-modal" type="submit" onclick="saveContract()"
+                                    <button type="submit" onclick="saveContract()"
                                         id="saveContract"
                                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                         Сохранить</button>
@@ -593,19 +593,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
+                            <div
+                                class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <!-- <div class="flex items-center justify-between"> -->
-                                    <button data-modal-hide="product-add-modal" type="button" id="saveContact"
-                                        onclick="addNewProduct()"
-                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
-                                        Сохранить</button>
-                                    
-                                    <div id="hideen4" class="float-right inline-flex items-center">
-                                        <h2 class="text-left font-medium pr-2 text-black">Давить входящие в состав изделия? </h2>
-                                        <input id="addProductChildren" type="checkbox" value=""
-                                            name="bordered-checkbox"
-                                            class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                    </div>
+                                <button data-modal-hide="product-add-modal" type="button" id="saveContact"
+                                    onclick="addNewProduct()"
+                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                    Сохранить</button>
+
+                                <div id="hideen4" class="float-right inline-flex items-center">
+                                    <h2 class="text-left font-medium pr-2 text-black">Давить входящие в состав изделия?
+                                    </h2>
+                                    <input id="addProductChildren" type="checkbox" value="" name="bordered-checkbox"
+                                        class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                </div>
 
                                 <!-- </div> -->
                             </div>

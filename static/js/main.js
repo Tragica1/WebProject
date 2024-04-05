@@ -63,7 +63,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${tmp.value}`)
+    fetch(`/contacts/${ tmp.value }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -169,6 +169,7 @@ function cleanInputWindow(id_modal) {
     document.getElementById('hideen2').style.display = 'none'
 }
 
+
 function saveProvider() {
     var contacts = []
     if (counter > 0) {
@@ -234,6 +235,49 @@ function getProdivers() {
 }
 
 
+function validateInput(id_modal) {
+    var flag = false
+    var modal = document.getElementById(id_modal)
+    var inputs = modal.getElementsByTagName('input')
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date') {
+            if (inputs[i].value == '') {
+                inputs[i].classList.replace('border-gray-300', 'border-red-600')
+                inputs[i].classList.replace('border-green-600', 'border-red-600')
+                if (inputs[i].parentElement.lastChild.nodeName != 'P') {
+                    var error = document.createElement('p')
+                    error.innerHTML = `<p id="outlined_error_help_` + i + `" class="mt-2 text-xs text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                    inputs[i].parentElement.appendChild(error)
+                }
+                flag = true
+            } else {
+                inputs[i].classList.replace('border-gray-300', 'border-green-600')
+                inputs[i].classList.replace('border-red-600', 'border-green-600')
+                // console.log((inputs[i].parentElement.lastChild.nodeName))
+                if (inputs[i].parentElement.lastChild.nodeName == 'P') {
+                    inputs[i].parentElement.lastChild.remove()
+                    // document.getElementById('outlined_error_help_' + i).remove()
+                }
+            }
+            // } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox' && inputs[i].id != 'addInDB') {
+            //     if (inputs[i].checked == false) {
+            //         inputs[i].classList.replace('border-gray-300', 'border-red-600')
+            //         inputs[i].classList.replace('border-green-600', 'border-red-600')
+            //         var error = document.createElement('p')
+            //         error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-xs text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+            //         inputs[i].parentElement.appendChild(error)
+            //     } else {
+            //         inputs[i].classList.replace('border-gray-300', 'border-green-600')
+            //         inputs[i].classList.replace('border-red-600', 'border-green-600')
+            //         // if (inputs[i].parentElement.)
+            //     }
+            // }
+        }
+    }
+    return flag
+}
+
+
 function saveContract() {
     var products = document.getElementById('productsSelector').getElementsByTagName('input')
     var pr = []
@@ -251,6 +295,7 @@ function saveContract() {
             type = types[i].id
         }
     }
+
     var formData = {
         'number': $('#contractNumber').val(),
         'innerNumber': $('#contractInnerNumber').val(),
@@ -261,23 +306,31 @@ function saveContract() {
         'contractStatus': 1,
         'products': pr
     };
-    $.ajax({
-        type: 'POST',
-        url: '/saveContract',
-        contentType: 'application/json;charset=UTF-8',
-        data: JSON.stringify(formData),
-        success: function (response) {
-            getContractInfo(response['contractId'], response['data'][0], response['data'][1], response['data'][2],
-                response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
-            updateContractList(response['contracts'])
-            cleanInputWindow('contract-modal')
-            console.log(response);
-        },
-        error: function (error) {
-            location.reload();
-            console.log(error);
-        }
-    });
+    if (validateInput('contract-modal')) {
+        console.log('Переделывай!!!!!!!!')
+    }
+    else {
+        document.getElementById('closeContractModal').click()
+        console.log('Нормально, оставляй...')
+        $.ajax({
+            type: 'POST',
+            url: '/saveContract',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                getContractInfo(response['contractId'], response['data'][0], response['data'][1], response['data'][2],
+                    response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
+                updateContractList(response['contracts'])
+                cleanInputWindow('contract-modal')
+                console.log(response);
+            },
+            error: function (error) {
+                location.reload();
+                console.log(error);
+            }
+        });
+    }
+
 }
 
 
@@ -530,7 +583,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
 
     $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
     createFileList(id, files, 'fileList')
-    
+
     $('#newProductName').val('')
     $('#newProductCode').val('')
     $('#newProductType').val('')
@@ -566,7 +619,7 @@ function addNewProduct() {
         'idProvider': 0,
         'start': '',
         'end': ''
-        
+
     }
     if (document.getElementById('newProductisLocalContract').checked) {
         data['isContract'] = 1
@@ -574,9 +627,9 @@ function addNewProduct() {
         data['start'] = $("#newProductStartDate").val()
         data['end'] = $("#newProductEndDate").val()
     }
-    if (document.getElementById('addInDB').checked == true){
+    if (document.getElementById('addInDB').checked == true) {
         data['mainProductId'] = document.getElementById('productInput').getAttribute('m-prod-id')
-        if(document.getElementById('newProductIsMain').checked){
+        if (document.getElementById('newProductIsMain').checked) {
             data['isMain'] = 1
         }
         formData.append('to_db', 1)
@@ -858,7 +911,7 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
@@ -885,11 +938,11 @@ function getProductList(only_db) {
             db_productList = []
             var j = 0
             if (only_db) {
-                for (var i = 0; i < productList.length; i++){
+                for (var i = 0; i < productList.length; i++) {
                     if (productList[i]['type'] == 'db') {
                         // console.log()
                         db_productList[j] = productList[i]
-                        j+=1
+                        j += 1
                     }
                 }
                 console.log(db_productList)
@@ -1057,12 +1110,12 @@ function saveInDB() {
     var div1 = document.getElementById('addDiv1')
     var div2 = document.getElementById('addDiv2')
     var elem = document.getElementById('hideen3')
-    if (option){
+    if (option) {
         document.getElementById('productInput').setAttribute('m-prod-id', '-1')
         div1.innerHTML = document.getElementById('autocompleteDiv').innerHTML
         div2.innerHTML = ''
         div2.className = ''
-        getProductList(true)    
+        getProductList(true)
         elem.style.display = 'block'
         document.getElementById('hideen4').style.display = 'none'
     } else {
@@ -1081,3 +1134,10 @@ function saveInDB() {
     $('#newProductType').val(1)
     // setDeafults()
 }
+
+
+// function inputValidation(myInput, formId) {
+//     if (myInput.value) {
+
+//     }
+// }
