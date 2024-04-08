@@ -77,6 +77,22 @@ def check_contract_file(contract_id):
     return [False, None]
 
 
+def check_children(my_list, code):
+    for l in my_list:
+        if l['code'] == code:
+            return True
+    return False
+
+
+def get_parents(contract_data, productCode, parents, flag):
+    for item in contract_data:
+        if len(item['children']) != 0:
+            if check_children(item['children'], productCode):
+                parents.append(item['name'])
+            get_parents(item['children'], productCode, parents, flag)
+
+
+
 def change_product_in_json(contract_data, product_data, file_pathes):
     for item in contract_data:
         if int(product_data['id']) == item['id']:
@@ -110,13 +126,12 @@ def delete_product_in_json(contract_data, product_id, index):
         
 
 def get_new_product_id(contract_data, max_id):
-    for item in contract_data:
-        if int(item['id']) > max_id:
-            max_id = int(item['id'])
+    for item in contract_data:  
+        if int(item['id']) > max_id['id']:
+            max_id['id'] = int(item['id'])
         if len(item['children']) != 0:
-            return get_new_product_id(item['children'], max_id)
-    return max_id
-
+            get_new_product_id(item['children'], max_id)
+    
 
 def get_product_children(contract_data, id):
     for item in contract_data:
@@ -133,15 +148,11 @@ def change_children(data, contract_data):
             return change_children(item['children'], contract_data)
 
 
-def add_product_in_json(contract_data, product_data, file_pathes, chl):
+def add_product_in_json(contract_data, product_data, file_pathes, chl, new_id):
     for item in contract_data:
         if int(product_data['mainProductId']) == item['id']:
-            if len(chl) != 0:
-                new_id = get_new_product_id(contract_data, -1) + 2
-            else:
-                new_id = get_new_product_id(contract_data, -1) + 1
             item['children'].append({
-                'id': new_id,
+                'id': new_id['id'],
                 'name': product_data['name'],
                 'code': product_data['code'],
                 'number': product_data['number'],
@@ -156,10 +167,10 @@ def add_product_in_json(contract_data, product_data, file_pathes, chl):
                 'files': file_pathes,
                 'children': chl
             })
-            print(f'\n______new product {new_id}______\n')
+            # print(f'\n______new product {new_id}______\n')
             return 0
         if len(item['children']) != 0:
-            add_product_in_json(item['children'], product_data, file_pathes, chl)
+            add_product_in_json(item['children'], product_data, file_pathes, chl, new_id)
 
 
 def delete_file_in_json(contract_data, product_id, file_name):
@@ -215,3 +226,10 @@ def check_files(contract_id, files):
             shutil.copy(file, my_file)
         new_files.append(my_file)
     return new_files
+
+
+def get_products_for_statistic(contract_data, products):
+    for item in contract_data:
+        products.append({'id': int(item['id']), 'isContract': int(item['isContract']), 'type': int(item['idType']), 'state': int(item['idState'])})
+        if len(item['children']) != 0:
+            get_products_for_statistic(item['children'], products)

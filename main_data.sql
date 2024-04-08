@@ -16,7 +16,7 @@ INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (6,'Комплект принад
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (7,'Прочее изделие');
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (8,'Часть прочего изделия');
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (9,'Документ');
-INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (11,'Стандартное изделие');
+INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (10,'Стандартное изделие');
 
 -------------- "Таблица contracttype"
 INSERT INTO `mydb`.`contracttype` (`id`,`name`) VALUES (1,'Сервис');

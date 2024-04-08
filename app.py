@@ -50,24 +50,65 @@ def index():
     state, contrs = db_get_government_contracts()
     contracts = []
     contractTypes = []
+    contractStatus = []
     types = []
     states = []
     tps = db_get_types()
     sts = db_get_states()
     contrs_types = db_get_contract_types()
+    contrs_status = db_get_contract_statuses()
     for t in tps:
         types.append(list(t))
     for s in sts:
         states.append(list(s))
     for ct in contrs_types:
         contractTypes.append(list(ct))
+    for cs in contrs_status:
+        contractStatus.append(list(cs))
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('index.html', contracts=contracts, types=types, states=states, contractTypes=contractTypes)
+        return render_template('index.html', contracts=contracts, types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus)
     else:
-        return render_template('index.html', types=types, states=states, contractTypes=contractTypes)
+        return render_template('index.html', types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus)
 
+
+@app.route('/statistic')
+def statistic():
+    state, contrs = db_get_government_contracts()
+    contracts = []
+    contractTypes = []
+    contractStatus = []
+    contrs_types = db_get_contract_types()
+    contrs_status = db_get_contract_statuses()
+    for ct in contrs_types:
+        contractTypes.append(list(ct))
+    for cs in contrs_status:
+        contractStatus.append(list(cs))
+    if state:
+        for c in contrs:
+            contracts.append(list(c))
+        return render_template('statistic.html', contracts=contracts, contractTypes=contractTypes, contractStatus=contractStatus)
+    else:
+        return render_template('statistic.html', contractTypes=contractTypes, contractStatus=contractStatus)
+
+
+@app.route('/getChartData')
+def data_for_chart():
+    try:
+        contractId = request.args.get('contractId')
+        contracts = get_contracts()
+        dir_path = os.path.join(contract_folder, 'contract_' + str(contractId))
+        with open(os.path.join(dir_path, 'contract' + str(contractId) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        products = []
+        get_products_for_statistic(contract_data['data'], products)
+        # print(products)
+        return jsonify({'status': 'success', 'contracts': contracts, 'products': products})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
 
 @app.route('/getProdivers', methods=['GET'])
 def get_providers():
@@ -120,6 +161,40 @@ def save_contract():
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/changeContractStatus', methods=['POST'])
+def change_contract_status():
+    try:
+        contractId = request.form['contractId']
+        newStatus = request.form['status']
+        print(contractId, newStatus)
+        db_update_contract(int(contractId), int(newStatus))
+        contracts = get_contracts()
+        return jsonify({'status': 'success', 'message': 'Contract changed successfully', 'contracts': contracts})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/getProductParents', methods=['GET'])
+def get_product_parents():
+    try:
+        contractId = request.args.get('contractId')
+        productCode = request.args.get('productCode')
+        print(contractId, productCode)
+        dir_path = os.path.join(contract_folder,'contract_' + str(contractId))
+        with open(os.path.join(dir_path, 'contract' + str(contractId) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        parents = []
+        if (productCode != 'н/ш'):
+            get_parents(contract_data['data'], productCode, parents, False)
+        return jsonify({'status': 'success', 'parents': parents})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+  
 
 
 @app.route('/changeProduct', methods=['POST'])    
@@ -221,13 +296,17 @@ def add_new_product():
                 f.close()
             condition = request.form['add_children']
             chl = []
+            new_id = {'id': -1}
             if int(condition) != -1:
                 chl = get_product_children(lol['data'], condition)
                 change_children(chl, lol['data'])
-                # ptree(chl)
-                # ptree(contract_data['data'])
-            add_product_in_json(contract_data['data'], data, json_file_pathes, chl)
-            # ptree(contract_data['data'])
+            if len(chl) != 0:
+                get_new_product_id(contract_data['data'], new_id)
+                new_id['id'] += 2
+            else:
+                get_new_product_id(contract_data['data'], new_id)
+                new_id['id'] += 1
+            add_product_in_json(contract_data['data'], data, json_file_pathes, chl, new_id)
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
                 json_data = json.dumps(contract_data)
                 f.write(json_data)

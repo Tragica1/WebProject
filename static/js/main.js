@@ -7,9 +7,9 @@ function getContractFromStorage() {
     // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     if (contractInfo && contractInfo['id'] != -1) {
-        getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'])
+        getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'], true)
     } else {
-        getContractInfo(-1, '', '', '', '', '', '', '')
+        getContractInfo(-1, '', '', '', '', '', '', '', true)
     }
 }
 
@@ -22,7 +22,7 @@ function updateContractList(contracts) {
         listElem.className = 'flex grid-cols-2 gap-2 mx-2 rounded-lg'
         listElem.innerHTML = `<button class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline"` +
             `data-te-dropdown-item-ref ` +
-            `onclick="getContractInfo('` + contract[0] + `', '` + contract[1] + `', '` + contract[2] + `', '` + contract[3] + `', '` + contract[4] + `', '` + contract[5] + `', '` + contract[7] + `', '` + contract[8] + `')">Контракт` +
+            `onclick="getContractInfo('` + contract[0] + `', '` + contract[1] + `', '` + contract[2] + `', '` + contract[3] + `', '` + contract[4] + `', '` + contract[5] + `', '` + contract[7] + `', ` + contract[8] + `, ` + true + `)">Контракт` +
             ` № ` + contract[1] + `</button>` +
             `<button type="button" onclick="deleteContract('` + contract[0] + `')">` +
             `<svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
@@ -63,7 +63,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${ tmp.value }`)
+    fetch(`/contacts/${tmp.value}`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -92,10 +92,10 @@ function deleteContract(id) {
             console.log(response);
             if (contracts.length != 0) {
                 updateContractList(contracts)
-                getContractInfo(contracts[0][0], contracts[0][1], contracts[0][2], contracts[0][3], contracts[0][4], contracts[0][5], contracts[0][7], contracts[0][8])
+                getContractInfo(contracts[0][0], contracts[0][1], contracts[0][2], contracts[0][3], contracts[0][4], contracts[0][5], contracts[0][7], contracts[0][8], true)
             }
             else {
-                getContractInfo(-1, '', '', '', '', '', '', '')
+                getContractInfo(-1, '', '', '', '', '', '', '', true)
                 document.getElementById('mainTree').innerHTML = ""
                 document.getElementById('contractList').innerHTML = ""
             }
@@ -108,7 +108,7 @@ function deleteContract(id) {
     });
 }
 
-function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status) {
+function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status, option) {
     if (id == -1) {
         var currentContract = {
             'id': id,
@@ -132,27 +132,61 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
             'startDate': startDate,
             'endDate': endDate,
             'type': type,
-            'status': status
+            'status': Number(status)
         }
         localStorage.setItem("currentContract", JSON.stringify(currentContract));
         $("#cNumber").text("Выбран контракт № " + number)
-        $("#cInnerNumber").text("Внутренний номер: " + innerNumber)
-        $("#cCity").text("Город: " + city)
-        $("#cStart").text("Дата подписания: " + startDate)
-        $("#cEnd").text("Дата сдачи: " + endDate)
-        $("#cType").text("Тип контракта: " + type)
-        $("#cStatus").text("Статус: " + status)
-        startCreation(id)
+        $("#cInnerNumber").html('<span class="font-medium">Внутренний номер: </span>' + innerNumber)
+        $("#cCity").html('<span class="font-medium">Город: </span>' + city)
+        $("#cStart").html('<span class="font-medium">Дата подписания: </span>' + startDate)
+        $("#cEnd").html('<span class="font-medium">Дата сдачи: </span>' + endDate)
+        $("#cType").html('<span class="font-medium">Тип контракта: </span>' + type)
+        $("#cStatus").val(Number(status))
+        if (option) {
+            startCreation(id)
+        }
     }
 };
 
 var products = []
 function setDeafults() {
-    $('#newProductCode').val('н/б')
+    $('#newProductCode').val('н/ш')
     $('#newProductCount').val('1')
     $('#newProductState').val(1)
     $('#newProductType').val(1)
+    $('#newProductNumber').val('н/б')
+    // console.log()
+    if (document.getElementById('currentProduct').value == null) {
+        document.getElementById('addInDB').checked = true
+        document.getElementById('addInDB').setAttribute('disabled', '')
+        saveInDB()
+    }
     getProductList(false)
+}
+
+
+function changeContractStatus(inp) {
+    var formData = new FormData()
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+    formData.append('contractId', contractInfo['id'])
+    formData.append('status', inp.value)
+    $.ajax({
+        type: 'POST',
+        url: '/changeContractStatus',
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function (response) {
+            getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], inp.value, false)
+            updateContractList(response['contracts'])
+            // addProductSelect()
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
 }
 
 
@@ -235,43 +269,27 @@ function getProdivers() {
 }
 
 
-function validateInput(id_modal) {
+function validateContractInput() {
     var flag = false
-    var modal = document.getElementById(id_modal)
+    var modal = document.getElementById('contract-modal')
     var inputs = modal.getElementsByTagName('input')
     for (var i = 0; i < inputs.length; i++) {
         if (inputs[i].type == 'text' || inputs[i].type == 'number' || inputs[i].type == 'date') {
             if (inputs[i].value == '') {
                 inputs[i].classList.replace('border-gray-300', 'border-red-600')
-                inputs[i].classList.replace('border-green-600', 'border-red-600')
                 if (inputs[i].parentElement.lastChild.nodeName != 'P') {
                     var error = document.createElement('p')
-                    error.innerHTML = `<p id="outlined_error_help_` + i + `" class="mt-2 text-xs text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                    error.innerHTML = `<p id="outlined_error_help_` + i + `" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
                     inputs[i].parentElement.appendChild(error)
                 }
                 flag = true
             } else {
-                inputs[i].classList.replace('border-gray-300', 'border-green-600')
-                inputs[i].classList.replace('border-red-600', 'border-green-600')
-                // console.log((inputs[i].parentElement.lastChild.nodeName))
+                // inputs[i].classList.replace('border-gray-300', 'border-green-600')
+                inputs[i].classList.replace('border-red-600', 'border-gray-300')
                 if (inputs[i].parentElement.lastChild.nodeName == 'P') {
                     inputs[i].parentElement.lastChild.remove()
-                    // document.getElementById('outlined_error_help_' + i).remove()
                 }
             }
-            // } else if (inputs[i].type == 'radio' || inputs[i].type == 'checkbox' && inputs[i].id != 'addInDB') {
-            //     if (inputs[i].checked == false) {
-            //         inputs[i].classList.replace('border-gray-300', 'border-red-600')
-            //         inputs[i].classList.replace('border-green-600', 'border-red-600')
-            //         var error = document.createElement('p')
-            //         error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-xs text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-            //         inputs[i].parentElement.appendChild(error)
-            //     } else {
-            //         inputs[i].classList.replace('border-gray-300', 'border-green-600')
-            //         inputs[i].classList.replace('border-red-600', 'border-green-600')
-            //         // if (inputs[i].parentElement.)
-            //     }
-            // }
         }
     }
     return flag
@@ -282,20 +300,29 @@ function saveContract() {
     var products = document.getElementById('productsSelector').getElementsByTagName('input')
     var pr = []
     var j = 0
+    var product_flag = true
     for (var i = 0; i < products.length; i++) {
         if (products[i].checked) {
             pr[j] = products[i].id
             j += 1
+            product_flag = false
         }
     }
     var types = document.getElementById('contractType').getElementsByTagName('input')
     var type = 0
+    var type_flag = true
     for (var i = 0; i < types.length; i++) {
         if (types[i].checked) {
             type = types[i].id
+            type_flag = false
         }
     }
-
+    var date_flag = false
+    if ($('#contractStartDate').val() != '' && $('#contractEndDate').val() != '') {
+        if (new Date($('#contractStartDate').val()) > new Date($('#contractEndDate').val())) {
+            date_flag = true
+        }
+    }
     var formData = {
         'number': $('#contractNumber').val(),
         'innerNumber': $('#contractInnerNumber').val(),
@@ -306,12 +333,48 @@ function saveContract() {
         'contractStatus': 1,
         'products': pr
     };
-    if (validateInput('contract-modal')) {
-        console.log('Переделывай!!!!!!!!')
+    console.log(formData)
+    if (validateContractInput(type, pr) || product_flag || type_flag || date_flag) {
+        if (type_flag) {
+            types[0].classList.replace('border-gray-300', 'border-red-600')
+            types[1].classList.replace('border-gray-300', 'border-red-600')
+            if (types[0].parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран тип контракта.</p> `
+                types[0].parentElement.appendChild(error)
+            }
+        } else if (types[0].parentElement.lastChild.nodeName == 'P') {
+            types[0].classList.replace('border-red-600', 'border-gray-300')
+            types[1].classList.replace('border-red-600', 'border-gray-300')
+            types[0].parentElement.lastChild.remove()
+        }
+        var p = document.getElementById('prodValid')
+        if (product_flag) {
+            if (p.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбрано изделие.</p> `
+                p.appendChild(error)
+            }
+        } else if (p.lastChild.nodeName == 'P') {
+            p.lastChild.remove()
+        }
+        var dt = document.getElementById('contractStartDate')
+        if (date_flag) {
+            dt.classList.replace('border-gray-300', 'border-red-600')
+            if (dt.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
+                dt.parentElement.appendChild(error)
+            }
+        }
+        else if (dt.parentElement.lastChild.nodeName == 'P' && $('#contractStartDate').val() != '') {
+            dt.classList.replace('border-red-600', 'border-gray-300')
+            dt.parentElement.lastChild.remove()
+        }
+
     }
     else {
         document.getElementById('closeContractModal').click()
-        console.log('Нормально, оставляй...')
         $.ajax({
             type: 'POST',
             url: '/saveContract',
@@ -319,7 +382,7 @@ function saveContract() {
             data: JSON.stringify(formData),
             success: function (response) {
                 getContractInfo(response['contractId'], response['data'][0], response['data'][1], response['data'][2],
-                    response['data'][3], response['data'][4], response['data'][5], response['data'][6],)
+                    response['data'][3], response['data'][4], response['data'][5], response['data'][6], true)
                 updateContractList(response['contracts'])
                 cleanInputWindow('contract-modal')
                 console.log(response);
@@ -408,7 +471,7 @@ function deleteProduct() {
             // startCreation(contractInfo['id'])
             document.getElementById('element' + $("#currentProduct").val().slice(14)).remove()
             cleanInputWindow('product-change-modal')
-            getProductList(false)
+            // getProductList(false)
             console.log(response);
         },
         error: function (error) {
@@ -494,6 +557,47 @@ function updateDragAndDrop(fileList, option) {
 }
 
 
+function getProductParents() {
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+    $.ajax({
+        url: '/getProductParents',
+        type: 'GET',
+        contentType: false,
+        data: { 'productCode': document.getElementById('productCode').innerText.slice(6), 'contractId': contractInfo['id'] },
+        success: function (response) {
+            const selector = document.getElementById('parentsSelector')
+            selector.classList.remove('h-20')
+            selector.classList.add('min-h-fit')
+            selector.classList.add('max-h-52')
+            selector.innerHTML = ''
+            if (response['parents'].length != 0) {
+                response['parents'].forEach((item) => {
+                    const opt = document.createElement('li')
+                    opt.innerHTML = `<div class="flex py-1 items-center border-b" >` +
+                        `<span` +
+                        `class="ms-2 text-sm texl-left font-medium text-black ">` + item + `</span></div>`
+                    selector.append(opt)
+                });
+            } else {
+                const opt = document.createElement('li')
+                selector.classList.remove('min-h-fit')
+                selector.classList.remove('max-h-52')
+                selector.classList.add('h-20')
+                opt.innerHTML = `<div class="flex items-center border-b" >` +
+                    `<span` +
+                    `class="ms-2 text-sm texl-left font-medium text-black ">Никуда не входит...</span></div>`
+                selector.append(opt)
+            }
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+
 var previousElem
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
     cleanInputWindow('product-add-modal')
@@ -501,28 +605,29 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     updateDragAndDrop("productFilesList", true)
     updateDragAndDrop("newProductFilesList", true)
     document.getElementById('hideen4').style.display = 'none'
+    document.getElementById('addInDB').removeAttribute('disabled')
     // document.getElementById('editButton').removeAttribute('disabled')
     document.getElementById('addButton').removeAttribute('disabled')
     document.getElementById('deleteButton').removeAttribute('disabled')
-    document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-black rounded-lg shadow sm:p-6 md:p-8'
+    document.getElementById('currentProduct').className = 'w-full max-w-2xl border-2 duration-500 border-blue-800/25 shadow-xl hover:shadow-blue-800 rounded-lg shadow-blue-400 sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-xl') != -1) {
-            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-cyan-500 duration-300 rounded-lg"
+            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-blue-300 duration-300 rounded-lg"
         } else {
-            previousElem.className = "flex text-lg text-black items-center hover:bg-cyan-300 duration-300 rounded-lg ml-4"
+            previousElem.className = "flex text-lg text-black items-center hover:bg-blue-100 duration-200 rounded-lg ml-4"
         }
 
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-cyan-500 rounded-lg"
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-blue-300 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-cyan-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-blue-100 rounded-lg ml-4"
         }
     } else {
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-cyan-500 rounded-lg"
+            currentElem.className = "flex text-xl text-black font-semibold items-center bg-blue-300 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-cyan-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-blue-100 rounded-lg ml-4"
         }
     }
     previousElem = currentElem
@@ -556,9 +661,6 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     } else {
         $("#productNote").val('')
     }
-    // document.getElementById('productNote').setAttribute('disabled', '')
-    // document.getElementById('isLocalContract').setAttribute('disabled', '')
-    // document.getElementById('productFile').setAttribute('disabled', '')
     if (isContract == 1) {
         document.getElementById('isLocalContract').checked = true
         $("#productProvider").val(provider)
@@ -576,14 +678,8 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         $("#endDate").val('')
         document.getElementById('hideen1').style.display = 'none'
     }
-
-    // document.getElementById('productProvider').setAttribute('disabled', '')
-    // document.getElementById('startDate').setAttribute('disabled', '')
-    // document.getElementById('endDate').setAttribute('disabled', '')
-
     $('#productToDelete').text('Вы действительно хотите удалить изделие - ' + $('#productName').text().slice(9))
     createFileList(id, files, 'fileList')
-
     $('#newProductName').val('')
     $('#newProductCode').val('')
     $('#newProductType').val('')
@@ -596,7 +692,6 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $('#newProductStartDate').val('')
     $('#newProductEndDate').val('')
     $("#newProductNote").val('')
-
 };
 
 
@@ -621,16 +716,39 @@ function addNewProduct() {
         'end': ''
 
     }
+    // console.log($("#newProductStartDate").val() == '')
+    var name_flag = false
+    var date_flag1 = false
+    var date_flag2 = false
+    var date_flag3 = false
+    var provider_flag = false
+    var checkName = document.getElementById('newProductName')
+    if (checkName.value == '') {
+        name_flag = true
+    }
     if (document.getElementById('newProductisLocalContract').checked) {
         data['isContract'] = 1
         data['idProvider'] = $("#newProductProvider").val()
         data['start'] = $("#newProductStartDate").val()
         data['end'] = $("#newProductEndDate").val()
+        if ($("#newProductStartDate").val() != '' && $("#newProductEndDate").val() != '' && new Date($("#newProductStartDate").val()) > new Date($("#newProductEndDate").val())) {
+            date_flag1 = true
+        }
+        if ($("#newProductProvider").val() == null) {
+            provider_flag = true
+        }
+        if ($("#newProductStartDate").val() == '') {
+            date_flag2 = true
+        }
+        if ($("#newProductEndDate").val() == '') {
+            date_flag3 = true
+        }
     }
-    if (document.getElementById('addInDB').checked == true) {
+    if (document.getElementById('addInDB').checked) {
         data['mainProductId'] = document.getElementById('productInput').getAttribute('m-prod-id')
         if (document.getElementById('newProductIsMain').checked) {
             data['isMain'] = 1
+
         }
         formData.append('to_db', 1)
     } else {
@@ -644,31 +762,93 @@ function addNewProduct() {
     }
     formData.append('data', JSON.stringify(data))
     for (var i = 0; i < files.length; i++) {
-        console.log(files[i])
         formData.append('files', files[i]);
     }
     if (static_files) {
-        console.log(static_files)
         formData.append('static_files', JSON.stringify(static_files))
     }
-    $.ajax({
-        type: 'POST',
-        url: '/addNewProduct',
-        processData: false,
-        contentType: false,
-        data: formData,
-        success: function (response) {
-            startCreation(contractInfo['id'])
-            cleanInputWindow('product-add-modal')
-            getProductList(false)
-            // addProductSelect()
-            console.log(response);
-        },
-        error: function (error) {
-            location.reload();
-            console.log(error);
+    if (name_flag || date_flag1 || date_flag2 || date_flag3 || provider_flag) {
+        var checkName = document.getElementById('newProductName')
+        if (name_flag) {
+            checkName.classList.replace('border-gray-300', 'border-red-600')
+            if (checkName.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                checkName.parentElement.appendChild(error)
+            }
+        } else if (checkName.parentElement.lastChild.nodeName == 'P') {
+            checkName.classList.replace('border-red-600', 'border-gray-300')
+            checkName.parentElement.lastChild.remove()
         }
-    });
+        var dt1 = document.getElementById('newProductStartDate')
+        if (date_flag1) {
+            console.log('ddddddddd')
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
+                dt1.parentElement.appendChild(error)
+            }
+        } else if (dt1.parentElement.lastChild.nodeName == 'P') {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        var dt2 = document.getElementById('newProductEndDate')
+        if (date_flag2 && !date_flag1) {
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt1.parentElement.appendChild(error)
+            }
+
+        } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag1) {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        if (date_flag3) {
+            dt2.classList.replace('border-gray-300', 'border-red-600')
+            if (dt2.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt2.parentElement.appendChild(error)
+            }
+
+        } else if (dt2.parentElement.lastChild.nodeName == 'P') {
+            dt2.classList.replace('border-red-600', 'border-gray-300')
+            dt2.parentElement.lastChild.remove()
+        }
+        var checkProvider = document.getElementById('newProductProvider')
+        if (provider_flag) {
+            if (checkProvider.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
+                checkProvider.parentElement.appendChild(error)
+            }
+        } else if (checkProvider.parentElement.lastChild.nodeName == 'P') {
+            checkProvider.parentElement.lastChild.remove()
+        }
+    } else {
+        document.getElementById('closeProductModal').click()
+        $.ajax({
+            type: 'POST',
+            url: '/addNewProduct',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (response) {
+                startCreation(contractInfo['id'])
+                cleanInputWindow('product-add-modal')
+                // getProductList(false)
+                // addProductSelect()
+                console.log(response);
+            },
+            error: function (error) {
+                location.reload();
+                console.log(error);
+            }
+        });
+    }
 }
 
 
@@ -792,58 +972,125 @@ function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = my_files
     var formData = new FormData()
-    var data = {}
+    var data = {
+        'contractId': contractInfo['id'],
+        'id': $("#currentProduct").val().slice(14),
+        'idType': $("#productType").val(),
+        'idState': $("#productState").val(),
+        'number': $("#productNumber").val(),
+        'count': $("#productCount").val(),
+        'isContract': 0,
+        'idProvider': 0,
+        'start': '',
+        'end': '',
+        'note': $("#productNote").val()
+    }
+    var provider_flag = false
+    var start_flag = false
+    var end_flag = false
+    var date_flag = false
     if (document.getElementById('isLocalContract').checked) {
-        data = {
-            'contractId': contractInfo['id'],
-            'id': $("#currentProduct").val().slice(14),
-            'idType': $("#productType").val(),
-            'idState': $("#productState").val(),
-            'number': $("#productNumber").val(),
-            'count': $("#productCount").val(),
-            'isContract': 1,
-            'idProvider': $("#productProvider").val(),
-            'start': $("#startDate").val(),
-            'end': $("#endDate").val(),
-            'note': $("#productNote").val()
+        data['isContract'] = 1
+        data['idProvider'] = $("#productProvider").val()
+        data['start'] = $("#startDate").val()
+        data['end'] = $("#endDate").val()
+        if ($("#startDate").val() != '' && $("#endDate").val() != '' && new Date($("#startDate").val()) > new Date($("#endDate").val())) {
+            date_flag = true
         }
-    } else {
-        data = {
-            'contractId': contractInfo['id'],
-            'id': $("#currentProduct").val().slice(14),
-            'idType': $("#productType").val(),
-            'idState': $("#productState").val(),
-            'number': $("#productNumber").val(),
-            'count': $("#productCount").val(),
-            'isContract': 0,
-            'idProvider': 0,
-            'start': '',
-            'end': '',
-            'note': $("#productNote").val()
+        if ($("#productProvider").val() == null) {
+            provider_flag = true
+        }
+        if ($("#startDate").val() == '') {
+            start_flag = true
+        }
+        if ($("#endDate").val() == '') {
+            end_flag = true
         }
     }
     formData.append('data', JSON.stringify(data))
     for (var i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
     }
-    $.ajax({
-        type: 'POST',
-        url: '/changeProduct',
-        processData: false,
-        contentType: false,
-        data: formData,
-        success: function (response) {
-            // startCreation(contractInfo['id'])
-            cleanInputWindow('product-change-modal')
-            updateProduct(data['id'], response['product'])
-            getProductList(false)
-            console.log(response);
-        },
-        error: function (error) {
-            location.reload();
-            console.log(error);
+    if (provider_flag || date_flag || start_flag || end_flag) {
+        var my_provider = document.getElementById('productProvider')
+        if (provider_flag) {
+            if (my_provider.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
+                my_provider.parentElement.appendChild(error)
+            }
+        } else if (my_provider.parentElement.lastChild.nodeName == 'P') {
+            my_provider.parentElement.lastChild.remove()
         }
-    });
+        var dt1 = document.getElementById('startDate')
+        if (date_flag) {
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
+                dt1.parentElement.appendChild(error)
+            }
+        } else if (dt1.parentElement.lastChild.nodeName == 'P') {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        var dt2 = document.getElementById('endDate')
+        if (start_flag && !date_flag) {
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt1.parentElement.appendChild(error)
+            }
+
+        } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag) {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        if (end_flag) {
+            dt2.classList.replace('border-gray-300', 'border-red-600')
+            if (dt2.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt2.parentElement.appendChild(error)
+            }
+
+        } else if (dt2.parentElement.lastChild.nodeName == 'P') {
+            dt2.classList.replace('border-red-600', 'border-gray-300')
+            dt2.parentElement.lastChild.remove()
+        }
+    } else {
+        if (document.getElementById('productProvider').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('productProvider').parentElement.lastChild.remove()
+        }
+        if (document.getElementById('startDate').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('startDate').classList.replace('border-red-600', 'border-gray-300')
+            document.getElementById('startDate').parentElement.lastChild.remove()
+        }
+        if (document.getElementById('endDate').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('endDate').classList.replace('border-red-600', 'border-gray-300')
+            document.getElementById('endDate').parentElement.lastChild.remove()
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/changeProduct',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (response) {
+                // startCreation(contractInfo['id'])
+                cleanInputWindow('product-change-modal')
+                updateProduct(data['id'], response['product'])
+                // getProductList(false)
+                console.log(response);
+            },
+            error: function (error) {
+                location.reload();
+                console.log(error);
+            }
+        });
+    }
+
 }
 
 
@@ -885,7 +1132,7 @@ function createTree(element, data, idd, i) {
         if (item.children.length != 0) {
             var tmp = item.id + i
             listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl text-black font-semibold items-center hover:bg-cyan-500 duration-300 rounded-lg"` +
+                `class="flex text-xl text-black font-semibold items-center hover:bg-blue-300 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
@@ -895,7 +1142,7 @@ function createTree(element, data, idd, i) {
             i += 1
         } else {
             listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-cyan-300 duration-300 rounded-lg ml-4"` +
+                `class="flex text-lg text-black items-center hover:bg-blue-100 duration-300 rounded-lg ml-4"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
@@ -911,13 +1158,12 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
             rootElement.innerHTML = ""
             var i = 1
-            console.log(data['data'])
             createTree(rootElement, data['data'], null, i)
         });
 }
@@ -970,7 +1216,6 @@ function autocomplete(id, type) {
         data: { 'contractId': contractInfo['id'], 'productId': id.slice(13), 'productType': type },
         success: function (response) {
             product = response['product']
-            console.log(product)
             $('#newProductName').val(product.name)
             $('#newProductCode').val(product.code)
             $('#newProductType').val(product.idType)
@@ -1017,10 +1262,8 @@ function productAutocomplete(productList, only_db) {
     var currentFocus;
     const styleSheet = document.styleSheets[0]
     styleSheet.insertRule('.auto-list { position: absolute; border-radius: 0.5rem; border-width: 1px; --tw-bg-opacity: 1; background-color: rgb(255 255 255 / var(--tw-bg-opacity)); }', styleSheet.cssRules.length)
-    // console.log(productList)
     inp.addEventListener('input', function (e) {
         var a, b, i, val = this.value
-        console.log(val)
         closeAllLists();
         if (!val) { return false; }
         currentFocus = -1;
@@ -1128,16 +1371,10 @@ function saveInDB() {
         getProductList(false)
     }
     cleanInputWindow('product-add-modal')
-    $('#newProductCode').val('н/б')
+    $('#newProductCode').val('н/ш')
     $('#newProductCount').val('1')
     $('#newProductState').val(1)
     $('#newProductType').val(1)
+    $('#newProductNumber').val('н/б')
     // setDeafults()
 }
-
-
-// function inputValidation(myInput, formId) {
-//     if (myInput.value) {
-
-//     }
-// }

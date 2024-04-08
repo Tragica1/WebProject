@@ -39,7 +39,7 @@
                             <button
                                 class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline "
                                 data-te-dropdown-item-ref
-                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}')">Контракт
+                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт
                                 № {{contract[1]}}
                             </button>
                             <button type="button" onclick="deleteContract('{{ contract[0] }}')">
@@ -68,19 +68,28 @@
                     </button>
                     </p>
                     <div data-popover id="popover-description" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-56 text-sm transition-opacity duration-500 rounded-lg bg-gray-500 border-gray-700">
-                        <div id="info" class="p-3 space-y-2 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">
-                            <h3 id="cInnerNumber" class="font-semibold"></h3>
-                            <h3 id="cType" class="font-semibold"></h3>
-                            <h3 id="cStatus" class="font-semibold"></h3>
-                            <h3 id="cCity" class="font-semibold"></h3>
-                            <h3 id="cStart" class="font-semibold"></h3>
-                            <h3 id="cEnd" class="font-semibold"></h3>
+                        class="absolute z-10 invisible inline-block w-72  duration-500 rounded-lg bg-gray-500 border-gray-700">
+                        <div id="info" class="p-2 space-y-1 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">
+                            <h3 id="cInnerNumber"></h3>
+                            <h3 id="cType"></h3>
+                            <div class="items-center inline-flex">
+                                <span class="font-medium">Статус: </span>
+                                <select id="cStatus" required onchange="changeContractStatus(this)"
+                                    class="block w-full mx-2 px-2 text-white border border-gray-300 rounded-lg bg-gray-400 focus:ring-gray-700  focus:border-gray-700 ">
+                                    <!-- <option value="1" selected></option> -->
+                                    {% for cs in contractStatus %}
+                                    <option value="{{cs[0]}}">{{cs[1]}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <h3 id="cCity"></h3>
+                            <h3 id="cStart"></h3>
+                            <h3 id="cEnd"></h3>
                         </div>
                         <div data-popper-arrow></div>
                     </div>
                     <button type="button" data-modal-target="contract-modal" data-popover-target="popover-AddContract"
-                        data-modal-toggle="contract-modal">
+                        data-modal-toggle="contract-modal" onclick="addProductSelect()">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 ms-2 text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -120,7 +129,7 @@
                                                 <input type="text" id="contractNumber" name="contractNumber"
                                                     class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg block w-full p-2.5"
                                                     required>
-                                                
+
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
@@ -188,28 +197,10 @@
                                                 <h2 class="text-left font-medium text-black">Выбор изделия:
                                                 </h2>
                                             </div>
-                                            <div class="grid grid-rows-1">
-                                                <!-- <button id="dropdownProductsButton" data-dropdown-toggle="dropdownProducts" data-dropdown-placement="bottom"
-                                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-lg text-center inline-flex items-center"
-                                                    type="button" onclick="addProductSelect()">Изделия
-                                                    <svg
-                                                        class="w-2.5 h-2.5 ms-3" aria-hidden="true"
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 10 6">
-                                                        <path stroke="currentColor" stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
-                                                    </svg>
-                                                </button>
-                                                <div id="dropdownProducts"
-                                                    class="z-10 hidden w-72 bg-white divide-y divide-gray-700 rounded-lg shadow ">
-                                                    <ul id="productsSelector" class="p-3 text-left space-y-3 text-black"
-                                                    aria-labelledby="dropdownProductsButton">
-                                                    </ul>
-                                                </div> -->
-
+                                            <div class="grid grid-rows-1" id="prodValid">
                                                 <button id="dropdownProductsButton"
                                                     data-dropdown-toggle="dropdownProducts"
-                                                    data-dropdown-placement="bottom" onclick="addProductSelect()"
+                                                    data-dropdown-placement="bottom"
                                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center "
                                                     type="button">Изделия <svg class="w-2.5 h-2.5 ms-3"
                                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -218,31 +209,26 @@
                                                             stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                                                     </svg>
                                                 </button>
-
-                                                <!-- Dropdown menu -->
                                                 <div id="dropdownProducts"
                                                     class="z-10 hidden bg-white divide-y divide-gray-700 rounded-lg shadow w-72 ">
                                                     <ul id="productsSelector"
                                                         class="h-72 p-3 space-y-3 overflow-y-auto text-gray-700 "
                                                         aria-labelledby="dropdownProductsButton">
                                                     </ul>
-
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                    <button type="submit" onclick="saveContract()"
-                                        id="saveContract"
+                                    <button type="submit" onclick="saveContract()" id="saveContract"
                                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                         Сохранить</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <a data-popover-target="popover-ContractStat" class="cursor-pointer">
+                    <a data-popover-target="popover-ContractStat" class="cursor-pointer" href="/statistic">
                         <svg class="w-6 h-6 ms-2 text-orange-500 hover:text-orange-800" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -276,7 +262,8 @@
         </div>
         <div id="currentDetal">
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
-            <div id="currentProduct" class="w-full max-w-2xl border border-black rounded-lg shadow sm:p-6 md:p-8">
+            <div id="currentProduct"
+                class="w-full max-w-2xl border border-black rounded-lg shadow-xl shadow-blue-400 sm:p-6 md:p-8">
                 <div class="flex justify-end">
                     <!-- <button id="editButton" type="button" onclick="editProduct()" disabled>
                         <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
@@ -286,7 +273,7 @@
                         </svg>
                     </button> -->
                     <button id="addButton" onclick="setDeafults()" type="button" data-popover-target="popover-addButton"
-                        disabled data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
+                        data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -369,7 +356,7 @@
                                                 изделие в шаблон</h3>
                                             <div data-popper-arrow></div>
                                         </div>
-                                        <button type="button"
+                                        <button type="button" id="closeProductModal"
                                             class="text-black bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                                             data-modal-hide="product-add-modal">
                                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -443,7 +430,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <select id="newProductState"
-                                            class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                            class="bg-blue-500 hover:bg-blue-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                             <!-- <option value="1" selected></option> -->
                                             {% for state in states %}
                                             <option value="{{state[0]}}">{{state[1]}}</option>
@@ -585,7 +572,7 @@
                                 </div>
                             </div>
                             <div class="p-4 md:p-2 space-y-4 text-xl">
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-2 gap-4 items-center">
                                     <div class="grid grid-rows-1 py-2 text-center">
                                         <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
                                     </div>
@@ -595,9 +582,8 @@
                             </div>
                             <div
                                 class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                <!-- <div class="flex items-center justify-between"> -->
-                                <button data-modal-hide="product-add-modal" type="button" id="saveContact"
-                                    onclick="addNewProduct()"
+                                <!-- <div class="flex items-center justify-between"> data-modal-hide="product-add-modal"-->
+                                <button type="button" id="saveContact" onclick="addNewProduct()"
                                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                     Сохранить</button>
 
@@ -618,6 +604,22 @@
                 <div id="product-change-modal" class="pt-2 space-y-6 text-xl">
                     <h5 id="productName" class="font-medium text-black">Изделие: </h5>
                     <h5 id="productCode" class="font-medium text-black">Шифр: </h5>
+                    <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents"
+                        data-dropdown-placement="bottom" onclick="getProductParents()"
+                        class="text-black cursor-pointer border-2 rounded-lg border-black hover:border-blue-600 hover:text-blue-600 font-medium px-2 py-1.5 text-center"
+                        type="button">Куда входит?
+                        <!-- <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 4 4 4-4" />
+                        </svg> -->
+                    </button>
+                    <div id="dropdownParents"
+                        class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72 ">
+                        <ul id="parentsSelector" class="h-20 p-3 space-y-3 overflow-y-auto text-black border border-black rounded-lg"
+                            aria-labelledby="dropdownProductsParents">
+                        </ul>
+                    </div>
                     <hr class="mt-1 mx-auto h-px bg-black border-blue-800 border-2">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
@@ -643,7 +645,7 @@
                         </div>
                         <div class="grid grid-rows-1">
                             <select id="productState"
-                                class="bg-cyan-500 hover:bg-cyan-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                class="bg-blue-500 hover:bg-blue-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for state in states %}
                                 {%if state[0] == 1%}

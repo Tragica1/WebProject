@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "apexcharts": "^3.48.0",
     "axios": "^1.6.7",
     "flowbite": "^2.2.0",
     "imask": "^7.4.0",

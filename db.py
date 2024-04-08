@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="123",
+    password="1234",
     host="localhost",
     port=3306
 )
@@ -98,6 +98,14 @@ def db_get_contract_types():
     return types
 
 
+def db_get_contract_statuses():
+    cur = con.cursor()
+    sql = '''SELECT * FROM contractstatus'''
+    cur.execute(sql)
+    statuses = cur.fetchall()
+    cur.close()
+    return statuses
+
 def db_get_contract_type(type_id):
     cur = con.cursor()
     sql = '''SELECT name FROM contracttype WHERE id=%s'''
@@ -146,7 +154,7 @@ def db_get_product_contract_list(contract_id):
 
 def db_get_government_contract(id):
     cur = con.cursor()
-    sql = '''SELECT governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, contracttype.name, contractstatus.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus WHERE governmentcontract.id=%s'''
+    sql = '''SELECT governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, contracttype.name, contractstatus.id FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus WHERE governmentcontract.id=%s'''
     cur.execute(sql, (id,))
     contract = cur.fetchone()
     cur.close()
@@ -158,7 +166,7 @@ def db_get_government_contract(id):
 
 def db_get_government_contracts():
     cur = con.cursor()
-    sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name, contractstatus.name FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus'''
+    sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name, contractstatus.id FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus'''
     cur.execute(sql)
     contracts = cur.fetchall()
     cur.close()
@@ -321,6 +329,14 @@ def db_update_product(data, contract_id=None):
     cur = con.cursor()
     sql = '''UPDATE product SET number=%s, idType=%s, count=%s, idLocalContract=%s, idState=%s WHERE id=%s'''
     cur.execute(sql, (int(data['number']), int(data['type']), int(data['count']), contract_id, int(data['state']), int(data['id'])))
+    cur.close()
+    con.commit()
+
+
+def db_update_contract(id, status):
+    cur = con.cursor()
+    sql = '''UPDATE governmentcontract SET idStatus=%s WHERE id=%s'''
+    cur.execute(sql, (status, id))
     cur.close()
     con.commit()
 

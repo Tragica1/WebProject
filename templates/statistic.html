@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/tw-elements.min.css')}}" />
+    <link href="{{url_for('static', filename='css/flowbite.min.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static', filename='css/css.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static', filename='css/output.css')}}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class=" relative flex w-full flex-wrap items-center justify-between py-2 bg-gray-800 text-white shadow-lg lg:py-4"
+        data-te-navbar-ref>
+        <div class="flex justify-between items-center w-full px-3">
+            <div>
+                <div class="relative ml-2" data-te-dropdown-ref>
+                    <a class="flex items-center text-white transition duration-200 hover:text-gray-400 focus:text-grey-400 motion-reduce:transition-none text-5xl font-bold whitespace-nowrap"
+                        href="#" type="button" id="dropdownMenuButton2" data-te-dropdown-toggle-ref
+                        aria-expanded="false">
+                        Контракты НПЦ-800
+                        <span class="ml-2 mt-1 w-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="h-6 w-6">
+                                <path fill-rule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </a>
+                    <ul id="contractList"
+                        class="absolute z-[1000] float-left m-0 hidden min-w-full list-none overflow-hidden rounded-lg border-none bg-gray-900 bg-clip-padding text-left text-base shadow-lg [&[data-te-dropdown-show]]:block"
+                        aria-labelledby="dropdownMenuButton2" data-te-dropdown-menu-ref>
+                        {% for contract in contracts %}
+                        <li class="flex grid-cols-2 gap-2 mx-2 rounded-lg">
+                            <button
+                                class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline "
+                                data-te-dropdown-item-ref
+                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт
+                                № {{contract[1]}}
+                            </button>
+                            <button type="button" onclick="deleteContract('{{ contract[0] }}')">
+                                <svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 22 22">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                </svg>
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="items-center inline-flex ml-2 mt-2">
+                    <p>
+                    <p id="cNumber" class="text-2xl text-white">Контракт не выбран </p>
+                    <button data-popover-target="popover-description" data-popover-trigger="click"
+                        data-popover-placement="bottom-end" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                        </svg>
+                        <span class=" sr-only"></span>
+                    </button>
+                    </p>
+                    <div data-popover id="popover-description" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-72  duration-500 rounded-lg bg-gray-500 border-gray-700">
+                        <div id="info" class="p-2 space-y-1 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">
+                            <h3 id="cInnerNumber"></h3>
+                            <h3 id="cType"></h3>
+                            <div class="items-center inline-flex">
+                                <span class="font-medium">Статус: </span>
+                                <select id="cStatus" required onchange="changeContractStatus(this)"
+                                    class="block w-full mx-2 px-2 text-white border border-gray-300 rounded-lg bg-gray-400 focus:ring-gray-700  focus:border-gray-700 ">
+                                    {% for cs in contractStatus %}
+                                    <option value="{{cs[0]}}">{{cs[1]}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <h3 id="cCity"></h3>
+                            <h3 id="cStart"></h3>
+                            <h3 id="cEnd"></h3>
+                        </div>
+                        <div data-popper-arrow></div>
+                    </div>
+                    <a data-popover-target="popover-ContractStat" class="cursor-pointer" href="/">
+                        <svg class="w-6 h-6 ms-2 text-orange-500 hover:text-orange-800" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
+                        </svg>
+                    </a>
+                    <div data-popover id="popover-ContractStat" role="tooltip"
+                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                        <h3 class="text-sm font-semibold text-center text-white p-2">Вернуться на главную</h3>
+                        <div data-popper-arrow></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a href="#" class="text-2xl text-white  hover:underline">Вход/Регистрация</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex justify-around content-around ml-16 pt-5">
+        <div class="max-w-md w-full space-y-5 border-2 bg-white rounded-lg shadow-lg shadow-gray-700/60 md:p-6">
+            <div class="flex justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="flex justify-center items-center">
+                        <h5 class="text-2xl font-bold leading-none text-black">Прогресс контрактов:</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 shadow-lg shadow-gray-700/40 p-3 rounded-lg">
+                <h5 class="text-xl font-bold leading-none text-black">Тип контракта:</h5>
+                <div class="mt-3 flex" id="contrTypes">
+                    <div class="flex items-center me-4">
+                        <input id="series" type="checkbox" value="series"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500  focus:ring-2 ">
+                        <label for="series" class="ms-2 text-lg font-medium text-black ">Серия</label>
+                    </div>
+                    <div class="flex items-center me-4">
+                        <input id="service" type="checkbox" value="service"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2 ">
+                        <label for="service" class="ms-2 text-lg font-medium text-black ">Сервис</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Radial Chart -->
+            <div class="py-6" id="donut-chart"></div>
+        </div>
+
+        <div class="max-w-5xl w-full space-y-5 bg-white rounded-lg border-2 shadow-lg shadow-gray-700/60 md:p-6">
+            <div class="flex justify-between mb-3">
+                <div class="flex items-center">
+                    <div class="flex justify-center items-center">
+                        <h5 class="text-2xl font-bold leading-none text-black">Прогресс текущего контракта:</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-evenly gap-5">
+                <div class="max-w-lg w-full bg-white rounded-lg border-2 shadow-lg shadow-gray-700/30 p-4">
+                    <div class="flex justify-between items-start w-full">
+                        <div class="flex-col items-center">
+                            <div class="flex items-center mb-1">
+                                <h5 class="text-xl font-bold leading-none text-black me-1">Состояния изделий:</h5>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="py-6" id="types-chart"></div>
+                </div>
+                <div class="max-w-lg w-full bg-white rounded-lg border-2 shadow-lg shadow-gray-700/30 p-4">
+                    <div class="flex justify-between items-start w-full">
+                        <div class="flex-col items-center">
+                            <div class="flex items-center mb-1">
+                                <h5 class="text-xl font-bold leading-none text-black me-1">Типы изделий:</h5>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="py-6" id="states-chart"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script src="./static/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="./static/js/inputmask.js"></script>
+    <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="./static/js/jquery-3.6.4.min.js"></script>
+    <script src="./static/js/jszip.min.js"></script>
+    <script src="./static/js/apexcharts.js"></script>
+    <script src="./static/js/statistic.js"></script>
+    <script src="./static/js/tw-elements.umd.min.js"></script>
+
+    <script src="./static/js/flowbite.min.js"></script>
+
+</body>
+
+</html>
