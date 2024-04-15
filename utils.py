@@ -1,7 +1,7 @@
 from db import *
 from config import contract_folder, secret_folder
 import os
-import datetime
+
 import shutil
 
 def create_product(id, name, code, number, count, type, state, idProvider, start, end, note):
@@ -28,16 +28,19 @@ def add_product_child(product, child):
     if len(db_get_product_children(child['id'])) > 0:
         children = db_get_product_children(child['id'])
         for ch in children:
-            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], ch[6], ch[7], ch[8], ch[9], ch[10], ch[11]))
+            add_product_child(child, create_product(ch[0], ch[1], ch[2], ch[3], ch[5], 
+                                                    ch[6], ch[7], ch[8], ch[9], ch[10], ch[11]))
 
 
 def create_product_tree(input_id):
     prod_state, product = db_get_product(input_id)
     if prod_state:
-        product_root = create_product(product[0], product[1], product[2], product[3], product[5], product[6], product[7], product[8], product[9], product[10], product[11])
+        product_root = create_product(product[0], product[1], product[2], product[3], product[5], 
+                                      product[6], product[7], product[8], product[9], product[10], product[11])
         children = db_get_product_children(product[0])
         for child in children:
-            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], child[6], child[7], child[8], child[9], child[10], child[11]))
+            add_product_child(product_root, create_product(child[0], child[1], child[2], child[3], child[5], 
+                                                           child[6], child[7], child[8], child[9], child[10], child[11]))
     return product_root
 
 
@@ -90,7 +93,6 @@ def get_parents(contract_data, productCode, parents, flag):
             if check_children(item['children'], productCode):
                 parents.append(item['name'])
             get_parents(item['children'], productCode, parents, flag)
-
 
 
 def change_product_in_json(contract_data, product_data, file_pathes):
@@ -233,3 +235,13 @@ def get_products_for_statistic(contract_data, products):
         products.append({'id': int(item['id']), 'isContract': int(item['isContract']), 'type': int(item['idType']), 'state': int(item['idState'])})
         if len(item['children']) != 0:
             get_products_for_statistic(item['children'], products)
+
+
+def unique_id(contract_data, num):
+    for item in contract_data:
+        item['id'] = num['id']
+        num['id']+=1
+        if len(item['children']) != 0:
+            unique_id(item['children'], num)
+            
+

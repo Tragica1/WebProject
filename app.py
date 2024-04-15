@@ -1,17 +1,17 @@
 import os
 import json
 from flask import render_template, redirect, url_for, request, flash, jsonify, send_file
-# from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from utils import *
-from config import app
+from config import *
 from printree import ptree
 import copy
 
 
 
-@app.route('/products/<contract_id>')
+@app.route('/products/<contract_id>', methods=['GET'])
+@jwt_required()
 def send_products(contract_id):
     print(f'\nSelected contract: {contract_id}\n')
     if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
@@ -24,14 +24,13 @@ def send_products(contract_id):
         return json_object
     else:
         products_id = db_get_product_contract_list(contract_id)
-        # root_obj = create_product('root', '', '', '', '', '', '', '')
         json_data = {
             'data': []
         }
         for pr_id in products_id:
             product_tree = create_product_tree(pr_id)
             json_data['data'].append(product_tree)
-            # root_obj['children'].append(product_tree)
+        unique_id(json_data['data'], {'id': 0})
         json_object = json.dumps(json_data)
         with open(os.path.join(contract_folder,'contract_' + str(contract_id), 'contract' + str(contract_id) + '.json'), 'x') as f:
             f.write(json_object)
@@ -39,14 +38,20 @@ def send_products(contract_id):
         return json_object
 
 
-@app.route('/contacts/<company_id>')
+@app.route('/contacts/<company_id>', methods=['GET'])
+@jwt_required()
 def send_contacts(company_id):
     contacts = db_get_company_contacts(company_id)
     return json.dumps(contacts)
 
+@jwt.unauthorized_loader
+def custom_unauthorized_response(_err):
+    return redirect(url_for('login'))
 
 @app.route('/')
+@jwt_required()
 def index():
+    cur_user = get_jwt_identity()
     state, contrs = db_get_government_contracts()
     contracts = []
     contractTypes = []
@@ -68,13 +73,15 @@ def index():
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('index.html', contracts=contracts, types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus)
+        return render_template('index.html', contracts=contracts, types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus, cur_user=cur_user)
     else:
-        return render_template('index.html', types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus)
+        return render_template('index.html', types=types, states=states, contractTypes=contractTypes, contractStatus=contractStatus, cur_user=cur_user)
 
 
 @app.route('/statistic')
+@jwt_required()
 def statistic():
+    cur_user = get_jwt_identity()
     state, contrs = db_get_government_contracts()
     contracts = []
     contractTypes = []
@@ -88,12 +95,13 @@ def statistic():
     if state:
         for c in contrs:
             contracts.append(list(c))
-        return render_template('statistic.html', contracts=contracts, contractTypes=contractTypes, contractStatus=contractStatus)
+        return render_template('statistic.html', contracts=contracts, contractTypes=contractTypes, contractStatus=contractStatus, cur_user=cur_user)
     else:
-        return render_template('statistic.html', contractTypes=contractTypes, contractStatus=contractStatus)
+        return render_template('statistic.html', contractTypes=contractTypes, contractStatus=contractStatus, cur_user=cur_user)
 
 
 @app.route('/getChartData')
+@jwt_required()
 def data_for_chart():
     try:
         contractId = request.args.get('contractId')
@@ -110,7 +118,9 @@ def data_for_chart():
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
 
+
 @app.route('/getProdivers', methods=['GET'])
+@jwt_required()
 def get_providers():
     try:
         companies = []
@@ -126,6 +136,7 @@ def get_providers():
 
 
 @app.route('/getSelector')
+@jwt_required()
 def create_product_selector():
     state, prods = db_get_products()
     res = []
@@ -140,6 +151,7 @@ def create_product_selector():
 
 
 @app.route('/saveContract', methods=['POST'])
+@jwt_required()
 def save_contract():
     try:
         data = request.get_json()
@@ -164,6 +176,7 @@ def save_contract():
 
 
 @app.route('/changeContractStatus', methods=['POST'])
+@jwt_required()
 def change_contract_status():
     try:
         contractId = request.form['contractId']
@@ -178,6 +191,7 @@ def change_contract_status():
 
 
 @app.route('/getProductParents', methods=['GET'])
+@jwt_required()
 def get_product_parents():
     try:
         contractId = request.args.get('contractId')
@@ -194,10 +208,10 @@ def get_product_parents():
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
-  
 
 
-@app.route('/changeProduct', methods=['POST'])    
+@app.route('/changeProduct', methods=['POST'])
+@jwt_required()  
 def change_product():
     try:
         data = json.loads(request.form['data'])
@@ -222,7 +236,7 @@ def change_product():
             f.close()
         product = {'product': {}}
         get_product_from_json(contract_data['data'], int(data['id']), product)
-        print(product['product'])
+        # print(product['product'])
         print('Product changed successfully')
         # print(files)
         return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product']})
@@ -232,6 +246,7 @@ def change_product():
 
 
 @app.route('/deleteProduct', methods=['POST'])
+@jwt_required()
 def delete_product():
     try:
         data = request.get_json()
@@ -256,6 +271,7 @@ def delete_product():
 
 
 @app.route('/addNewProduct', methods=['POST'])
+@jwt_required()
 def add_new_product():
     try:
         data = json.loads(request.form['data'])
@@ -280,7 +296,6 @@ def add_new_product():
         if static_files:
             for f in static_files:
                 json_file_pathes.append(f)
-        # print(file_pathes)
         if (int(to_db) == 1):
             new_prod_id = db_add_product(data)
             if int(data['mainProductId']) != -1:
@@ -318,10 +333,10 @@ def add_new_product():
     
 
 @app.route('/downloadFile', methods=['GET'])
+@jwt_required()
 def send_product_file():
     try:
         file_name = request.args.get('filePath')
-        # print(file_name.split('\\')[-1])
         name = file_name.split('\\')[-1]
         return send_file(file_name, as_attachment=True, download_name=name)
     except Exception as e:
@@ -330,6 +345,7 @@ def send_product_file():
 
 
 @app.route('/deleteFile', methods=['GET'])
+@jwt_required()
 def delete_product_file():
     try:
         file_name = request.args.get('filePath')
@@ -353,7 +369,8 @@ def delete_product_file():
         return jsonify({'status': 'error', 'message': str(e)})
     
 
-@app.route('/saveProvider', methods=['POST'])    
+@app.route('/saveProvider', methods=['POST'])
+@jwt_required()    
 def save_provider():
     try:
         data = request.get_json()
@@ -371,6 +388,7 @@ def save_provider():
     
 
 @app.route('/deleteContract', methods=['GET'])
+@jwt_required()
 def delete_contract():
     try:
         id = request.args.get('contractId')
@@ -388,6 +406,7 @@ def delete_contract():
     
 
 @app.route('/getProductList', methods=['GET'])
+@jwt_required()
 def get_product_list():
     try:
         id = request.args.get('contractId')
@@ -407,6 +426,7 @@ def get_product_list():
 
 
 @app.route('/getProductInfo', methods=['GET'])
+@jwt_required()
 def get_product_info():
     try:
         contract_id = request.args.get('contractId')
@@ -429,6 +449,63 @@ def get_product_info():
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)}) 
+
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    return render_template('login.html')
+
+
+@app.route('/loginUser', methods=['POST', 'GET'])
+def login_user():
+    try:
+        username = request.form['username']
+        password = request.form['password']
+        checker = db_check_users(username)
+        if checker[0]:
+            if str(db_get_user_password(checker[1])[0]) == password:
+                role = db_get_user_role(checker[1])
+                main_products = db_get_role_allowed_products(role[0])
+                print(main_products)
+                allowed_prods = {'products': []}
+                # get_allowed_prods_from_json()
+                response = jsonify({'status': 'success', 'message': 'User logged successfully', 'url': '/'})
+                access_token = create_access_token(identity={'username': username, 'role': role})
+                set_access_cookies(response, access_token)
+            else:
+                response = jsonify({'status': 'fail', 'message': 'Ошибка! Неверный пароль.'})
+        else:
+            response = jsonify({'status': 'fail', 'message': 'Ошибка! Такого пользователя не существует.'})
+        return response
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})  
+
+
+@app.route("/logout", methods=["GET"])
+@jwt_required()
+def logout():
+    response = jsonify({'status': 'success', "message": "User logouted successfully", 'url': '/login'})
+    unset_jwt_cookies(response)
+    return response
+
+
+@app.after_request
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.now()
+        print(response, exp_timestamp)
+        target_timestamp = datetime.timestamp(now + timedelta(hours=1))
+        if target_timestamp > exp_timestamp:
+            print('\nNew token:')
+            access_token = create_access_token(identity=get_jwt_identity())
+            print(access_token)
+            set_access_cookies(response, access_token)
+        return response
+    except (RuntimeError, KeyError):
+        return response
 
 
 if __name__ == '__main__':

@@ -1,0 +1,16 @@
+body, html {
+    height: 100%;
+    background-repeat: no-repeat;
+    /*background-image: linear-gradient(rgb(12, 97, 33),rgb(104, 145, 162));*/
+    background: rgb(21, 94, 117);
+    position: relative;
+}
+#particles-js{
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: 50% 50%;
+    position: fixed;
+    top: 0px;
+    z-index:1;
+}

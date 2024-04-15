@@ -127,7 +127,7 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="text" id="contractNumber" name="contractNumber"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg block w-full p-2.5"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                                                     required>
 
                                             </div>
@@ -140,7 +140,7 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="text" id="contractInnerNumber" name="contractInnerNumber"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                                                     required>
                                             </div>
                                         </div>
@@ -150,7 +150,7 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="text" id="contractCity" name="contractCity"
-                                                    class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    class="bg-grey-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                                                     required>
                                             </div>
                                         </div>
@@ -161,7 +161,7 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="date" id="contractStartDate" name="contractStartDate"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                                                     required>
                                             </div>
                                         </div>
@@ -172,7 +172,7 @@
                                             </div>
                                             <div class="grid grid-rows-1">
                                                 <input type="date" id="contractEndDate" name="contractEndDate"
-                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
                                                     required>
                                             </div>
                                         </div>
@@ -201,7 +201,7 @@
                                                 <button id="dropdownProductsButton"
                                                     data-dropdown-toggle="dropdownProducts"
                                                     data-dropdown-placement="bottom"
-                                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center "
+                                                    class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center "
                                                     type="button">Изделия <svg class="w-2.5 h-2.5 ms-3"
                                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                         fill="none" viewBox="0 0 10 6">
@@ -222,7 +222,7 @@
                                 </div>
                                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                     <button type="submit" onclick="saveContract()" id="saveContract"
-                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                        class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                         Сохранить</button>
                                 </div>
                             </div>
@@ -245,7 +245,12 @@
                 </div>
             </div>
             <div>
-                <a href="#" class="text-2xl text-white  hover:underline">Вход/Регистрация</a>
+                {% if cur_user %}
+                <button onclick="logoutUser()" class="text-2xl pr-10 text-white hover:underline">{{cur_user.username}}</button>
+                <h5 id="userRole{{cur_user.role[0]}}" class="text-xl pr-10 text-white">Роль: {{cur_user.role[1]}}</h5>
+                {% else %}
+                <a href="/login" class="text-2xl text-white  hover:underline">Вход</a>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -254,7 +259,7 @@
         <div>
             <h2 class="mb-2 text-3xl font-semibold text-black">Список изделий: </h2>
 
-            <div class="max-w-screen-lg" id="mainTree">
+            <div class="max-w-screen-xl" id="mainTree">
             </div>
             <a data-te-collapse-init href="#collapseThree" role="button" aria-expanded="false"
                 aria-controls="collapseThree" class="flex items-center px-2">
@@ -263,7 +268,7 @@
         <div id="currentDetal">
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
-                class="w-full max-w-2xl border border-black rounded-lg shadow-xl shadow-blue-400 sm:p-6 md:p-8">
+                class="w-full max-w-2xl border border-teal-800 rounded-lg shadow-xl shadow-teal-400 sm:p-6 md:p-8">
                 <div class="flex justify-end">
                     <!-- <button id="editButton" type="button" onclick="editProduct()" disabled>
                         <svg class="w-6 h-6 text-orange-500 hover:text-orange-800 " aria-hidden="true"
@@ -272,7 +277,8 @@
                                 d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
                         </svg>
                     </button> -->
-                    <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents" data-dropdown-placement="left" data-popover-target="popover-Parents"
+                    <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents"
+                        data-dropdown-placement="left" data-popover-target="popover-Parents"
                         data-dropdown-placement="bottom" onclick="getProductParents()" type="button">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
@@ -287,7 +293,7 @@
                         <div data-popper-arrow></div>
                     </div>
                     <div id="dropdownParents" style="inset: 0px auto auto -78px;"
-                        class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72" >
+                        class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72">
                         <ul id="parentsSelector"
                             class="h-20 p-3 space-y-3 text-sm overflow-y-auto text-black border border-black rounded-lg"
                             aria-labelledby="dropdownProductsParents">
@@ -321,7 +327,7 @@
                     </div>
 
                 </div>
-                <hr class="mt-1 mx-auto h-px bg-black border-blue-800 border-2">
+                <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
                 <div id="product-delete-modal" tabindex="-1"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative p-4 w-full max-w-md max-h-full">
@@ -401,7 +407,7 @@
                                     </h4>
                                     <div id="autocompleteDiv" class="relative inline-block w-full">
                                         <input type="text" id="productInput"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-2 p-2.5  "
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full ps-2 p-2.5  "
                                             placeholder="Поиск по изделиям..." required />
                                     </div>
                                 </div>
@@ -413,7 +419,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <input type="text" id="newProductName" required
-                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
+                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>
                                 </div>
                             </div>
@@ -424,7 +430,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <input type="text" id="newProductCode" required
-                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
+                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>
                                 </div>
                             </div>
@@ -467,7 +473,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <input type="text" id="newProductNumber"
-                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>
                                 </div>
                             </div>
@@ -478,7 +484,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <input type="number" id="newProductCount"
-                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                            class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                     </div>
                                 </div>
                             </div>
@@ -489,7 +495,7 @@
                                     </div>
                                     <div class="grid grid-rows-1 items-center">
                                         <input id="newProductIsMain" type="checkbox" value="" name="bordered-checkbox"
-                                            class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                            class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                                     </div>
                                 </div>
                             </div>
@@ -501,7 +507,7 @@
                                     <div class="grid grid-rows-1 items-center">
                                         <input id="newProductisLocalContract" type="checkbox" value=""
                                             name="bordered-checkbox"
-                                            class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                            class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                                     </div>
                                 </div>
                             </div>
@@ -532,7 +538,7 @@
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="date" id="newProductStartDate"
-                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                 </div>
@@ -543,7 +549,7 @@
                                         </div>
                                         <div class="grid grid-rows-1">
                                             <input type="date" id="newProductEndDate"
-                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                         </div>
                                     </div>
                                 </div>
@@ -555,7 +561,7 @@
                                     </div>
                                     <div class="grid grid-rows-1">
                                         <textarea id="newProductNote" rows="4"
-                                            class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                            class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -605,7 +611,7 @@
                                 class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <!-- <div class="flex items-center justify-between"> data-modal-hide="product-add-modal"-->
                                 <button type="button" id="saveContact" onclick="addNewProduct()"
-                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                    class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                     Сохранить</button>
 
                                 <div id="hideen4" class="float-right inline-flex items-center">
@@ -613,7 +619,7 @@
                                         изделия?
                                     </h2>
                                     <input id="addProductChildren" type="checkbox" value="" name="bordered-checkbox"
-                                        class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                                 </div>
 
                                 <!-- </div> -->
@@ -626,7 +632,7 @@
                 <div id="product-change-modal" class="pt-2 space-y-6 text-xl">
                     <h5 id="productName" class="font-medium text-black">Изделие: </h5>
                     <h5 id="productCode" class="font-medium text-black">Шифр: </h5>
-                    <hr class="mt-1 mx-auto h-px bg-black border-blue-800 border-2">
+                    <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
@@ -670,7 +676,7 @@
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="text" id="productNumber" value="н/б"
-                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -679,7 +685,7 @@
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="number" id="productCount" value="1"
-                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -688,7 +694,7 @@
                         </div>
                         <div class="grid grid-rows-1 pt-3 text-center">
                             <input id="isLocalContract" type="checkbox" value="" name="bordered-checkbox"
-                                class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                         </div>
                     </div>
                     <div id="hideen1">
@@ -740,7 +746,7 @@
                                                         </div>
                                                         <div class="grid grid-rows-1">
                                                             <input type="text" id="companyName"
-                                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-gree-500 focus:border-blue-500 block w-full p-2.5">
+                                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2 gap-4">
@@ -750,7 +756,7 @@
                                                         </div>
                                                         <div class="grid grid-rows-1">
                                                             <input type="text" id="companyAddress"
-                                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                                         </div>
                                                     </div>
                                                     <div class="flex grid-cols-2 gap-4">
@@ -773,7 +779,7 @@
                                                     class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                                     <button data-modal-hide="company-modal" type="button"
                                                         id="saveContact" onclick="saveProvider()"
-                                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                                        class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                                         Сохранить</button>
                                                 </div>
                                             </div>
@@ -823,7 +829,7 @@
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="date" id="startDate"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4 py-2">
@@ -833,7 +839,7 @@
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="date" id="endDate"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
@@ -843,7 +849,7 @@
                         </div>
                         <div class="grid grid-rows-1">
                             <textarea id="productNote" rows="4"
-                                class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -883,7 +889,7 @@
                     <div id="changeButton" class="grid grid-cols-2 gap-4 py-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <button data-modal-hide="company-modal" type="button" onclick="changeProduct()"
-                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
                                 Сохранить</button>
 
                         </div>
@@ -898,8 +904,8 @@
     <script src="./static/js/inputmask.js"></script>
     <script src="./static/js/jquery-3.5.1.slim.min.js"></script>
     <script src="./static/js/jquery-3.6.4.min.js"></script>
-    <script src="./static/js/jszip.min.js"></script>
     <script src="./static/js/main.js"></script>
+    <script src="./static/js/login.js"></script>
     <script src="./static/js/tw-elements.umd.min.js"></script>
 
     <script src="./static/js/flowbite.min.js"></script>

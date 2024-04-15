@@ -8,6 +8,48 @@ con = ps.connect(
     port=3306
 )
 
+
+def db_check_users(name):
+    cursor = con.cursor()
+    sql = '''SELECT id FROM user WHERE name=%s'''
+    cursor.execute(sql, (name,))
+    userId = cursor.fetchone()
+    cursor.close()
+    if userId != None:
+        return [True, userId[0]]
+    else:
+        return [False, None]
+
+ 
+def db_get_user_password(id_user):
+    cursor = con.cursor()
+    sql = '''SELECT password FROM user WHERE id=%s'''
+    cursor.execute(sql, (id_user,))
+    passwd = cursor.fetchone()
+    cursor.close()
+    return passwd
+
+
+def db_get_user_role(id_user):
+    cursor = con.cursor()
+    sql = '''SELECT role.id, role.name FROM role JOIN userrolelist ON userrolelist.idUser=%s WHERE role.id=userrolelist.idRole'''
+    cursor.execute(sql, (id_user,))
+    role = cursor.fetchone()
+    cursor.close()
+    return role
+
+def db_get_role_allowed_products(id_role):
+    cursor = con.cursor()
+    sql = '''SELECT product.code FROM product JOIN roleproductlist ON roleproductlist.idRole=%s WHERE product.id=roleproductlist.idProduct'''
+    cursor.execute(sql, (id_role,))
+    result = []
+    products = cursor.fetchall()
+    cursor.close()
+    for prod in products:
+        result.append(prod[0])
+    return result    
+
+
 def db_add_localcontract(startDate, endDate):
     cur = con.cursor()
     sql = '''INSERT INTO localcontract (startDate, endDate) VALUES (%s, %s)'''

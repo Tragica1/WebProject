@@ -154,3 +154,36 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `mydb`.`role` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`ud`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+  CREATE TABLE `mydb`.`userrolelist` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idUser` INT NULL,
+  `idRole` INT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id`),
+  INDEX `id_user_idx` (`idUser`),
+  INDEX `id_role_idx` (`idRole`),
+  CONSTRAINT `id_user` FOREIGN KEY (`idUser`) REFERENCES `user` (`id`),
+  CONSTRAINT `id_role` FOREIGN KEY (`idRole`) REFERENCES `role` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `mydb`.`roleproductlist` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idRole` INT NULL,
+  `idProduct` INT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id`),
+  INDEX `id_rrole_idx` (`idRole`),
+  INDEX `id_pproduct_idx` (`idProduct`),
+  CONSTRAINT `id_rrole` FOREIGN KEY (`idRole`) REFERENCES `mydb`.`role` (`id`),
+  CONSTRAINT `id_pproduct` FOREIGN KEY (`idProduct`) REFERENCES `mydb`.`product` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
