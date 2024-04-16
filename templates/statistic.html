@@ -42,7 +42,7 @@
                                 onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт
                                 № {{contract[1]}}
                             </button>
-                            <button type="button" onclick="deleteContract('{{ contract[0] }}')">
+                            <button id="deleteContractButton" type="button" onclick="deleteContract('{{ contract[0] }}')">
                                 <svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                     viewBox="0 0 22 22">
@@ -103,8 +103,13 @@
             </div>
             <div>
                 {% if cur_user %}
-                <button onclick="logoutUser()" class="text-2xl pr-10 text-white hover:underline">{{cur_user.username}}</button>
-                <h5 id="userRole{{cur_user.role[0]}}" class="text-xl pr-10 text-white">Роль: {{cur_user.role[1]}}</h5>
+                <button onclick="logoutUser()" id="currentUser"
+                    class="text-2xl pr-10 text-white hover:underline">{{cur_user.username}}</button>
+                <h3 id="userRoles" class="text-white">Роли:
+                    {%for role in cur_user.roles%}
+                    <span id="role{{role[0]}}">{{role[1]}}</span>
+                    {%endfor%}
+                </h3>
                 {% else %}
                 <a href="/login" class="text-2xl text-white  hover:underline">Вход</a>
                 {% endif %}

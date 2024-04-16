@@ -3,15 +3,36 @@ window.onload = getChartData(0)
 
 
 function getContractFromStorage() {
-
+    getPermission()
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     if (contractInfo && contractInfo['id'] != -1) {
         getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'], false)
     } else {
         getContractInfo(-1, '', '', '', '', '', '', '', false)
     }
+
 }
 
+function getPermission() {
+    var roles = document.getElementById('userRoles').getElementsByTagName('span')
+    var flag = false
+    for (var i = 0; i < roles.length; i++) {
+        if (roles[i].innerText == 'Администратор') {
+            flag = true
+        }
+    }
+    if (!flag) {
+        document.getElementById('addContractButton').setAttribute('disabled', '')
+        var lst = document.getElementById('contractList').getElementsByTagName('button')
+        for (var i = 0; i < lst.length; i++) {
+            if (lst[i].id == 'deleteContractButton') {
+                lst[i].setAttribute('disabled', '')
+            }
+        }
+        document.getElementById('cStatus').setAttribute('disabled', '')
+
+    }
+}
 
 function getContractInfo(id, number, innerNumber, city, startDate, endDate, type, status, option) {
     if (id == -1) {

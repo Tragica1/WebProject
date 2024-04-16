@@ -4,6 +4,7 @@ window.onload = getProdivers();
 // window.onload = getContracts();
 
 function getContractFromStorage() {
+    getPermission()
     // console.log(localStorage)
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     if (contractInfo && contractInfo['id'] != -1) {
@@ -150,11 +151,11 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
 
 var products = []
 function setDeafults() {
-    $('#newProductCode').val('н/ш')
+    $('#newProductCode').val('б/ш')
     $('#newProductCount').val('1')
     $('#newProductState').val(1)
     $('#newProductType').val(1)
-    $('#newProductNumber').val('н/б')
+    $('#newProductNumber').val('б/н')
     // console.log()
     if (document.getElementById('currentProduct').value == null) {
         document.getElementById('addInDB').checked = true
@@ -400,13 +401,6 @@ function saveContract() {
 
 }
 
-// function getCookie(name) {
-
-//     var matches = document.cookie.match(new RegExp(
-//       "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-//     ))
-//     return matches ? decodeURIComponent(matches[1]) : undefined
-// }
 
 var counter = 0;
 function addContactBlock() {
@@ -543,6 +537,27 @@ function showFileList(inpName, fileList) {
 }
 
 
+function getPermission() {
+    var roles = document.getElementById('userRoles').getElementsByTagName('span')
+    var flag = false
+    for (var i = 0; i < roles.length; i++) {
+        if (roles[i].innerText == 'Администратор') {
+            flag = true
+        }
+    }
+    if (!flag) {
+        document.getElementById('addContractButton').setAttribute('disabled', '')
+        var lst = document.getElementById('contractList').getElementsByTagName('button')
+        for (var i = 0; i < lst.length; i++) {
+            if (lst[i].id == 'deleteContractButton') {
+                lst[i].setAttribute('disabled', '')
+            }
+        }
+        document.getElementById('cStatus').setAttribute('disabled', '')
+
+    }
+}
+
 function deleteFileFromList(index, fileList) {
     my_files.splice(index, 1)
     var t = document.getElementById('file-list-' + index)
@@ -633,15 +648,57 @@ function changeArrow(id) {
 var previousElem
 
 function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
-    
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+    $.ajax({
+        type: 'GET',
+        url: '/checkProduct',
+        contentType: false,
+        data: { 'contractId': contractInfo['id'], 'product': code },
+        success: function (response) {
+            if (response['status'] == 'fail') {
+                // document.getElementById('addInDB').setAttribute('disabled')
+                document.getElementById('addButton').setAttribute('disabled', '')
+                document.getElementById('deleteButton').setAttribute('disabled', '')
+                document.getElementById('chButton').setAttribute('disabled', '')
+                document.getElementById('productNote').setAttribute('disabled', '')
+                var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
+                var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
+                console.log(all_inps)
+                for (var i = 0; i< all_inps.length; i++) {
+                    all_inps[i].setAttribute('disabled', '')
+                }
+                for (var i = 0; i< all_select.length; i++) {
+                    all_select[i].setAttribute('disabled', '')
+                }
+            }
+            else {
+                document.getElementById('addButton').removeAttribute('disabled')
+                document.getElementById('deleteButton').removeAttribute('disabled')
+                document.getElementById('chButton').removeAttribute('disabled')
+                document.getElementById('productNote').removeAttribute('disabled')
+                var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
+                var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
+                console.log(all_inps)
+                for (var i = 0; i< all_inps.length; i++) {
+                    all_inps[i].removeAttribute('disabled')
+                }
+                for (var i = 0; i< all_select.length; i++) {
+                    all_select[i].removeAttribute('disabled')
+                }
+            }
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
     cleanInputWindow('product-add-modal')
     my_files = []
     updateDragAndDrop("productFilesList", true)
     updateDragAndDrop("newProductFilesList", true)
     document.getElementById('hideen4').style.display = 'none'
-    document.getElementById('addInDB').removeAttribute('disabled')
-    document.getElementById('addButton').removeAttribute('disabled')
-    document.getElementById('deleteButton').removeAttribute('disabled')
+    // document.getElementById('addInDB').removeAttribute('disabled')
     document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     changeArrow(id)
@@ -651,18 +708,18 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
 
             previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"
         } else {
-            previousElem.className = "flex text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-4"
+            previousElem.className = "flex text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
         }
         if (currentElem.className.indexOf('text-xl') != -1) {
             currentElem.className = "flex text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     } else {
         if (currentElem.className.indexOf('text-xl') != -1) {
             currentElem.className = "flex text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-4"
+            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     }
     previousElem = currentElem
@@ -1146,7 +1203,7 @@ function addProductSelect() {
 
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
-    treeElement.className = 'ps-2 mt-2 space-y-1 list-none list-inside';
+    treeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
     if (idd != null && idd != 'root') {
         var tmp = idd + i - 1
         treeElement.id = 'collapse' + tmp;
@@ -1170,7 +1227,7 @@ function createTree(element, data, idd, i) {
             i += 1
         } else {
             listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-4"` +
+                `class="flex text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +

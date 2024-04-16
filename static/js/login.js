@@ -1,26 +1,26 @@
 function loginUser() {
     var login = document.getElementById('userLogin').value
     var passwd1 = document.getElementById('userPassword1').value
-    var passwd2 = document.getElementById('userPassword2').value
+    // var passwd2 = document.getElementById('userPassword2').value
     var flag1 = false
     var flag2 = false
-    var flag3 = false
-    var flag4 = false
+    // var flag3 = false
+    // var flag4 = false
     if (login == '') {
         flag1 = true
     }
     if (passwd1 == '') {
         flag2 = true
     }
-    if (passwd2 == '') {
-        flag3 = true
-    }
-    if (passwd1 != '' && passwd2 != '' && passwd1 != passwd2) {
-        flag4 = true
-    }
-    console.log(login, passwd1, passwd2)
-    console.log(flag1, flag2, flag3, flag4)
-    if (flag1 || flag2 || flag3 || flag4) {
+    // if (passwd2 == '') {
+    //     flag3 = true
+    // }
+    // if (passwd1 != '' && passwd2 != '' && passwd1 != passwd2) {
+    //     flag4 = true
+    // }
+    // console.log(login, passwd1, passwd2)
+    // console.log(flag1, flag2, flag3, flag4)
+    if (flag1 || flag2) {
         var item = document.getElementById('userLogin')
         if (flag1) {
             item.classList.replace('border-gray-300', 'border-red-600')
@@ -47,32 +47,32 @@ function loginUser() {
             item.classList.replace('border-red-600', 'border-gray-300')
             item.parentElement.lastChild.remove()
         }
-        var item = document.getElementById('userPassword2')
-        if (flag3) {
-            item.classList.replace('border-gray-300', 'border-red-600')
-            if (item.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-                item.parentElement.appendChild(error)
-            }
-        }
-        else if (item.parentElement.lastChild.nodeName == 'P') {
-            item.classList.replace('border-red-600', 'border-gray-300')
-            item.parentElement.lastChild.remove()
-        }
-        var item = document.getElementById('userPassword2')
-        if (flag4 && (!flag2 || !flag3)) {
-            item.classList.replace('border-gray-300', 'border-red-600')
-            if (item.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Папроли не совпадают.</p> `
-                item.parentElement.appendChild(error)
-            }
-        }
-        else if (item.parentElement.lastChild.nodeName == 'P' && (!flag2 || !flag3)) {
-            item.classList.replace('border-red-600', 'border-gray-300')
-            item.parentElement.lastChild.remove()
-        }
+        // var item = document.getElementById('userPassword2')
+        // if (flag3) {
+        //     item.classList.replace('border-gray-300', 'border-red-600')
+        //     if (item.parentElement.lastChild.nodeName != 'P') {
+        //         var error = document.createElement('p')
+        //         error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+        //         item.parentElement.appendChild(error)
+        //     }
+        // }
+        // else if (item.parentElement.lastChild.nodeName == 'P') {
+        //     item.classList.replace('border-red-600', 'border-gray-300')
+        //     item.parentElement.lastChild.remove()
+        // }
+        // var item = document.getElementById('userPassword2')
+        // if (flag4 && (!flag2 || !flag3)) {
+        //     item.classList.replace('border-gray-300', 'border-red-600')
+        //     if (item.parentElement.lastChild.nodeName != 'P') {
+        //         var error = document.createElement('p')
+        //         error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Папроли не совпадают.</p> `
+        //         item.parentElement.appendChild(error)
+        //     }
+        // }
+        // else if (item.parentElement.lastChild.nodeName == 'P' && (!flag2 || !flag3)) {
+        //     item.classList.replace('border-red-600', 'border-gray-300')
+        //     item.parentElement.lastChild.remove()
+        // }
     } else {
         if (document.getElementById('userLogin').parentElement.lastChild.nodeName == 'P') {
             document.getElementById('userLogin').classList.replace('border-red-600', 'border-gray-300')
@@ -82,10 +82,10 @@ function loginUser() {
             document.getElementById('userPassword1').classList.replace('border-red-600', 'border-gray-300')
             document.getElementById('userPassword1').parentElement.lastChild.remove()
         }
-        if (document.getElementById('userPassword2').parentElement.lastChild.nodeName == 'P') {
-            document.getElementById('userPassword2').classList.replace('border-red-600', 'border-gray-300')
-            document.getElementById('userPassword2').parentElement.lastChild.remove()
-        }
+        // if (document.getElementById('userPassword2').parentElement.lastChild.nodeName == 'P') {
+        //     document.getElementById('userPassword2').classList.replace('border-red-600', 'border-gray-300')
+        //     document.getElementById('userPassword2').parentElement.lastChild.remove()
+        // }
         var formData = new FormData()
         formData.append('username', $('#userLogin').val())
         formData.append('password', $('#userPassword1').val())

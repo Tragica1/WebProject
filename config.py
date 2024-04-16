@@ -3,16 +3,12 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-# upl_folder = 'static/images'
 contract_folder = 'contracts'
 secret_folder = 'secret'
-# app.config['SECRET_KEY'] = 'fjkisdjhfuih2jr_'
+app.config['SECRET_KEY'] = 'fjkisdjhfuih2jr_'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 app.config['JWT_SECRET_KEY'] = 'fjkisdjhfuih2jr_'
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=8)
 jwt = JWTManager(app)
-# app.config['UPLOAD_FOLDER'] = upl_folder
-
-# manager = LoginManager(app)

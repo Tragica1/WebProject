@@ -160,8 +160,8 @@ CREATE TABLE `mydb`.`role` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`ud`),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  UNIQUE INDEX `id_UNIQUE` (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
   CREATE TABLE `mydb`.`userrolelist` (
   `id` INT NOT NULL AUTO_INCREMENT,

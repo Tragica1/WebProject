@@ -3,7 +3,7 @@ import pymysql as ps
 con = ps.connect(
     database="mydb",
     user="root",
-    password="1234",
+    password="123",
     host="localhost",
     port=3306
 )
@@ -34,19 +34,23 @@ def db_get_user_role(id_user):
     cursor = con.cursor()
     sql = '''SELECT role.id, role.name FROM role JOIN userrolelist ON userrolelist.idUser=%s WHERE role.id=userrolelist.idRole'''
     cursor.execute(sql, (id_user,))
-    role = cursor.fetchone()
-    cursor.close()
-    return role
-
-def db_get_role_allowed_products(id_role):
-    cursor = con.cursor()
-    sql = '''SELECT product.code FROM product JOIN roleproductlist ON roleproductlist.idRole=%s WHERE product.id=roleproductlist.idProduct'''
-    cursor.execute(sql, (id_role,))
     result = []
-    products = cursor.fetchall()
+    roles = cursor.fetchall()
     cursor.close()
-    for prod in products:
-        result.append(prod[0])
+    for role in roles:
+        result.append([role[0], role[1]])
+    return result
+
+def db_get_role_allowed_products(id_roles):
+    result = []
+    for id_role in id_roles:
+        cursor = con.cursor()
+        sql = '''SELECT product.code FROM product JOIN roleproductlist ON roleproductlist.idRole=%s WHERE product.id=roleproductlist.idProduct'''
+        cursor.execute(sql, (id_role[0],))
+        products = cursor.fetchall()
+        cursor.close()
+        for prod in products:
+            result.append(prod[0])
     return result    
 
 

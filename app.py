@@ -250,14 +250,16 @@ def change_product():
 def delete_product():
     try:
         data = request.get_json()
+        print(data)
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
         index = 0
-        files = delete_product_in_json(contract_data['data'], int(data['productId']), index)
-        if files:
-            for file in files:
+        files = {'files': []}
+        delete_product_in_json(contract_data['data'], int(data['productId']), index, files)
+        if files['files']:
+            for file in files['files']:
                 os.remove(file)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
@@ -465,13 +467,9 @@ def login_user():
         checker = db_check_users(username)
         if checker[0]:
             if str(db_get_user_password(checker[1])[0]) == password:
-                role = db_get_user_role(checker[1])
-                main_products = db_get_role_allowed_products(role[0])
-                print(main_products)
-                allowed_prods = {'products': []}
-                # get_allowed_prods_from_json()
+                roles = db_get_user_role(checker[1])
                 response = jsonify({'status': 'success', 'message': 'User logged successfully', 'url': '/'})
-                access_token = create_access_token(identity={'username': username, 'role': role})
+                access_token = create_access_token(identity={'username': username, 'roles': roles})
                 set_access_cookies(response, access_token)
             else:
                 response = jsonify({'status': 'fail', 'message': 'Ошибка! Неверный пароль.'})
@@ -482,6 +480,34 @@ def login_user():
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})  
 
+
+@app.route('/checkProduct', methods=['GET'])
+@jwt_required()
+def check_product():
+    try:
+        id = request.args.get('contractId')
+        my_prod = request.args.get('product')
+        user_roles = get_jwt_identity()
+        role_names = [item[1] for item in user_roles['roles']]
+        if 'Администратор' not in role_names:
+            dir_path = os.path.join(contract_folder, 'contract_' + str(id))
+            with open(os.path.join(dir_path, 'contract' + str(id) + '.json'), 'r') as f:
+                contract_data = json.load(f)
+                f.close()
+            main_products = db_get_role_allowed_products(user_roles['roles']) 
+            condition = {'flag': False}
+            allowed_prods = {'prods': []}
+            for main_prod in main_products:
+                get_allowed_prods_from_json(contract_data['data'], main_prod, allowed_prods)
+                check_product_in_json(allowed_prods['prods'], my_prod, condition)
+                if condition['flag'] == True or main_prod == my_prod:
+                    return jsonify({'status': 'success', 'message': 'Product is allowed'})
+            return jsonify({'status': 'fail', 'message': 'Product is not allowed'})
+        else:
+            return jsonify({'status': 'success', 'message': 'Product is allowed'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)}) 
 
 @app.route("/logout", methods=["GET"])
 @jwt_required()
@@ -496,12 +522,9 @@ def refresh_expiring_jwts(response):
     try:
         exp_timestamp = get_jwt()["exp"]
         now = datetime.now()
-        print(response, exp_timestamp)
         target_timestamp = datetime.timestamp(now + timedelta(hours=1))
         if target_timestamp > exp_timestamp:
-            print('\nNew token:')
             access_token = create_access_token(identity=get_jwt_identity())
-            print(access_token)
             set_access_cookies(response, access_token)
         return response
     except (RuntimeError, KeyError):
@@ -509,4 +532,5 @@ def refresh_expiring_jwts(response):
 
 
 if __name__ == '__main__':
-   app.run(debug=True)
+   app.run('192.168.0.78', 80)
+    # app.run(debug=True)
