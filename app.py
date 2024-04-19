@@ -311,18 +311,24 @@ def add_new_product():
                 contract_data = json.load(f)
                 lol = copy.deepcopy(contract_data)
                 f.close()
-            condition = request.form['add_children']
-            chl = []
             new_id = {'id': -1}
+            condition = request.form['add_children']
+            condition_type = request.form['add_children_type']
+            chl = []
             if int(condition) != -1:
-                chl = get_product_children(lol['data'], condition)
-                change_children(chl, lol['data'])
-            if len(chl) != 0:
-                get_new_product_id(contract_data['data'], new_id)
-                new_id['id'] += 2
+                if condition_type == 'json':
+                    chl = get_product_children_from_json(lol['data'], condition)
+                elif condition_type == 'db':
+                    chl = create_product_tree(db_get_product_id(data['code']))['children']
+                change_children(chl, lol['data'], new_id)
+            # if len(chl) != 0:
+            #     get_new_product_id(contract_data['data'], new_id)
+            #     new_id['id'] += 2
+            # else:
+            #     get_new_product_id(contract_data['data'], new_id)
+            #     new_id['id'] += 1
             else:
                 get_new_product_id(contract_data['data'], new_id)
-                new_id['id'] += 1
             add_product_in_json(contract_data['data'], data, json_file_pathes, chl, new_id)
             with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
                 json_data = json.dumps(contract_data)
@@ -531,6 +537,11 @@ def refresh_expiring_jwts(response):
         return response
 
 
+@jwt.expired_token_loader
+def my_expired_token_callback():
+    return redirect(url_for('login'))
+
+
 if __name__ == '__main__':
-   app.run('192.168.0.78', 80)
-    # app.run(debug=True)
+    # app.run('192.168.0.78', 80)
+    app.run(debug=True)

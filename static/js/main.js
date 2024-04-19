@@ -575,10 +575,7 @@ function updateDragAndDrop(fileList, option) {
             `d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />` +
             `</svg>` +
             `<p class="mb-2 text-sm text-gray-500 "><span` +
-            `class="font-semibold">Click to upload</span> or drag and ` +
-            `drop</p>` +
-            `<p class="text-xs text-gray-500 ">DOC, DOCX, ` +
-            `PDF</p>`
+            `class="font-semibold">Нажмите чтобы загрузить файл.</span></p>`
     }
 }
 
@@ -663,7 +660,6 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
                 document.getElementById('productNote').setAttribute('disabled', '')
                 var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
                 var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
-                console.log(all_inps)
                 for (var i = 0; i< all_inps.length; i++) {
                     all_inps[i].setAttribute('disabled', '')
                 }
@@ -678,7 +674,6 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
                 document.getElementById('productNote').removeAttribute('disabled')
                 var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
                 var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
-                console.log(all_inps)
                 for (var i = 0; i< all_inps.length; i++) {
                     all_inps[i].removeAttribute('disabled')
                 }
@@ -839,9 +834,11 @@ function addNewProduct() {
         formData.append('to_db', 1)
     } else {
         if (document.getElementById('addProductChildren').checked) {
+            formData.append('add_children_type', document.getElementById('productInput').getAttribute('data-type'))
             formData.append('add_children', document.getElementById('productInput').getAttribute('ch-prod-id'))
         } else {
             formData.append('add_children', -1)
+            formData.append('add_children_type', -1)
         }
         data['mainProductId'] = $("#mainProduct").val().slice(11)
         formData.append('to_db', 0)
@@ -1056,6 +1053,7 @@ function updateProduct(id, data) {
 function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = my_files
+    console.log(files)
     var formData = new FormData()
     var data = {
         'contractId': contractInfo['id'],
@@ -1096,84 +1094,84 @@ function changeProduct() {
     for (var i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
     }
-    if (provider_flag || date_flag || start_flag || end_flag) {
-        var my_provider = document.getElementById('productProvider')
-        if (provider_flag) {
-            if (my_provider.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
-                my_provider.parentElement.appendChild(error)
-            }
-        } else if (my_provider.parentElement.lastChild.nodeName == 'P') {
-            my_provider.parentElement.lastChild.remove()
-        }
-        var dt1 = document.getElementById('startDate')
-        if (date_flag) {
-            dt1.classList.replace('border-gray-300', 'border-red-600')
-            if (dt1.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
-                dt1.parentElement.appendChild(error)
-            }
-        } else if (dt1.parentElement.lastChild.nodeName == 'P') {
-            dt1.classList.replace('border-red-600', 'border-gray-300')
-            dt1.parentElement.lastChild.remove()
-        }
-        var dt2 = document.getElementById('endDate')
-        if (start_flag && !date_flag) {
-            dt1.classList.replace('border-gray-300', 'border-red-600')
-            if (dt1.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-                dt1.parentElement.appendChild(error)
-            }
+    // if (provider_flag || date_flag || start_flag || end_flag) {
+    //     var my_provider = document.getElementById('productProvider')
+    //     if (provider_flag) {
+    //         if (my_provider.parentElement.lastChild.nodeName != 'P') {
+    //             var error = document.createElement('p')
+    //             error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
+    //             my_provider.parentElement.appendChild(error)
+    //         }
+    //     } else if (my_provider.parentElement.lastChild.nodeName == 'P') {
+    //         my_provider.parentElement.lastChild.remove()
+    //     }
+    //     var dt1 = document.getElementById('startDate')
+    //     if (date_flag) {
+    //         dt1.classList.replace('border-gray-300', 'border-red-600')
+    //         if (dt1.parentElement.lastChild.nodeName != 'P') {
+    //             var error = document.createElement('p')
+    //             error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
+    //             dt1.parentElement.appendChild(error)
+    //         }
+    //     } else if (dt1.parentElement.lastChild.nodeName == 'P') {
+    //         dt1.classList.replace('border-red-600', 'border-gray-300')
+    //         dt1.parentElement.lastChild.remove()
+    //     }
+    //     var dt2 = document.getElementById('endDate')
+    //     if (start_flag && !date_flag) {
+    //         dt1.classList.replace('border-gray-300', 'border-red-600')
+    //         if (dt1.parentElement.lastChild.nodeName != 'P') {
+    //             var error = document.createElement('p')
+    //             error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+    //             dt1.parentElement.appendChild(error)
+    //         }
 
-        } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag) {
-            dt1.classList.replace('border-red-600', 'border-gray-300')
-            dt1.parentElement.lastChild.remove()
-        }
-        if (end_flag) {
-            dt2.classList.replace('border-gray-300', 'border-red-600')
-            if (dt2.parentElement.lastChild.nodeName != 'P') {
-                var error = document.createElement('p')
-                error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-                dt2.parentElement.appendChild(error)
-            }
+    //     } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag) {
+    //         dt1.classList.replace('border-red-600', 'border-gray-300')
+    //         dt1.parentElement.lastChild.remove()
+    //     }
+    //     if (end_flag) {
+    //         dt2.classList.replace('border-gray-300', 'border-red-600')
+    //         if (dt2.parentElement.lastChild.nodeName != 'P') {
+    //             var error = document.createElement('p')
+    //             error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+    //             dt2.parentElement.appendChild(error)
+    //         }
 
-        } else if (dt2.parentElement.lastChild.nodeName == 'P') {
-            dt2.classList.replace('border-red-600', 'border-gray-300')
-            dt2.parentElement.lastChild.remove()
-        }
-    } else {
-        if (document.getElementById('productProvider').parentElement.lastChild.nodeName == 'P') {
-            document.getElementById('productProvider').parentElement.lastChild.remove()
-        }
-        if (document.getElementById('startDate').parentElement.lastChild.nodeName == 'P') {
-            document.getElementById('startDate').classList.replace('border-red-600', 'border-gray-300')
-            document.getElementById('startDate').parentElement.lastChild.remove()
-        }
-        if (document.getElementById('endDate').parentElement.lastChild.nodeName == 'P') {
-            document.getElementById('endDate').classList.replace('border-red-600', 'border-gray-300')
-            document.getElementById('endDate').parentElement.lastChild.remove()
-        }
-        $.ajax({
-            type: 'POST',
-            url: '/changeProduct',
-            processData: false,
-            contentType: false,
-            data: formData,
-            success: function (response) {
-                // startCreation(contractInfo['id'])
-                cleanInputWindow('product-change-modal')
-                updateProduct(data['id'], response['product'])
-                console.log(response);
-            },
-            error: function (error) {
-                // location.reload();
-                console.log(error);
-            }
-        });
-    }
+    //     } else if (dt2.parentElement.lastChild.nodeName == 'P') {
+    //         dt2.classList.replace('border-red-600', 'border-gray-300')
+    //         dt2.parentElement.lastChild.remove()
+    //     }
+    // } else {
+    //     if (document.getElementById('productProvider').parentElement.lastChild.nodeName == 'P') {
+    //         document.getElementById('productProvider').parentElement.lastChild.remove()
+    //     }
+    //     if (document.getElementById('startDate').parentElement.lastChild.nodeName == 'P') {
+    //         document.getElementById('startDate').classList.replace('border-red-600', 'border-gray-300')
+    //         document.getElementById('startDate').parentElement.lastChild.remove()
+    //     }
+    //     if (document.getElementById('endDate').parentElement.lastChild.nodeName == 'P') {
+    //         document.getElementById('endDate').classList.replace('border-red-600', 'border-gray-300')
+    //         document.getElementById('endDate').parentElement.lastChild.remove()
+    //     }
+    //     $.ajax({
+    //         type: 'POST',
+    //         url: '/changeProduct',
+    //         processData: false,
+    //         contentType: false,
+    //         data: formData,
+    //         success: function (response) {
+    //             // startCreation(contractInfo['id'])
+    //             cleanInputWindow('product-change-modal')
+    //             updateProduct(data['id'], response['product'])
+    //             console.log(response);
+    //         },
+    //         error: function (error) {
+    //             // location.reload();
+    //             console.log(error);
+    //         }
+    //     });
+    // }
 
 }
 
@@ -1373,6 +1371,7 @@ function productAutocomplete(productList, only_db) {
                     if (!only_db) {
                         autocomplete(this.getElementsByTagName("input")[0].id, this.getElementsByTagName("input")[0].getAttribute('data-type'))
                         inp.setAttribute('m-prod-id', '-1')
+                        inp.setAttribute('data-type', this.getElementsByTagName("input")[0].getAttribute('data-type'))
                         inp.setAttribute('ch-prod-id', this.getElementsByTagName("input")[0].id.slice(13))
                     } else {
                         inp.setAttribute('m-prod-id', this.getElementsByTagName("input")[0].id.slice(13))

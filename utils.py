@@ -134,6 +134,7 @@ def get_allowed_prods_from_json(contract_data, main_prod, allowed_prods):
         if len(item['children']) != 0:
             get_allowed_prods_from_json(item['children'], main_prod, allowed_prods)
 
+
 def check_product_in_json(contract_data, my_prod, condition):
     for item in contract_data:
         if item['code'] == my_prod:
@@ -144,25 +145,28 @@ def check_product_in_json(contract_data, my_prod, condition):
 
 def get_new_product_id(contract_data, max_id):
     for item in contract_data:  
-        if int(item['id']) > max_id['id']:
-            max_id['id'] = int(item['id'])
+        if item['id'] > max_id['id']:
+            max_id['id'] = item['id']
         if len(item['children']) != 0:
             get_new_product_id(item['children'], max_id)
     
 
-def get_product_children(contract_data, id):
+def get_product_children_from_json(contract_data, id):
     for item in contract_data:
         if int(id) == item['id']:
             return item['children']
         if len(item['children']) != 0:
-            return get_product_children(item['children'], id)
+            return get_product_children_from_json(item['children'], id)
 
 
-def change_children(data, contract_data):
+def change_children(data, contract_data, my_id):
     for item in data:
-        item['id'] = get_new_product_id(contract_data, -1) + 1
+        get_new_product_id(contract_data, my_id)
+        my_id['id'] +=1
+        item['id'] = my_id['id']
+        print(item['id'])
         if len(item['children']) != 0:
-            return change_children(item['children'], contract_data)
+            change_children(item['children'], contract_data, my_id)
 
 
 def add_product_in_json(contract_data, product_data, file_pathes, chl, new_id):

@@ -307,6 +307,14 @@ def db_get_product_children(id):
     return childrenData
 
 
+def db_get_product_id(code):
+    cur = con.cursor()
+    sql = '''SELECT id FROM product WHERE code=%s'''
+    cur.execute(sql, (code,))
+    prod_id = cur.fetchone()[0]
+    cur.close()
+    return prod_id
+
 def db_has_children(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
