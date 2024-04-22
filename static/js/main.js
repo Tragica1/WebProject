@@ -64,7 +64,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${tmp.value}`)
+    fetch(`/contacts/${ tmp.value }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -160,7 +160,7 @@ function setDeafults() {
     if (document.getElementById('currentProduct').value == null) {
         document.getElementById('addInDB').checked = true
         document.getElementById('addInDB').setAttribute('disabled', '')
-        
+
     }
     saveInDB()
     // getProductList(false)
@@ -660,10 +660,10 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
                 document.getElementById('productNote').setAttribute('disabled', '')
                 var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
                 var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
-                for (var i = 0; i< all_inps.length; i++) {
+                for (var i = 0; i < all_inps.length; i++) {
                     all_inps[i].setAttribute('disabled', '')
                 }
-                for (var i = 0; i< all_select.length; i++) {
+                for (var i = 0; i < all_select.length; i++) {
                     all_select[i].setAttribute('disabled', '')
                 }
             }
@@ -674,10 +674,10 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
                 document.getElementById('productNote').removeAttribute('disabled')
                 var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
                 var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
-                for (var i = 0; i< all_inps.length; i++) {
+                for (var i = 0; i < all_inps.length; i++) {
                     all_inps[i].removeAttribute('disabled')
                 }
-                for (var i = 0; i< all_select.length; i++) {
+                for (var i = 0; i < all_select.length; i++) {
                     all_select[i].removeAttribute('disabled')
                 }
             }
@@ -697,24 +697,32 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     changeArrow(id)
-    
+
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-xl') != -1) {
-
-            previousElem.className = "flex text-xl text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"
+            previousElem.className = "flex p-0.5 text-xl text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"
+            var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
+            mxm.classList.remove('rounded-lg')
+            mxm.classList.remove('bg-teal-100')
         } else {
-            previousElem.className = "flex text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
+            previousElem.className = "flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
         }
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            currentElem.className = "flex p-0.5 text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+            mxm.classList.add('rounded-lg')
+            mxm.classList.add('bg-teal-100')
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
+            currentElem.className = "flex p-0.5 text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     } else {
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            currentElem.className = "flex p-0.5 text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+            mxm.classList.add('rounded-lg')
+            mxm.classList.add('bg-teal-100')
         } else {
-            currentElem.className = "flex text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
+            currentElem.className = "flex p-0.5 text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     }
     previousElem = currentElem
@@ -1213,23 +1221,23 @@ function createTree(element, data, idd, i) {
         const listItem = document.createElement('li')
         if (item.children.length != 0) {
             var tmp = item.id + i
-            listItem.innerHTML = `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"` +
+            listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                `class="flex text-xl p-0.5 text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 `<div d-num="0">` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                item.name + `</a>`
+                item.name + `</a><span class="border text-sm border-black p-0.5 rounded-lg text-center text-black font-bold"> ` + item.code + `</span></div>`
             i += 1
         } else {
-            listItem.innerHTML = `<a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
+            listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
+                `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                item.name + `</a>`
+                item.name + `</a><span class="border min-w-min text-sm border-black p-0.5 rounded-lg text-center text-black font-bold">` + item.code + `</span></div>`
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
@@ -1241,7 +1249,7 @@ function createTree(element, data, idd, i) {
 
 
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')

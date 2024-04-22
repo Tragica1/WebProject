@@ -543,5 +543,5 @@ def my_expired_token_callback():
 
 
 if __name__ == '__main__':
-    # app.run('192.168.0.78', 80)
-    app.run(debug=True)
+    app.run('192.168.0.78', 80)
+    # app.run(debug=True)

@@ -140,7 +140,7 @@ def check_product_in_json(contract_data, my_prod, condition):
         if item['code'] == my_prod:
             condition['flag'] = True
         if len(item['children']) != 0:
-            check_product_in_json(item['children'], condition)
+            check_product_in_json(item['children'],  my_prod, condition)
 
 
 def get_new_product_id(contract_data, max_id):
