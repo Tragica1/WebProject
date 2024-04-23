@@ -129,18 +129,18 @@ def delete_product_in_json(contract_data, product_id, index, files):
 
 def get_allowed_prods_from_json(contract_data, main_prod, allowed_prods):
     for item in contract_data:
-        if item['code'] == main_prod:
+        if item['name'] == main_prod['name'] and item['code'] == main_prod['code']:
             allowed_prods['prods'] = item['children']            
         if len(item['children']) != 0:
             get_allowed_prods_from_json(item['children'], main_prod, allowed_prods)
 
 
-def check_product_in_json(contract_data, my_prod, condition):
+def check_product_in_json(contract_data, my_prod_name, my_prod_code, condition):
     for item in contract_data:
-        if item['code'] == my_prod:
+        if item['name'] == my_prod_name and item['code'] == my_prod_code:
             condition['flag'] = True
         if len(item['children']) != 0:
-            check_product_in_json(item['children'],  my_prod, condition)
+            check_product_in_json(item['children'], my_prod_name, my_prod_code, condition)
 
 
 def get_new_product_id(contract_data, max_id):

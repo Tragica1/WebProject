@@ -492,7 +492,8 @@ def login_user():
 def check_product():
     try:
         id = request.args.get('contractId')
-        my_prod = request.args.get('product')
+        my_prod_name = request.args.get('productName')
+        my_prod_code = request.args.get('productCode')
         user_roles = get_jwt_identity()
         role_names = [item[1] for item in user_roles['roles']]
         if 'Администратор' not in role_names:
@@ -500,13 +501,14 @@ def check_product():
             with open(os.path.join(dir_path, 'contract' + str(id) + '.json'), 'r') as f:
                 contract_data = json.load(f)
                 f.close()
-            main_products = db_get_role_allowed_products(user_roles['roles']) 
+            main_products = db_get_role_allowed_products(user_roles['roles'])
+            print(main_products) 
             condition = {'flag': False}
             allowed_prods = {'prods': []}
             for main_prod in main_products:
                 get_allowed_prods_from_json(contract_data['data'], main_prod, allowed_prods)
-                check_product_in_json(allowed_prods['prods'], my_prod, condition)
-                if condition['flag'] == True or main_prod == my_prod:
+                check_product_in_json(allowed_prods['prods'], my_prod_name, my_prod_code, condition)
+                if condition['flag'] == True or main_prod['code'] == my_prod_code:
                     return jsonify({'status': 'success', 'message': 'Product is allowed'})
             return jsonify({'status': 'fail', 'message': 'Product is not allowed'})
         else:
