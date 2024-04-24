@@ -650,7 +650,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         type: 'GET',
         url: '/checkProduct',
         contentType: false,
-        data: { 'contractId': contractInfo['id'], 'product': code },
+        data: { 'contractId': contractInfo['id'], 'productId': id, 'productCode': code},
         success: function (response) {
             if (response['status'] == 'fail') {
                 // document.getElementById('addInDB').setAttribute('disabled')

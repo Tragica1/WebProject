@@ -135,12 +135,12 @@ def get_allowed_prods_from_json(contract_data, main_prod, allowed_prods):
             get_allowed_prods_from_json(item['children'], main_prod, allowed_prods)
 
 
-def check_product_in_json(contract_data, my_prod_name, my_prod_code, condition):
+def check_product_in_json(contract_data, my_prod, condition):
     for item in contract_data:
-        if item['name'] == my_prod_name and item['code'] == my_prod_code:
+        if item['id'] == int(my_prod):
             condition['flag'] = True
         if len(item['children']) != 0:
-            check_product_in_json(item['children'], my_prod_name, my_prod_code, condition)
+            check_product_in_json(item['children'], my_prod, condition)
 
 
 def get_new_product_id(contract_data, max_id):

@@ -44,9 +44,11 @@ def send_contacts(company_id):
     contacts = db_get_company_contacts(company_id)
     return json.dumps(contacts)
 
+
 @jwt.unauthorized_loader
 def custom_unauthorized_response(_err):
     return redirect(url_for('login'))
+
 
 @app.route('/')
 @jwt_required()
@@ -492,7 +494,7 @@ def login_user():
 def check_product():
     try:
         id = request.args.get('contractId')
-        my_prod_name = request.args.get('productName')
+        my_prod_id = request.args.get('productId')
         my_prod_code = request.args.get('productCode')
         user_roles = get_jwt_identity()
         role_names = [item[1] for item in user_roles['roles']]
@@ -507,7 +509,7 @@ def check_product():
             allowed_prods = {'prods': []}
             for main_prod in main_products:
                 get_allowed_prods_from_json(contract_data['data'], main_prod, allowed_prods)
-                check_product_in_json(allowed_prods['prods'], my_prod_name, my_prod_code, condition)
+                check_product_in_json(allowed_prods['prods'], my_prod_id, condition)
                 if condition['flag'] == True or main_prod['code'] == my_prod_code:
                     return jsonify({'status': 'success', 'message': 'Product is allowed'})
             return jsonify({'status': 'fail', 'message': 'Product is not allowed'})
@@ -545,5 +547,5 @@ def my_expired_token_callback():
 
 
 if __name__ == '__main__':
-    app.run('192.168.0.78', 80)
-    # app.run(debug=True)
+    # app.run('192.168.0.78', 80)
+    app.run(debug=True)

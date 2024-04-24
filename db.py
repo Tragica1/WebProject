@@ -45,12 +45,12 @@ def db_get_role_allowed_products(id_roles):
     result = []
     for id_role in id_roles:
         cursor = con.cursor()
-        sql = '''SELECT product.name, product.code FROM product JOIN roleproductlist ON roleproductlist.idRole=%s WHERE product.id=roleproductlist.idProduct'''
+        sql = '''SELECT product.id, product.name, product.code FROM product JOIN roleproductlist ON roleproductlist.idRole=%s WHERE product.id=roleproductlist.idProduct'''
         cursor.execute(sql, (id_role[0],))
         products = cursor.fetchall()
         cursor.close()
         for prod in products:
-            result.append({'name': prod[0], 'code': prod[1]})
+            result.append({'id': prod[0], 'name': prod[1], 'code': prod[2]})
     return result    
 
 
