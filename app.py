@@ -15,8 +15,12 @@ import copy
 def send_products(contract_id):
     print(f'\nSelected contract: {contract_id}\n')
     if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
-        os.mkdir(os.path.join(contract_folder, 'contract_' + str(contract_id)))
-    file = check_contract_file(contract_id)
+        contract_id = db_get_last_contract()
+        # print(contract_id)
+        if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
+            os.mkdir(os.path.join(contract_folder, 'contract_' + str(contract_id)))
+    print(contract_id)
+    file = check_contract_file(str(contract_id))
     if file[0]: 
         with open(file[1], 'r') as f:
             json_object = f.read()
@@ -542,10 +546,10 @@ def refresh_expiring_jwts(response):
 
 
 @jwt.expired_token_loader
-def my_expired_token_callback():
+def my_expired_token_callback(jwt_header, jwt_payload):
     return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
-    # app.run('192.168.0.78', 80)
-    app.run(debug=True)
+    app.run('192.168.0.78', 80)
+    # app.run(debug=True)

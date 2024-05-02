@@ -54,6 +54,16 @@ def db_get_role_allowed_products(id_roles):
     return result    
 
 
+def db_get_last_contract():
+    cursor = con.cursor()
+    sql = '''SELECT id FROM governmentcontract'''
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    print(res)
+    cursor.close()
+    return res[0]
+
+
 def db_add_localcontract(startDate, endDate):
     cur = con.cursor()
     sql = '''INSERT INTO localcontract (startDate, endDate) VALUES (%s, %s)'''

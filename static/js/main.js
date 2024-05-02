@@ -5,13 +5,18 @@ window.onload = getProdivers();
 
 function getContractFromStorage() {
     getPermission()
-    // console.log(localStorage)
+
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
-    if (contractInfo && contractInfo['id'] != -1) {
+    console.log(contractInfo)
+    console.log(check_cotract_in_list(contractInfo['id']))
+    if (contractInfo && contractInfo['id'] != -1 && check_cotract_in_list(contractInfo['id']) == true) {
         getContractInfo(contractInfo['id'], contractInfo['number'], contractInfo['innerNumber'], contractInfo['city'], contractInfo['startDate'], contractInfo['endDate'], contractInfo['type'], contractInfo['status'], true)
     } else {
+        // if (check_cotract_in_list(contractInfo['id'])[0] == true) {
         getContractInfo(-1, '', '', '', '', '', '', '', true)
+        // }
     }
+
 }
 
 
@@ -21,7 +26,7 @@ function updateContractList(contracts) {
     contracts.forEach((contract) => {
         var listElem = document.createElement('li')
         listElem.className = 'flex grid-cols-2 gap-2 mx-2 rounded-lg'
-        listElem.innerHTML = `<button class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline"` +
+        listElem.innerHTML = `<button id="contract_` + contract[0] + `" class="w-full text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline"` +
             `data-te-dropdown-item-ref ` +
             `onclick="getContractInfo('` + contract[0] + `', '` + contract[1] + `', '` + contract[2] + `', '` + contract[3] + `', '` + contract[4] + `', '` + contract[5] + `', '` + contract[7] + `', ` + contract[8] + `, ` + true + `)">Контракт` +
             ` № ` + contract[1] + `</button>` +
@@ -650,7 +655,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         type: 'GET',
         url: '/checkProduct',
         contentType: false,
-        data: { 'contractId': contractInfo['id'], 'productId': id, 'productCode': code},
+        data: { 'contractId': contractInfo['id'], 'productId': id, 'productCode': code },
         success: function (response) {
             if (response['status'] == 'fail') {
                 // document.getElementById('addInDB').setAttribute('disabled')
@@ -1061,7 +1066,7 @@ function updateProduct(id, data) {
 function changeProduct() {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var files = my_files
-    console.log(files)
+    // console.log(files)
     var formData = new FormData()
     var data = {
         'contractId': contractInfo['id'],
@@ -1102,84 +1107,84 @@ function changeProduct() {
     for (var i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
     }
-    // if (provider_flag || date_flag || start_flag || end_flag) {
-    //     var my_provider = document.getElementById('productProvider')
-    //     if (provider_flag) {
-    //         if (my_provider.parentElement.lastChild.nodeName != 'P') {
-    //             var error = document.createElement('p')
-    //             error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
-    //             my_provider.parentElement.appendChild(error)
-    //         }
-    //     } else if (my_provider.parentElement.lastChild.nodeName == 'P') {
-    //         my_provider.parentElement.lastChild.remove()
-    //     }
-    //     var dt1 = document.getElementById('startDate')
-    //     if (date_flag) {
-    //         dt1.classList.replace('border-gray-300', 'border-red-600')
-    //         if (dt1.parentElement.lastChild.nodeName != 'P') {
-    //             var error = document.createElement('p')
-    //             error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
-    //             dt1.parentElement.appendChild(error)
-    //         }
-    //     } else if (dt1.parentElement.lastChild.nodeName == 'P') {
-    //         dt1.classList.replace('border-red-600', 'border-gray-300')
-    //         dt1.parentElement.lastChild.remove()
-    //     }
-    //     var dt2 = document.getElementById('endDate')
-    //     if (start_flag && !date_flag) {
-    //         dt1.classList.replace('border-gray-300', 'border-red-600')
-    //         if (dt1.parentElement.lastChild.nodeName != 'P') {
-    //             var error = document.createElement('p')
-    //             error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-    //             dt1.parentElement.appendChild(error)
-    //         }
+    if (provider_flag || date_flag || start_flag || end_flag) {
+        var my_provider = document.getElementById('productProvider')
+        if (provider_flag) {
+            if (my_provider.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Не выбран поставщик.</p> `
+                my_provider.parentElement.appendChild(error)
+            }
+        } else if (my_provider.parentElement.lastChild.nodeName == 'P') {
+            my_provider.parentElement.lastChild.remove()
+        }
+        var dt1 = document.getElementById('startDate')
+        if (date_flag) {
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_111" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Дата введена некорректно.</p> `
+                dt1.parentElement.appendChild(error)
+            }
+        } else if (dt1.parentElement.lastChild.nodeName == 'P') {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        var dt2 = document.getElementById('endDate')
+        if (start_flag && !date_flag) {
+            dt1.classList.replace('border-gray-300', 'border-red-600')
+            if (dt1.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_2" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt1.parentElement.appendChild(error)
+            }
 
-    //     } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag) {
-    //         dt1.classList.replace('border-red-600', 'border-gray-300')
-    //         dt1.parentElement.lastChild.remove()
-    //     }
-    //     if (end_flag) {
-    //         dt2.classList.replace('border-gray-300', 'border-red-600')
-    //         if (dt2.parentElement.lastChild.nodeName != 'P') {
-    //             var error = document.createElement('p')
-    //             error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
-    //             dt2.parentElement.appendChild(error)
-    //         }
+        } else if (dt1.parentElement.lastChild.nodeName == 'P' && !date_flag) {
+            dt1.classList.replace('border-red-600', 'border-gray-300')
+            dt1.parentElement.lastChild.remove()
+        }
+        if (end_flag) {
+            dt2.classList.replace('border-gray-300', 'border-red-600')
+            if (dt2.parentElement.lastChild.nodeName != 'P') {
+                var error = document.createElement('p')
+                error.innerHTML = `<p id="outlined_error_help_3" class="mt-2 text-sm text-red-600"><span class="font-medium">Ошибка!</span> Поле не заполнено.</p> `
+                dt2.parentElement.appendChild(error)
+            }
 
-    //     } else if (dt2.parentElement.lastChild.nodeName == 'P') {
-    //         dt2.classList.replace('border-red-600', 'border-gray-300')
-    //         dt2.parentElement.lastChild.remove()
-    //     }
-    // } else {
-    //     if (document.getElementById('productProvider').parentElement.lastChild.nodeName == 'P') {
-    //         document.getElementById('productProvider').parentElement.lastChild.remove()
-    //     }
-    //     if (document.getElementById('startDate').parentElement.lastChild.nodeName == 'P') {
-    //         document.getElementById('startDate').classList.replace('border-red-600', 'border-gray-300')
-    //         document.getElementById('startDate').parentElement.lastChild.remove()
-    //     }
-    //     if (document.getElementById('endDate').parentElement.lastChild.nodeName == 'P') {
-    //         document.getElementById('endDate').classList.replace('border-red-600', 'border-gray-300')
-    //         document.getElementById('endDate').parentElement.lastChild.remove()
-    //     }
-    //     $.ajax({
-    //         type: 'POST',
-    //         url: '/changeProduct',
-    //         processData: false,
-    //         contentType: false,
-    //         data: formData,
-    //         success: function (response) {
-    //             // startCreation(contractInfo['id'])
-    //             cleanInputWindow('product-change-modal')
-    //             updateProduct(data['id'], response['product'])
-    //             console.log(response);
-    //         },
-    //         error: function (error) {
-    //             // location.reload();
-    //             console.log(error);
-    //         }
-    //     });
-    // }
+        } else if (dt2.parentElement.lastChild.nodeName == 'P') {
+            dt2.classList.replace('border-red-600', 'border-gray-300')
+            dt2.parentElement.lastChild.remove()
+        }
+    } else {
+        if (document.getElementById('productProvider').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('productProvider').parentElement.lastChild.remove()
+        }
+        if (document.getElementById('startDate').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('startDate').classList.replace('border-red-600', 'border-gray-300')
+            document.getElementById('startDate').parentElement.lastChild.remove()
+        }
+        if (document.getElementById('endDate').parentElement.lastChild.nodeName == 'P') {
+            document.getElementById('endDate').classList.replace('border-red-600', 'border-gray-300')
+            document.getElementById('endDate').parentElement.lastChild.remove()
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/changeProduct',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (response) {
+                // startCreation(contractInfo['id'])
+                cleanInputWindow('product-change-modal')
+                updateProduct(data['id'], response['product'])
+                console.log(response);
+            },
+            error: function (error) {
+                // location.reload();
+                console.log(error);
+            }
+        });
+    }
 
 }
 
@@ -1257,6 +1262,23 @@ function startCreation(id) {
             var i = 1
             createTree(rootElement, data['data'], null, i)
         });
+}
+
+
+function check_cotract_in_list(contr_id) {
+    var a = document.getElementById('contractList')
+    var elems = a.getElementsByTagName('button')
+    var flag = false
+    for (var i = 0; i < elems.length; i++) {
+        if (i % 2 == 0) {
+            var j = elems[i].getAttribute('id').slice(8)
+            // console.log(j)
+            if (j == contr_id) {
+                flag = true
+            }
+        }
+    }
+    return flag
 }
 
 

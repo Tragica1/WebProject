@@ -236,7 +236,7 @@ function contractsChart1(contracts) {
                         total: {
                             showAlways: true,
                             show: true,
-                            label: "Контракта",
+                            label: "Количество ГК",
                             fontSize: '25px',
                             fontFamily: "Inter, sans-serif",
                             formatter: function (w) {
@@ -331,7 +331,7 @@ function contractsChart1(contracts) {
 
 function contractsChart2(products) {
     // var products = my_data['products']
-    var types = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var types = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     var states = [0, 0, 0, 0, 0]
     products.forEach((product) => {
         switch (product['type']) {
@@ -365,6 +365,15 @@ function contractsChart2(products) {
             case 10:
                 types[9] += 1
                 break
+            case 11:
+                types[10] += 1
+                break
+            case 12:
+                types[11] += 1
+                break
+            case 13:
+                types[12] += 1
+                break
         }
         switch (product['state']) {
             case 1:
@@ -386,7 +395,7 @@ function contractsChart2(products) {
     })
     option_types = {
         series: types,
-        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232", "#E06666", "#C90076", "#134F5C", "#3A2386", "#D29534"],
+        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232", "#E06666", "#C90076", "#134F5C", "#3A2386", "#D29534", "#BA13D4", "#24C8ED", "#ED120E"],
         chart: {
             height: 620,
             width: "100%",
@@ -407,7 +416,7 @@ function contractsChart2(products) {
                 }
             },
         },
-        labels: ["Сборочная единица", "Материал", "Деталь", "Программное обеспечение", "Комплект", "Комплект принадлежностей", "Прочее изделие", "Часть прочего изделия", "Документ", "Стандартное изделие"],
+        labels: ["Сборочная единица", "Материал", "Деталь", "Программное обеспечение", "Комплект", "Комплект принадлежностей", "Прочее изделие", "Часть прочего изделия", "Документ", "Стандартное изделие", "Комплект запасных частей", "Комплект сменных частей", "Инструмент"],
         dataLabels: {
             enabled: true,
             style: {
