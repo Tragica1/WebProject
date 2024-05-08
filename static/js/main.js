@@ -142,7 +142,7 @@ function getContractInfo(id, number, innerNumber, city, startDate, endDate, type
         }
         localStorage.setItem("currentContract", JSON.stringify(currentContract));
         $("#cNumber").text("Выбран контракт № " + number)
-        $("#cInnerNumber").html('<span class="font-medium">Внутренний номер: </span>' + innerNumber)
+        $("#cInnerNumber").html('<span class="font-medium">Номер заказа: </span>' + innerNumber)
         $("#cCity").html('<span class="font-medium">Город: </span>' + city)
         $("#cStart").html('<span class="font-medium">Дата подписания: </span>' + startDate)
         $("#cEnd").html('<span class="font-medium">Дата сдачи: </span>' + endDate)
@@ -591,7 +591,7 @@ function getProductParents() {
         url: '/getProductParents',
         type: 'GET',
         contentType: false,
-        data: { 'productCode': document.getElementById('productCode').innerText.slice(6), 'contractId': contractInfo['id'] },
+        data: { 'productCode': document.getElementById('productCode').innerText.slice(13), 'contractId': contractInfo['id'] },
         success: function (response) {
             const selector = document.getElementById('parentsSelector')
             selector.classList.remove('h-20')
@@ -705,7 +705,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
 
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-xl') != -1) {
-            previousElem.className = "flex p-0.5 text-xl text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"
+            previousElem.className = "flex p-0.5 text-xl text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"
             var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
             mxm.classList.remove('rounded-lg')
             mxm.classList.remove('bg-teal-100')
@@ -713,7 +713,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
             previousElem.className = "flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
         }
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex p-0.5 text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            currentElem.className = "flex p-0.5 text-xl text-black italic items-center bg-teal-400 rounded-lg"
             var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
             mxm.classList.add('rounded-lg')
             mxm.classList.add('bg-teal-100')
@@ -722,7 +722,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
         }
     } else {
         if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex p-0.5 text-xl text-black font-semibold items-center bg-teal-400 rounded-lg"
+            currentElem.className = "flex p-0.5 text-xl text-black italic items-center bg-teal-400 rounded-lg"
             var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
             mxm.classList.add('rounded-lg')
             mxm.classList.add('bg-teal-100')
@@ -741,7 +741,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     $("#mainProduct").val("mainProduct" + id)
     if (code != 'null') {
         document.getElementById('productCode').style.display = 'block'
-        $("#productCode").text("Шифр: " + code)
+        $("#productCode").text("Обозначение: " + code)
     } else {
         document.getElementById('productCode').style.display = 'none'
     }
@@ -1227,22 +1227,33 @@ function createTree(element, data, idd, i) {
         if (item.children.length != 0) {
             var tmp = item.id + i
             listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl p-0.5 text-black font-semibold items-center hover:bg-teal-400 duration-300 rounded-lg"` +
+                `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 `<div d-num="0">` +
                 `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                 `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                item.name + `</a><span class="border text-sm border-black p-0.5 rounded-lg text-center text-black font-bold"> ` + item.code + `</span></div>`
+                item.name + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"> ` + item.code + `</span></div>`
             i += 1
         } else {
+            if (item.idType == 9) {
+                console.log('penis')
+                listItem.innerHTML = `<div class="flex gap-2 items-center "><a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
+                        `<div d-num="0">` +
+                    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+                    `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
+                    `Документы` + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"></span></div>`
+            }
             listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
                 `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
                 `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                item.name + `</a><span class="border min-w-min text-sm border-black p-0.5 rounded-lg text-center text-black font-bold">` + item.code + `</span></div>`
+                item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
+
+            i += 1
         }
         if (item.children.length != 0) {
             createTree(listItem, item.children, item.id, i)
