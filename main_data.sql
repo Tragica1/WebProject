@@ -17,7 +17,7 @@ INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (7,'Прочее изделие')
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (8,'Часть прочего изделия');
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (9,'Документ');
 INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (10,'Стандартное изделие');
-INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (11,'Стандартное изделие');
+INSERT INTO `mydb`.`type` (`id`,`name`) VALUES (11,'Комплект запасных частей');
 INSERT INTO `mydb`.`type` (`id`, `name`) VALUES (12, 'Комплект сменных частей');
 INSERT INTO `mydb`.`type` (`id`, `name`) VALUES (13, 'Инструмент');
 
@@ -173,7 +173,6 @@ INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`,
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('143', 'Ведомость эксплуатационных документов Лист утверждения', 'ТСЮИ.462989.004ВЭ-ЛУ', '0', '1', '5', '1');
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('144', 'Комплект запасных частей Вставка плоская ВП2Б-1В-5А 250В', 'ОЮО.481.005ТУ-Р', '0', '4', '5', '1');
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('145', 'Наконечник 2,5-4-ЛТ-05', 'ГОСТ 22002.1-82', '0', '2', '5', '1');
-INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('146', 'Пункт контроля и управления тренировкой наземный (НПКУ)', 'ТСЮИ.468369.054', '1', '1', '1', '1');
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('146', 'Сборочный чертеж', 'ТСЮИ.436112.003СБ', '0', '1', '9', '1');
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('147', 'Этикетка', 'ТСЮИ.436112.003ЭТ', '0', '1', '9', '1');
 INSERT INTO `mydb`.`product` (`id`, `name`, `code`, `isMain`, `count`, `idType`, `idState`) VALUES ('148', 'Корпус', 'ТСЮИ.301152.037', '0', '1', '1', '1');
@@ -292,7 +291,7 @@ INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES 
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES ('Трубка термоусадочная 3, белая', 'ТУ 2247-011-79523310-2006', '1', '2', '300 мм');
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES ('Трубка термоусадочная ТТ-С нг (3:1)-6/2', 'ТУ 2247-011-79523310-2006', '1', '2', '300 мм');
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES ('Трубка термоусадочная ТТ-С нг (3:1)-6/2', 'ТУ 2247-011-79523310-2006', '1', '2', '300 мм');
-INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES ('Трубка термоусадочная ТТ-С нг (3:1)-6/2', 'ТУ 2247-011-79523310-2006', '1', '2');
+INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`) VALUES ('Трубка термоусадочная ТТ-С нг (3:1)-6/2', 'ТУ 2247-011-79523310-2006', '1', '2');
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`, `note`) VALUES ('Трубка термоусадочная ТУТнг-10/5', 'ТУ 2247-011-79523310-2006', '1', '2', '120 мм');
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`) VALUES ('Сборочный чертеж', 'ТСЮИ.685631.046СБ', '1', '9');
 INSERT INTO `mydb`.`product` (`name`, `code`, `count`, `idType`) VALUES ('Этикетка', 'КЛИВ.754241.001-02', '1', '3');

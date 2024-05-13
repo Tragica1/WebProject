@@ -69,7 +69,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${ tmp.value }`)
+    fetch(`/contacts/${tmp.value}`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -631,20 +631,17 @@ function changeArrow(id) {
     if (my_elem.className.indexOf('text-xl') != -1) {
         var d = my_elem.childNodes
         s = d[0].getAttribute('d-num')
-        if (my_elem.className.indexOf('text-xl') != -1) {
-            if (s == 0) {
-                d[0].innerHTML = `<svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
-                    `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19 9-7 7-7-7"/></svg>`
-                s = 1
-            } else {
-                d[0].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
-                    `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>`
-                s = 0
-            }
+        if (s == 0) {
+            d[0].innerHTML = `<svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+                `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19 9-7 7-7-7"/></svg>`
+            s = 1
+        } else {
+            d[0].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+                `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>`
+            s = 0
         }
         d[0].setAttribute('d-num', s)
     }
-
 }
 
 var previousElem
@@ -1211,6 +1208,21 @@ function addProductSelect() {
     }
 };
 
+function changeDocArrow(id) {
+    var my_elem = document.getElementById('elementDoc' + id)
+    var d = my_elem.childNodes
+    s = d[0].getAttribute('d-num')
+    if (s == 0) {
+        d[0].innerHTML = `<svg class="h-4 w-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+            `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19 9-7 7-7-7"/></svg>`
+        s = 1
+    } else {
+        d[0].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+            `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>`
+        s = 0
+    }
+    d[0].setAttribute('d-num', s)
+}
 
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
@@ -1221,30 +1233,31 @@ function createTree(element, data, idd, i) {
         treeElement.className = '!visible hidden ' + treeElement.className
         treeElement.setAttribute('data-te-collapse-item', '')
     }
+    const docTreeElement = document.createElement('ul');
+    docTreeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
+    if (idd != null && idd != 'root') {
+        var tmp = idd + i - 1
+        docTreeElement.id = 'collapseDoc' + tmp;
+        docTreeElement.className = '!visible hidden ' + docTreeElement.className
+        docTreeElement.setAttribute('data-te-collapse-item', '')
+        var flag = true
+        var fflag = true
+    }
     data.forEach((item) => {
-        // console.log(item)
-        const listItem = document.createElement('li')
-        if (item.children.length != 0) {
-            var tmp = item.id + i
-            listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
-                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
-                `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
-                item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                `<div d-num="0">` +
-                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
-                `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                item.name + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"> ` + item.code + `</span></div>`
-            i += 1
-        } else {
-            if (item.idType == 9) {
-                console.log('penis')
-                listItem.innerHTML = `<div class="flex gap-2 items-center "><a data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
-                        `<div d-num="0">` +
+        if (item.idType == 9) {
+            const doclistItem = document.createElement('li')
+            const listItem = document.createElement('li')
+            var tmp
+            if (flag == true) {
+                tmp = item.id + i - 2
+                doclistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="elementDoc` + item.id + `" data-te-collapse-init href="#collapseDoc` + tmp + `" role="button" aria-expanded="false" aria-controls="collapseDoc` + tmp + `"` +
+                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick=changeDocArrow(` + item.id + `)>` +
+                    `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                    `Документы` + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"></span></div>`
+                    `Документы` + `</a></div>`
+                flag = false
+                treeElement.append(doclistItem)
             }
             listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
                 `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
@@ -1253,19 +1266,48 @@ function createTree(element, data, idd, i) {
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
 
-            i += 1
+            docTreeElement.append(listItem)
+        } else {
+            if (fflag == true) {
+                treeElement.append(docTreeElement)
+                fflag = false
+            }
+            const listItem = document.createElement('li')
+            if (item.children.length != 0) {
+                var tmp = item.id + i
+                listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
+                    `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                    `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                    item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
+                    `<div d-num="0">` +
+                    `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
+                    `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
+                    item.name + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"> ` + item.code + `</span></div>`
+                i += 1
+            } else {
+                listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
+                    `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
+                    `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                    `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
+                    item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
+                    item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
+
+                i += 1
+            }
+            if (item.children.length != 0) {
+                createTree(listItem, item.children, item.id, i)
+            }
+            treeElement.append(listItem)
         }
-        if (item.children.length != 0) {
-            createTree(listItem, item.children, item.id, i)
-        }
-        treeElement.append(listItem)
     });
     element.append(treeElement)
 };
 
 
+
 function startCreation(id) {
-    fetch(`/products/${ id }`)
+    fetch(`/products/${id}`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
