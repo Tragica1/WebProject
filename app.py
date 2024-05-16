@@ -222,8 +222,13 @@ def change_product():
     try:
         data = json.loads(request.form['data'])
         print(data)
+        if data['toDB']:
+            dataToDB = json.loads(request.form['dataToDB'])
+            print(dataToDB)
+            db_update_product(data, dataToDB)
         dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
-        file_pathes = []   
+        file_pathes = []
+        db_file_pathes = []  
         if request.files:
             files = request.files.getlist('files')
             print(files)
@@ -231,10 +236,15 @@ def change_product():
                 if file.filename != '':
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
+                    db_file_pathes.append(filepath)
                     file_pathes.append(filepath)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
+        if db_file_pathes and data['toDB']:
+            for filepath in db_file_pathes:
+                file_id = db_add_files(filepath)
+                db_add_product_file_list(file_id, dataToDB['dbID'])
         change_product_in_json(contract_data['data'], data, file_pathes)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
@@ -242,9 +252,7 @@ def change_product():
             f.close()
         product = {'product': {}}
         get_product_from_json(contract_data['data'], int(data['id']), product)
-        # print(product['product'])
         print('Product changed successfully')
-        # print(files)
         return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product']})
     except Exception as e:
         print(e)
@@ -370,14 +378,16 @@ def delete_product_file():
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        file_list = delete_file_in_json(contract_data['data'], product_id, file_name)
+        file_list = {'files': []}
+        delete_file_in_json(contract_data['data'], product_id, file_name, file_list)
         print(file_list)
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
+        
         os.remove(file_name)
-        return jsonify({'status': 'success', 'message': 'File deleted successfully', 'files': file_list})
+        return jsonify({'status': 'success', 'message': 'File deleted successfully', 'files': file_list['files']})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})

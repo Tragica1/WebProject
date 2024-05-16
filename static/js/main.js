@@ -69,7 +69,7 @@ var currentProvider = -1;
 function showContacts(tmp) {
     var addr = $('#company' + tmp.value).data('address')
     $("#providerAddress").text(addr)
-    fetch(`/contacts/${tmp.value}`)
+    fetch(`/contacts/${ tmp.value }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
@@ -645,8 +645,8 @@ function changeArrow(id) {
 }
 
 var previousElem
-
-function showProduct(id, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
+var curProdStyle = document.getElementById('currentProduct').className
+function showProduct(id, dbID, name, code, number, type, count, state, isContract, provider, start, end, note_list, files) {
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     $.ajax({
         type: 'GET',
@@ -657,6 +657,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
             if (response['status'] == 'fail') {
                 // document.getElementById('addInDB').setAttribute('disabled')
                 document.getElementById('addButton').setAttribute('disabled', '')
+                document.getElementById('changeInDB').setAttribute('disabled', '')
                 document.getElementById('deleteButton').setAttribute('disabled', '')
                 document.getElementById('chButton').setAttribute('disabled', '')
                 document.getElementById('productNote').setAttribute('disabled', '')
@@ -671,6 +672,7 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
             }
             else {
                 document.getElementById('addButton').removeAttribute('disabled')
+                document.getElementById('changeInDB').removeAttribute('disabled')
                 document.getElementById('deleteButton').removeAttribute('disabled')
                 document.getElementById('chButton').removeAttribute('disabled')
                 document.getElementById('productNote').removeAttribute('disabled')
@@ -690,13 +692,19 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
             console.log(error);
         }
     });
+    $("#dbID").val("dbID" + dbID)
     cleanInputWindow('product-add-modal')
     my_files = []
     updateDragAndDrop("productFilesList", true)
     updateDragAndDrop("newProductFilesList", true)
     document.getElementById('hideen4').style.display = 'none'
     // document.getElementById('addInDB').removeAttribute('disabled')
-    document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
+    if (document.getElementById('changeInDB').checked == true) {
+        document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 sm:p-6 md:p-8'
+    } else {
+        document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
+    }
+    // document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     changeArrow(id)
 
@@ -732,6 +740,9 @@ function showProduct(id, name, code, number, type, count, state, isContract, pro
     document.getElementById('addDiv1').innerHTML = inner_div1
     document.getElementById('addDiv2').innerHTML = inner_div2
     document.getElementById('addDiv2').className = div2_class
+    console.log(document.getElementById('changeInDB').checked)
+    $("#productNameforDB").val(name)
+    $("#productCodeforDB").val(code)
     $("#currentProduct").val("currentProduct" + id)
     $("#productName").text("Изделие: " + name)
     $('#mainProduct').text($('#productName').text().slice(9))
@@ -1023,7 +1034,9 @@ function downloadFile(filePath, filename) {
 
 
 function updateProduct(id, data) {
-    // console.log(data, files)
+    // console.log(data)
+    $("#productNameforDB").val(data.name)
+    $("#productCodeforDB").val(data.code)
     $("#productNumber").val(data.number)
     $("#productType").val(data.idType)
     $("#productCount").val(data.count)
@@ -1076,7 +1089,8 @@ function changeProduct() {
         'idProvider': 0,
         'start': '',
         'end': '',
-        'note': $("#productNote").val()
+        'note': $("#productNote").val(),
+        'toDB': document.getElementById('changeInDB').checked
     }
     var provider_flag = false
     var start_flag = false
@@ -1101,6 +1115,14 @@ function changeProduct() {
         }
     }
     formData.append('data', JSON.stringify(data))
+    if (document.getElementById('changeInDB').checked == true) {
+        var dataToDB = {
+            'dbID': $("#dbID").val().slice(4),
+            'name': $("#productNameforDB").val(),
+            'code': $("#productCodeforDB").val()
+        }
+        formData.append('dataToDB',  JSON.stringify(dataToDB))
+    }
     for (var i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
     }
@@ -1208,6 +1230,7 @@ function addProductSelect() {
     }
 };
 
+
 function changeDocArrow(id) {
     var my_elem = document.getElementById('elementDoc' + id)
     var d = my_elem.childNodes
@@ -1224,6 +1247,7 @@ function changeDocArrow(id) {
     d[0].setAttribute('d-num', s)
 }
 
+
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
     treeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
@@ -1235,16 +1259,18 @@ function createTree(element, data, idd, i) {
     }
     const docTreeElement = document.createElement('ul');
     docTreeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
-    if (idd != null && idd != 'root') {
-        var tmp = idd + i - 1
-        docTreeElement.id = 'collapseDoc' + tmp;
-        docTreeElement.className = '!visible hidden ' + docTreeElement.className
-        docTreeElement.setAttribute('data-te-collapse-item', '')
-        var flag = true
-        var fflag = true
-    }
+
+    var tmp = idd + i - 1
+    docTreeElement.id = 'collapseDoc' + tmp;
+    docTreeElement.className = '!visible hidden ' + docTreeElement.className
+    docTreeElement.setAttribute('data-te-collapse-item', '')
+    var docTreeLength = 0
+    var flag = true
+    var fflag = true
+
     data.forEach((item) => {
-        if (item.idType == 9) {
+        if
+            (item.idType == 9) {
             const doclistItem = document.createElement('li')
             const listItem = document.createElement('li')
             var tmp
@@ -1259,25 +1285,29 @@ function createTree(element, data, idd, i) {
                 flag = false
                 treeElement.append(doclistItem)
             }
-            listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
+            listItem.innerHTML = `<div class="flex gap-2  items-center "><a dbId id="element` + item.id + `" role="button" aria-expanded="false"` +
                 `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
-                `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                 item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
-
+            docTreeLength += 1
             docTreeElement.append(listItem)
         } else {
-            if (fflag == true) {
+            if (fflag == true && docTreeLength != 0) {
+                // console.log(docTreeElement)
+                // console.log(treeElement)
+                // console.log(docTreeLength)
                 treeElement.append(docTreeElement)
                 fflag = false
+                docTreeLength = 0
             }
             const listItem = document.createElement('li')
             if (item.children.length != 0) {
                 var tmp = item.id + i
                 listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
                     `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
-                    `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                    `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                     `<div d-num="0">` +
@@ -1288,7 +1318,7 @@ function createTree(element, data, idd, i) {
             } else {
                 listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
                     `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
-                    `onclick='showProduct(` + item.id + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+                    `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                     item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
@@ -1305,9 +1335,8 @@ function createTree(element, data, idd, i) {
 };
 
 
-
 function startCreation(id) {
-    fetch(`/products/${id}`)
+    fetch(`/products/${ id }`)
         .then(response => response.json())
         .then(data => {
             const rootElement = document.getElementById('mainTree')
@@ -1547,5 +1576,33 @@ function saveInDB() {
     // setDeafults()
 }
 
+var buttonStyle = document.getElementById('chButton').className
+function changeInDB() {
+    var option = document.getElementById('changeInDB').checked
+    // console.log($('#dbID').val())
+    if (option) {
 
+    } else {
+        document.getElementById('close-changeDB-modal').click()
+        // document.getElementById('currentProduct').className = curProdStyle
+        document.getElementById('chButton').className = buttonStyle
+    }
+}
+
+document.getElementById('hideen6').style.display = 'none'
+function checkAnswer(answ) {
+    if (answ == 0) {
+        document.getElementById('hideen5').style.display = 'block'
+        document.getElementById('hideen6').style.display = 'none'
+
+        document.getElementById('changeInDB').checked = false
+        document.getElementById('currentProduct').className = curProdStyle
+        document.getElementById('chButton').className = buttonStyle
+    } else {
+        document.getElementById('hideen5').style.display = 'none'
+        document.getElementById('hideen6').style.display = 'block'
+        document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 sm:p-6 md:p-8'
+        document.getElementById('chButton').className = 'text-white bg-red-700 hover:bg-red-800 focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center'
+    }
+}
 

@@ -7,6 +7,7 @@ import shutil
 def create_product(id, name, code, number, count, type, state, idProvider, start, end, note):
     return {
         'id': id,
+        'dbID': id,
         'name': fix_quotes(str(name)),
         'code': code,
         'number': number,
@@ -98,7 +99,7 @@ def get_parents(contract_data, productCode, parents, flag):
 def change_product_in_json(contract_data, product_data, file_pathes):
     for item in contract_data:
         if int(product_data['id']) == item['id']:
-            print(item['name'])
+            # print(item['name'])
             item['number'] = product_data['number']
             item['count'] = product_data['count']
             item['idType'] = product_data['idType']
@@ -194,16 +195,16 @@ def add_product_in_json(contract_data, product_data, file_pathes, chl, new_id):
             add_product_in_json(item['children'], product_data, file_pathes, chl, new_id)
 
 
-def delete_file_in_json(contract_data, product_id, file_name):
+def delete_file_in_json(contract_data, product_id, file_name, file_list):
     for item in contract_data:
         if int(item['id']) == int(product_id):
-            for i in range(len(item['files'])):
+            for i in range(len(item['files'])-1):
                 if file_name == item['files'][i]:
                     item['files'].remove(file_name)
                     print(item['files'])
-                    return item['files']
+                    file_list['files'] = item['files']
         if len(item['children']) != 0:
-            return delete_file_in_json(item['children'], product_id, file_name)
+            delete_file_in_json(item['children'], product_id, file_name, file_list)
 
 
 def get_products_from_json(contract_data, products):

@@ -389,10 +389,22 @@ def db_add_product(data):
     return product_id
 
 
-def db_update_product(data, contract_id=None):
+def db_update_product(data1, data2):
     cur = con.cursor()
-    sql = '''UPDATE product SET number=%s, idType=%s, count=%s, idLocalContract=%s, idState=%s WHERE id=%s'''
-    cur.execute(sql, (int(data['number']), int(data['type']), int(data['count']), contract_id, int(data['state']), int(data['id'])))
+    print(data1, data2)
+    if  data1['start'] == '':
+        data1['start'] = None
+    if  data1['end'] == '':
+        data1['end'] = None
+    if data1['idProvider'] == 0:
+        data1['idProvider'] = None
+    if data1['note'] == '':
+        data1['note'] = None
+    sql = '''UPDATE product SET name=%s, code=%s, number=%s, count=%s, idType=%s, idState=%s, idCompany=%s, startDate=%s, endDate=%s, note=%s 
+            WHERE id=%s'''
+    cur.execute(sql, (str(data2['name']), str(data2['code']), str(data1['number']),
+                int(data1['count']), int(data1['idType']), int(data1['idState']), data1['idProvider'],
+                data1['start'], data1['end'], data1['note'], int(data2['dbID'])))
     cur.close()
     con.commit()
 

@@ -1608,6 +1608,10 @@ video {
   margin-left: 0.25rem;
 }
 
+.ml-10 {
+  margin-left: 2.5rem;
+}
+
 .ml-16 {
   margin-left: 4rem;
 }
@@ -1826,10 +1830,6 @@ video {
 
 .mt-px {
   margin-top: 1px;
-}
-
-.ml-10 {
-  margin-left: 2.5rem;
 }
 
 .box-border {
@@ -2483,6 +2483,11 @@ video {
   min-width: max-content;
 }
 
+.min-w-min {
+  min-width: -moz-min-content;
+  min-width: min-content;
+}
+
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -3026,6 +3031,10 @@ video {
   grid-auto-flow: dense;
 }
 
+.grid-flow-row-dense {
+  grid-auto-flow: row dense;
+}
+
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -3292,12 +3301,12 @@ video {
   row-gap: 0.25rem;
 }
 
-.gap-y-3 {
-  row-gap: 0.75rem;
-}
-
 .gap-y-10 {
   row-gap: 2.5rem;
+}
+
+.gap-y-3 {
+  row-gap: 0.75rem;
 }
 
 .gap-y-96 {
@@ -5423,6 +5432,10 @@ video {
   padding: 0px;
 }
 
+.p-0\.5 {
+  padding: 0.125rem;
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -7167,6 +7180,11 @@ video {
   --tw-shadow: var(--tw-shadow-colored);
 }
 
+.shadow-red-400 {
+  --tw-shadow-color: #f87171;
+  --tw-shadow: var(--tw-shadow-colored);
+}
+
 .shadow-red-500 {
   --tw-shadow-color: #ef4444;
   --tw-shadow: var(--tw-shadow-colored);
@@ -7314,6 +7332,11 @@ video {
 .ring-red-300 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(252 165 165 / var(--tw-ring-opacity));
+}
+
+.ring-red-600 {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(220 38 38 / var(--tw-ring-opacity));
 }
 
 .ring-teal-300 {
@@ -7681,9 +7704,19 @@ video {
   top: 0.125rem;
 }
 
+.after\:h-4::after {
+  content: var(--tw-content);
+  height: 1rem;
+}
+
 .after\:h-5::after {
   content: var(--tw-content);
   height: 1.25rem;
+}
+
+.after\:w-4::after {
+  content: var(--tw-content);
+  width: 1rem;
 }
 
 .after\:w-5::after {
@@ -8059,6 +8092,11 @@ video {
 .hover\:outline-none:hover {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.hover\:ring-red-800:hover {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(153 27 27 / var(--tw-ring-opacity));
 }
 
 .hover\:ring-teal-800:hover {
@@ -8550,6 +8588,11 @@ video {
 
 .group\/ps.ps--scrolling-y .group-\[\&\.ps--scrolling-y\]\/ps\:opacity-60 {
   opacity: 0.6;
+}
+
+.peer:checked ~ .peer-checked\:bg-red-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity));
 }
 
 .peer:checked ~ .peer-checked\:bg-teal-700 {

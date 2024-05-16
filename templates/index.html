@@ -42,7 +42,8 @@
                                 onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт
                                 № {{contract[1]}}
                             </button>
-                            <button id="deleteContractButton" type="button" onclick="deleteContract('{{ contract[0] }}')">
+                            <button id="deleteContractButton" type="button"
+                                onclick="deleteContract('{{ contract[0] }}')">
                                 <svg class="w-5 h-5 mr-2 text-red-500 hover:text-red-800" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                     viewBox="0 0 22 22">
@@ -88,8 +89,9 @@
                         </div>
                         <div data-popper-arrow></div>
                     </div>
-                    <button type="button" id="addContractButton" data-modal-target="contract-modal" data-popover-target="popover-AddContract"
-                        data-modal-toggle="contract-modal" onclick="addProductSelect()">
+                    <button type="button" id="addContractButton" data-modal-target="contract-modal"
+                        data-popover-target="popover-AddContract" data-modal-toggle="contract-modal"
+                        onclick="addProductSelect()">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6 ms-2 text-green-500 hover:text-green-800">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -274,62 +276,103 @@
             <h2 class="mb-2 text-3xl font-semibold text-black">Деталь: </h2>
             <div id="currentProduct"
                 class="w-full max-w-2xl border border-teal-800 rounded-lg shadow-xl shadow-teal-400 sm:p-6 md:p-8">
-                <div class="flex justify-end">
-                    <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents"
-                        data-dropdown-placement="left" data-popover-target="popover-Parents"
-                        data-dropdown-placement="bottom" onclick="getProductParents()" type="button">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-                        </svg>
-                        <span class=" sr-only"></span>
-                    </button>
-                    <div data-popover id="popover-Parents" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                        <h3 class="text-sm font-semibold text-center text-white p-2">Куда входит?</h3>
-                        <div data-popper-arrow></div>
+                <div class="grid grid-cols-3">
+                    <div class="flex col-span-2 gap-3">
+                        <h5 class="font-medium text-black">Режим редактирования базы данных:</h5>
+                        <label class="cursor-pointer mb-1" onclick="changeInDB()">
+                            <input id="changeInDB" type="checkbox" value="" class="sr-only peer" disabled
+                                data-modal-target="product-changeDB-modal" data-modal-toggle="product-changeDB-modal">
+                            <div
+                                class="mt-1 relative w-10 h-5 bg-red-200 hover:ring-red-800 ring-2 ring-red-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all border-gray-700 peer-checked:bg-red-700">
+                            </div>
+                        </label>
+                        <!-- <div data-popover id="popover-changeInDB" role="tooltip"
+                                class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                                <h3 class="text-sm font-semibold text-center text-white p-2">Режим редактирования
+                                    шаблона
+                                </h3>
+                                <div data-popper-arrow></div>
+                            </div> -->
                     </div>
-                    <div id="dropdownParents" style="inset: 0px auto auto -78px;"
-                        class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72">
-                        <ul id="parentsSelector"
-                            class="h-20 p-3 space-y-3 text-sm overflow-y-auto text-black border border-black rounded-lg"
-                            aria-labelledby="dropdownProductsParents">
-                        </ul>
+                    <div class="flex justify-end">
+                        <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents"
+                            data-dropdown-placement="left" data-popover-target="popover-Parents"
+                            data-dropdown-placement="bottom" onclick="getProductParents()" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                            </svg>
+                            <span class=" sr-only"></span>
+                        </button>
+                        <div data-popover id="popover-Parents" role="tooltip"
+                            class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                            <h3 class="text-sm font-semibold text-center text-white p-2">Куда входит?</h3>
+                            <div data-popper-arrow></div>
+                        </div>
+                        <div id="dropdownParents" style="inset: 0px auto auto -78px;"
+                            class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72">
+                            <ul id="parentsSelector"
+                                class="h-20 p-3 space-y-3 text-sm overflow-y-auto text-black border border-black rounded-lg"
+                                aria-labelledby="dropdownProductsParents">
+                            </ul>
+                        </div>
+                        <button id="addButton" onclick="setDeafults()" type="button"
+                            data-popover-target="popover-addButton" data-modal-target="product-add-modal"
+                            data-modal-toggle="product-add-modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </button>
+                        <div data-popover id="popover-addButton" role="tooltip"
+                            class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                            <h3 class="text-sm font-semibold text-center text-white p-2">Добавить изделие</h3>
+                            <div data-popper-arrow></div>
+                        </div>
+                        <button id="deleteButton" type="button" data-popover-target="popover-deleteButton" disabled
+                            data-modal-target="product-delete-modal" data-modal-toggle="product-delete-modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </button>
+                        <div data-popover id="popover-deleteButton" role="tooltip"
+                            class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
+                            <h3 class="text-sm font-semibold text-center text-white p-2">Удалить изделие</h3>
+                            <div data-popper-arrow></div>
+                        </div>
                     </div>
-                    <button id="addButton" onclick="setDeafults()" type="button" data-popover-target="popover-addButton"
-                        data-modal-target="product-add-modal" data-modal-toggle="product-add-modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                    </button>
-                    <div data-popover id="popover-addButton" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                        <h3 class="text-sm font-semibold text-center text-white p-2">Добавить изделие</h3>
-                        <div data-popper-arrow></div>
-                    </div>
-                    <button id="deleteButton" type="button" data-popover-target="popover-deleteButton" disabled
-                        data-modal-target="product-delete-modal" data-modal-toggle="product-delete-modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                    </button>
-                    <div data-popover id="popover-deleteButton" role="tooltip"
-                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                        <h3 class="text-sm font-semibold text-center text-white p-2">Удалить изделие</h3>
-                        <div data-popper-arrow></div>
-                    </div>
-
                 </div>
-                <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
+                <hr id="dbID" class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
                 <div id="product-change-modal" class="pt-2 space-y-6 text-xl">
-                    <h5 id="productName" class="font-medium text-black">Изделие: </h5>
-                    <h5 id="productCode" class="font-medium text-black">Обозначение: </h5>
-                    <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
+                    <div id="hideen5" class="pt-2 space-y-6 text-xl" >
+                        <h5 id="productName" class="font-medium text-black">Изделие: </h5>
+                        <h5 id="productCode" class="font-medium text-black">Обозначение: </h5>
+                        <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
+                    </div>
+                    <div id="hideen6" class="pt-2 space-y-6 text-xl">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-rows-1 py-2 text-center">
+                                <h2 class="text-left font-medium text-black">Изделие: </h2>
+                            </div>
+                            <div class="grid grid-rows-1">
+                                <input type="text" id="productNameforDB" 
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-rows-1 py-2 text-center">
+                                <h2 class="text-left font-medium text-black">Обозначение: </h2>
+                            </div>
+                            <div class="grid grid-rows-1">
+                                <input type="text" id="productCodeforDB"
+                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
@@ -476,7 +519,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="grid grid-rows-1 py-2 text-center">
-                            <h2 class="text-left font-medium text-black">Документы:</h2>
+                            <h2 class="text-left font-medium text-black">Файлы:</h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <div class="flex items-center justify-center w-full">
@@ -490,7 +533,8 @@
                                                 stroke-width="2"
                                                 d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                                         </svg>
-                                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Нажмите чтобы загрузить файл.</span></p>
+                                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Нажмите чтобы
+                                                загрузить файл.</span></p>
                                     </div>
                                     <input id="productFile" oninput="showFileList('productFile', 'productFilesList')"
                                         type="file" class="hidden" multiple />
@@ -510,7 +554,7 @@
                         <div class="grid grid-rows-1 py-2 text-center">
                             <button id="chButton" data-modal-hide="company-modal" type="button"
                                 onclick="changeProduct()"
-                                class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                                class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center">
                                 Сохранить</button>
 
                         </div>
@@ -611,6 +655,41 @@
                         </button>
                         <button data-modal-hide="product-delete-modal" type="button"
                             class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-10">Нет</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Изменение в БД -->
+        <div id="product-changeDB-modal" tabindex="-1"
+            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-md max-h-full">
+                <div class="relative bg-white rounded-lg shadow">
+                    <button type="button"
+                        class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                        data-modal-hide="product-changeDB-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Закрыть окно</span>
+                    </button>
+                    <div class="p-4 md:p-5 text-center">
+                        <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <h3 class=" text-lg font-normal text-gray-500"> Изменение изделий в этом режиме приведёт к
+                            изменению базы данных.</h3>
+                        <h3 class="mb-5 text-lg font-semibold text-gray-500"> Вы уверены что хотите этого?</h3>
+                        <button type="button" onclick="checkAnswer(1)" data-modal-hide="product-changeDB-modal"
+                            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                            Да
+                        </button>
+                        <button id="close-changeDB-modal" data-modal-hide="product-changeDB-modal" type="button" onclick="checkAnswer(0)"
+                            class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-10">
+                            Нет</button>
                     </div>
                 </div>
             </div>
@@ -822,7 +901,7 @@
                     <div class="p-4 md:p-2 space-y-4 text-xl">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="grid grid-rows-1 py-2 text-center">
-                                <h2 class="text-left font-medium text-black">Документы: </h2>
+                                <h2 class="text-left font-medium text-black">Файлы: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <div class="flex items-center justify-center w-full">
@@ -836,7 +915,8 @@
                                                     stroke-linejoin="round" stroke-width="2"
                                                     d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                                             </svg>
-                                            <p class="mb-2 text-sm text-gray-500 "><span class="font-semibold">Нажмите чтобы загрузить файл.</span></p>
+                                            <p class="mb-2 text-sm text-gray-500 "><span class="font-semibold">Нажмите
+                                                    чтобы загрузить файл.</span></p>
                                         </div>
                                         <!-- oninput="showFileList('newProductFiles', 'newProductFilesList')" -->
                                         <input id="newProductFiles"
