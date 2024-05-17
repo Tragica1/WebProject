@@ -236,16 +236,18 @@ def change_product():
                 if file.filename != '':
                     filepath = os.path.join(dir_path, file.filename.replace(' ', '_'))
                     file.save(filepath)
-                    db_file_pathes.append(filepath)
-                    file_pathes.append(filepath)
+                    db_file_pathes.append({'file': filepath, 'type': 'db'})
+                    file_pathes.append({'file': filepath, 'type': 'json'})
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
         if db_file_pathes and data['toDB']:
             for filepath in db_file_pathes:
-                file_id = db_add_files(filepath)
+                file_id = db_add_files(filepath['file'])
                 db_add_product_file_list(file_id, dataToDB['dbID'])
-        change_product_in_json(contract_data['data'], data, file_pathes)
+            change_product_in_json(contract_data['data'], data, db_file_pathes)
+        else:
+            change_product_in_json(contract_data['data'], data, file_pathes)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
@@ -373,6 +375,7 @@ def delete_product_file():
         file_name = request.args.get('filePath')
         product_id = request.args.get('productId')
         contract_id = request.args.get('contractId')
+        file_type = request.args.get('fileType')
         print(file_name, product_id, contract_id)
         dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
@@ -385,7 +388,8 @@ def delete_product_file():
             json_data = json.dumps(contract_data)
             f.write(json_data)
             f.close()
-        
+        if file_type == 'db':
+            db_delete_file(product_id, file_name.replace)            
         os.remove(file_name)
         return jsonify({'status': 'success', 'message': 'File deleted successfully', 'files': file_list['files']})
     except Exception as e:
@@ -532,6 +536,7 @@ def check_product():
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)}) 
+
 
 @app.route("/logout", methods=["GET"])
 @jwt_required()

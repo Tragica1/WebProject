@@ -398,8 +398,6 @@ def db_update_product(data1, data2):
         data1['end'] = None
     if data1['idProvider'] == 0:
         data1['idProvider'] = None
-    if data1['note'] == '':
-        data1['note'] = None
     sql = '''UPDATE product SET name=%s, code=%s, number=%s, count=%s, idType=%s, idState=%s, idCompany=%s, startDate=%s, endDate=%s, note=%s 
             WHERE id=%s'''
     cur.execute(sql, (str(data2['name']), str(data2['code']), str(data1['number']),
@@ -493,7 +491,18 @@ def db_get_product_files(prod_id):
         for file_id in file_ids:
             sql = '''SELECT name FROM file WHERE id=%s'''
             cur.execute(sql, (file_id))
-            files.append(cur.fetchone()[0])
+            files.append({'file': cur.fetchone()[0], 'type': 'db'})
     cur.close()
     con.commit()
     return files
+
+
+def db_delete_file(prod_id, file_name):
+    cur = con.cursor()
+    sql = '''SELECT id FROM file WHERE name=%s'''
+    cur.execute(sql, (file_name,))
+    file_id = cur.fetchall()
+    sql = '''DELETE FROM productfilelist WHERE idProduct=%s AND idFile=%s'''
+    cur.execute(sql, (prod_id, file_id))
+    cur.close()
+    con.commit()

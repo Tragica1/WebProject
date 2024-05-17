@@ -661,6 +661,7 @@ function showProduct(id, dbID, name, code, number, type, count, state, isContrac
                 document.getElementById('deleteButton').setAttribute('disabled', '')
                 document.getElementById('chButton').setAttribute('disabled', '')
                 document.getElementById('productNote').setAttribute('disabled', '')
+                document.getElementById('dropdownProductsParents').setAttribute('disabled', '')
                 var all_inps = document.getElementById('product-change-modal').getElementsByTagName('input')
                 var all_select = document.getElementById('product-change-modal').getElementsByTagName('select')
                 for (var i = 0; i < all_inps.length; i++) {
@@ -671,6 +672,7 @@ function showProduct(id, dbID, name, code, number, type, count, state, isContrac
                 }
             }
             else {
+                document.getElementById('dropdownProductsParents').removeAttribute('disabled')
                 document.getElementById('addButton').removeAttribute('disabled')
                 document.getElementById('changeInDB').removeAttribute('disabled')
                 document.getElementById('deleteButton').removeAttribute('disabled')
@@ -966,15 +968,38 @@ function createFileList(id, files, fileList) {
         for (var i = 0; i < files.length; i++) {
             var a = document.createElement('li')
             a.className = 'inline-flex items-center'
-            var tmp = files[i].split('\\')
-            a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 " role="button" ` +
-                `onclick='downloadFile(` + JSON.stringify(files[i]) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
-                `</a>` +
-                `<button onclick='deleteFile(` + JSON.stringify(files[i]) + `, ` + id + `, "` + contractInfo['id'] + `")'>` +
-                `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
-                `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
-                `</svg>` +
-                `</button>`
+            var tmp = files[i].file.split('\\')
+            var popover = 'popover-' + tmp[tmp.length - 1]
+            if (files[i].type == 'json') {
+                a.innerHTML = `<a data-dropdown-toggle="`+popover+`" data-popover-target="`+popover+`" data-popover-target="popover-`+ files[i].file +`" class="text-gray-500 hover:text-gray-800 " role="button" ` +
+                    `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
+                    `</a>` +
+                    `<button file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "`+ files[i].type +`")'>` +
+                    `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+                    `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+                    `</svg>` +
+                    `</button>` +
+                    `<div  data-popover id="`+popover+`" role="tooltip" ` +
+                    `class="absolute z-1000 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">` +
+                    `<h3 class="text-sm font-semibold text-center text-white p-2">Файл из контракта</h3>` + 
+                    `<div data-popper-arrow></div>` +
+                    `</div>` 
+            } else {
+                a.innerHTML = `<a data-dropdown-toggle="`+popover+`" data-popover-target="`+popover+`" class="text-gray-500 hover:text-gray-800 " role="button" ` +
+                    `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
+                    `</a>` +
+                    `<button style="display: none" file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "`+ files[i].type +`")'>` +
+                    `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+                    `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+                    `</svg>` +
+                    `</button>` +
+                    `<div data-popover id="`+popover+`" role="tooltip" ` +
+                    `class="absolute z-1000 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">` +
+                    `<h3 class="text-sm font-semibold text-center text-white p-2">Файл из базы данных</h3>` + 
+                    `<div data-popper-arrow></div>` +
+                    `</div>` 
+            }
+
             ul.appendChild(a)
         }
         fileListDiv.appendChild(ul)
@@ -984,12 +1009,12 @@ function createFileList(id, files, fileList) {
 }
 
 
-function deleteFile(filePath, product_id, contract_id) {
+function deleteFile(filePath, product_id, contract_id, fileType) {
     $.ajax({
         url: '/deleteFile',
         type: 'GET',
         contentType: false,
-        data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id },
+        data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id, 'fileType': fileType },
         success: function (response) {
             console.log(response)
             createFileList(product_id, response['files'], 'fileList')
@@ -1121,7 +1146,7 @@ function changeProduct() {
             'name': $("#productNameforDB").val(),
             'code': $("#productCodeforDB").val()
         }
-        formData.append('dataToDB',  JSON.stringify(dataToDB))
+        formData.append('dataToDB', JSON.stringify(dataToDB))
     }
     for (var i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
@@ -1581,8 +1606,24 @@ function changeInDB() {
     var option = document.getElementById('changeInDB').checked
     // console.log($('#dbID').val())
     if (option) {
+        var filelst = document.getElementById('fileList').getElementsByTagName('button')
+        for (var i = 0; i < filelst.length; i++) {
+            if (filelst[i].getAttribute('file-type') == 'db') {
+                filelst[i].style.display = 'block'
+            } else {
+                filelst[i].style.display = 'none'
+            }
+        }
 
     } else {
+        var filelst = document.getElementById('fileList').getElementsByTagName('button')
+        for (var i = 0; i < filelst.length; i++) {
+            if (filelst[i].getAttribute('file-type') == 'json') {
+                filelst[i].style.display = 'block'
+            } else {
+                filelst[i].style.display = 'none'
+            }
+        }
         document.getElementById('close-changeDB-modal').click()
         // document.getElementById('currentProduct').className = curProdStyle
         document.getElementById('chButton').className = buttonStyle

@@ -198,11 +198,11 @@ def add_product_in_json(contract_data, product_data, file_pathes, chl, new_id):
 def delete_file_in_json(contract_data, product_id, file_name, file_list):
     for item in contract_data:
         if int(item['id']) == int(product_id):
-            for i in range(len(item['files'])-1):
-                if file_name == item['files'][i]:
-                    item['files'].remove(file_name)
-                    print(item['files'])
+            for i in range(len(item['files'])):
+                if item['files'][i]['file'] == file_name:
+                    item['files'].pop(i)
                     file_list['files'] = item['files']
+                    return 0
         if len(item['children']) != 0:
             delete_file_in_json(item['children'], product_id, file_name, file_list)
 
