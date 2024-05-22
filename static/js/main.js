@@ -79,8 +79,11 @@ function showContacts(tmp) {
             for (var i = 0; i < contacts.length; i++) {
                 var d = document.createElement('div')
                 d.className = "pb-2"
-                d.innerHTML = `<p class="font-semibold">` + contacts[i][1] + `</p>` +
-                    `<p class="font-semibold">` + contacts[i][2] + `</p>`
+                d.innerHTML =
+                    `<p class="font-semibold"><span>ФИО:  </span>` + contacts[i][1] + `</p>` +
+                    `<p class="font-semibold"><span>Должность:  </span>` + contacts[i][3] + `</p>` +
+                    `<p class="font-semibold"><span>Телефон:  </span>` + contacts[i][2] + `</p>` +
+                    `<p class="font-semibold"><span>Почта:  </span>` + contacts[i][4] + `</p>`
                 block.appendChild(d)
             }
         });
@@ -211,15 +214,18 @@ function cleanInputWindow(id_modal) {
 }
 
 
-function saveProvider() {
+function changeProvider() {
     var contacts = []
+    var my_items = document.getElementById('providerContactsList').getElementsByTagName('li')
     if (counter > 0) {
-        for (var i = 1; i <= counter; i++) {
+        for (var i = 0; i <= my_items.length; i++) {
             var tmp = {
-                'name': $("#contactName" + i).val(),
-                'number': $("#contactNumber" + i).val()
+                'name': my_items.getAttribute('name'),
+                'number': my_items.getAttribute('phone'),
+                'post': my_items.getAttribute('post'),
+                'email': my_items.getAttribute('email')
             }
-            contacts[i - 1] = tmp
+            contacts[i] = tmp
         }
     }
 
@@ -230,7 +236,7 @@ function saveProvider() {
     }
     $.ajax({
         type: 'POST',
-        url: '/saveProvider',
+        url: '/changeProvider',
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(formData),
         success: function (response) {
@@ -259,6 +265,129 @@ function createProviderOptionList(providers, elemId) {
 }
 
 
+function createProviderModal(providers) {
+    console.log(providers)
+    var prodviders_ul = document.getElementById('providersList')
+    prodviders_ul.innerHTML = ""
+    for (var i = 0; i < providers.length; i++) {
+        var elem = document.createElement('li')
+        elem.className = 'grid grid-cols-2 py-1 border-b  hover:bg-gray-200 hover:text-gray-900 rounded-lg'
+        elem.innerHTML = `<button id="productEdit`+ providers[i][0] +`" onclick='showProdviderInfo(`+ providers[i][0] +`, "`+ providers[i][1] +`", "`+ providers[i][2] +`")' `+
+        `class="text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">`+ providers[i][1] +`</button>` +
+        `<button type="button" class="justify-self-end text-end" onclick="deleteProvider('` + providers[i][0] + `')">` +
+        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+        `viewBox="0 0 22 22">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+        `</svg>` +
+        `</button>`
+        prodviders_ul.append(elem)
+    }
+}
+
+
+function deleteProvider(id) {
+    $.ajax({
+        type: 'GET',
+        url: '/deleteProvider',
+        contentType: false,
+        data: { 'providerId': id},
+        success: function (response) {
+            getProdivers()
+            $('#contactName').val('')
+            $('#contactPost').val('')
+            $('#contactPhone').val('')
+            $('#contactEmail').val('')
+            document.getElementById('providerContactsList').innerHTML = ""
+            console.log(response);
+        },
+        error: function (error) {
+            // location.reload();
+            console.log(error);
+        }
+    });
+}
+
+
+function deleteContact(idProvider, idContact, name, addr) {
+    $.ajax({
+        type: 'GET',
+        url: '/deleteContact',
+        contentType: false,
+        data: { 'providerId': idProvider, 'contactId': idContact},
+        success: function (response) {
+            // getProdivers()
+            showProdviderInfo(idProvider, name, addr)
+            console.log(response);
+        },
+        error: function (error) {
+            // location.reload();
+            console.log(error);
+        }
+    });
+}
+
+function updateCurrentContact() {
+    var cur_contact =  document.getElementById('currentContact').value
+    // console.log(cur_contact)
+    var my_li = document.getElementById('contactLI' + cur_contact)
+    my_li.setAttribute('name', $('#contactName').val())
+    my_li.setAttribute('post', $('#contactPost').val())
+    my_li.setAttribute('phone', $('#contactPhone').val())
+    my_li.setAttribute('email', $('#contactEmail').val())
+}
+
+
+function showProdviderInfo(id, name, addr) {
+    // console.log(provider)
+    $('#companyName').val(name)
+    $('#companyAddress').val(addr)
+    fetch(`/contacts/${ id }`)
+        .then(response => response.json())
+        .then(data => {
+            contacts = data
+            // console.log(contacts)
+            var contacts_ul = document.getElementById('providerContactsList')
+            contacts_ul.innerHTML = ""
+            for (var i = 0; i < contacts.length; i++) {
+                var elem = document.createElement('li')
+                elem.id = 'contactLI' + contacts[i][0]
+                elem.setAttribute('name', contacts[i][1] )
+                elem.setAttribute('post', contacts[i][2] )
+                elem.setAttribute('phone', contacts[i][3] )
+                elem.setAttribute('email', contacts[i][4] )
+                elem.className = 'grid grid-cols-2 py-1 items-center border-b hover:bg-gray-200 hover:text-gray-900 rounded-lg'
+                elem.innerHTML = `<button id="contactEdit`+ contacts[i][0] +`" onclick='showContactInfo(`+ contacts[i][0] +`)' `+
+                `class="text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">`+ contacts[i][1] +`</button>` +
+                `<button type="button" class="justify-self-end text-end" onclick='deleteContact(` + id + `, ` +  contacts[i][0]  + `, "` +  $('#companyName').val() + `", "` + $('#companyAddress').val() + `")'>` +
+                `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+                `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+                `viewBox="0 0 22 22">` +
+                `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+                `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+                `</svg>` +
+                `</button>`
+                contacts_ul.append(elem) 
+            }
+            $('#contactName').val('')
+            $('#contactPost').val('')
+            $('#contactPhone').val('')
+            $('#contactEmail').val('')
+        });
+}
+
+
+function showContactInfo(id, name, phone, post, email) {
+    document.getElementById('currentContact').value = id
+    document.getElementById('contactLI' + id).getAttribute('name')
+    $('#contactName').val(document.getElementById('contactLI' + id).getAttribute('name'))
+    $('#contactPost').val(document.getElementById('contactLI' + id).getAttribute('post'))
+    $('#contactPhone').val(document.getElementById('contactLI' + id).getAttribute('phone'))
+    $('#contactEmail').val(document.getElementById('contactLI' + id).getAttribute('email'))
+}
+
+
 function getProdivers() {
     $.ajax({
         type: 'GET',
@@ -267,6 +396,7 @@ function getProdivers() {
             providers = response['data']
             createProviderOptionList(providers, 'productProvider')
             createProviderOptionList(providers, 'newProductProvider')
+            createProviderModal(providers)
         },
         error: function (error) {
             location.reload();
@@ -414,7 +544,8 @@ function addContactBlock() {
     var contactBlock = document.createElement('div')
     contactBlock.className = 'w-full max-w-xl p-2 bg-white border border-black rounded-lg shadow m-auto sm:p-4'
     contactBlock.setAttribute('id', 'contactBlock' + counter)
-    contactBlock.innerHTML = `<div class="flex items-start justify-between">` +
+    contactBlock.innerHTML =
+        `<div class="flex items-start justify-between">` +
         `<h2 id="contactBlockName` + counter + `" class="text-left font-medium text-black">Контакт № ` + counter + `</h2>` +
         `<button id="contactToDelete` + counter + `" type="button" onclick="deleteContactBlock(` + counter + `)">` +
         `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ms-2 text-gray-500 hover:text-gray-800">` +
@@ -423,6 +554,7 @@ function addContactBlock() {
         `</button>` +
         `</div>` +
         `<hr class="mx-auto my-1 h-px bg-black border-grey-300 border">` +
+
         `<div class="grid grid-cols-2 gap-4 my-3">` +
         `<div class="grid grid-rows-1 py-2 text-center">` +
         `<h2 class="text-left font-medium text-black">ФИО: </h2>` +
@@ -432,16 +564,37 @@ function addContactBlock() {
         `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">` +
         `</div>` +
         `</div>` +
+
+        `<div class="grid grid-cols-2 gap-4 my-3">` +
+        `<div class="grid grid-rows-1 py-2 text-center">` +
+        `<h2 class="text-left font-medium text-black">Должность: </h2>` +
+        `</div>` +
+        `<div class="grid grid-rows-1">` +
+        `<input type="text" id="contactPost` + counter + `"` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">` +
+        `</div>` +
+        `</div>` +
+
         `<div class="grid grid-cols-2 gap-4">` +
         `<div class="grid grid-rows-1 py-2 text-center">` +
         `<h2 class="text-left font-medium text-black">Телефон: </h2>` +
         `</div>` +
         `<div class="grid grid-rows-1">` +
-        `<input type="text" id="contactNumber` + counter + `"` + `data-inputmask="'mask': '+7(999)999-99-99', 'showMaskOnHover': false, 'placeholder': '#'"` +
+        `<input type="text" id="contactNumber` + counter + `"` +
         `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5" maxlength="16" placeholder="+7(999)999-99-99" required>` +
         `</div>` +
-        `</div>`
+        `</div>` +
 
+        `<div class="grid grid-cols-2 gap-4 my-3">` +
+        `<div class="grid grid-rows-1 py-2 text-center">` +
+        `<h2 class="text-left font-medium text-black">Почта: </h2>` +
+        `</div>` +
+        `<div class="grid grid-rows-1">` +
+        `<input type="text" id="contactEmail` + counter + `"` +
+        `class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">` +
+        `</div>` +
+        `</div>` +
+        `</div>`
     itemBlock.appendChild(contactBlock)
     let allIns = document.querySelectorAll("input");
     Inputmask().mask(allIns);
@@ -541,7 +694,6 @@ function showFileList(inpName, fileList) {
     updateDragAndDrop(fileList, false)
 }
 
-
 function getPermission() {
     var roles = document.getElementById('userRoles').getElementsByTagName('span')
     var flag = false
@@ -562,6 +714,7 @@ function getPermission() {
 
     }
 }
+
 
 function deleteFileFromList(index, fileList) {
     my_files.splice(index, 1)
@@ -628,7 +781,7 @@ function getProductParents() {
 var s = 0
 function changeArrow(id) {
     var my_elem = document.getElementById('element' + id)
-    if (my_elem.className.indexOf('text-xl') != -1) {
+    if (my_elem.className.indexOf('text-lg') != -1) {
         var d = my_elem.childNodes
         s = d[0].getAttribute('d-num')
         if (s == 0) {
@@ -711,30 +864,30 @@ function showProduct(id, dbID, name, code, number, type, count, state, isContrac
     changeArrow(id)
 
     if (currentElem != previousElem && previousElem) {
-        if (previousElem.className.indexOf('text-xl') != -1) {
-            previousElem.className = "flex p-0.5 text-xl text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"
+        if (previousElem.className.indexOf('text-lg') != -1) {
+            previousElem.className = "inline-flex font-serif p-0.5 text-lg text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"
             var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
             mxm.classList.remove('rounded-lg')
             mxm.classList.remove('bg-teal-100')
         } else {
-            previousElem.className = "flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
-        }
-        if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex p-0.5 text-xl text-black italic items-center bg-teal-400 rounded-lg"
+            previousElem.className = "inline-flex font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
+        }  
+        if (currentElem.className.indexOf('text-lg') != -1) {
+            currentElem.className = "inline-flex font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
             var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
             mxm.classList.add('rounded-lg')
             mxm.classList.add('bg-teal-100')
         } else {
-            currentElem.className = "flex p-0.5 text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
+            currentElem.className = "inline-flex font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     } else {
-        if (currentElem.className.indexOf('text-xl') != -1) {
-            currentElem.className = "flex p-0.5 text-xl text-black italic items-center bg-teal-400 rounded-lg"
+        if (currentElem.className.indexOf('text-lg') != -1) {
+            currentElem.className = "inline-flex font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
             var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
             mxm.classList.add('rounded-lg')
             mxm.classList.add('bg-teal-100')
         } else {
-            currentElem.className = "flex p-0.5 text-lg text-black items-center bg-teal-300 rounded-lg ml-2"
+            currentElem.className = "inline-flex font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
         }
     }
     previousElem = currentElem
@@ -971,33 +1124,35 @@ function createFileList(id, files, fileList) {
             var tmp = files[i].file.split('\\')
             var popover = 'popover-' + tmp[tmp.length - 1]
             if (files[i].type == 'json') {
-                a.innerHTML = `<a data-dropdown-toggle="`+popover+`" data-popover-target="`+popover+`" data-popover-target="popover-`+ files[i].file +`" class="text-gray-500 hover:text-gray-800 " role="button" ` +
+                a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 " role="button" ` +
                     `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
                     `</a>` +
-                    `<button file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "`+ files[i].type +`")'>` +
+                    `<button file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "` + files[i].type + `")'>` +
                     `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
                     `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
                     `</svg>` +
-                    `</button>` +
-                    `<div  data-popover id="`+popover+`" role="tooltip" ` +
-                    `class="absolute z-1000 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">` +
-                    `<h3 class="text-sm font-semibold text-center text-white p-2">Файл из контракта</h3>` + 
-                    `<div data-popper-arrow></div>` +
-                    `</div>` 
+                    `</button>`
             } else {
-                a.innerHTML = `<a data-dropdown-toggle="`+popover+`" data-popover-target="`+popover+`" class="text-gray-500 hover:text-gray-800 " role="button" ` +
-                    `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
-                    `</a>` +
-                    `<button style="display: none" file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "`+ files[i].type +`")'>` +
-                    `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
-                    `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
-                    `</svg>` +
-                    `</button>` +
-                    `<div data-popover id="`+popover+`" role="tooltip" ` +
-                    `class="absolute z-1000 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">` +
-                    `<h3 class="text-sm font-semibold text-center text-white p-2">Файл из базы данных</h3>` + 
-                    `<div data-popper-arrow></div>` +
-                    `</div>` 
+                if (document.getElementById('changeInDB').checked == true) {
+                    a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 " role="button" ` +
+                        `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
+                        `</a>` +
+                        `<button style="display: block" file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "` + files[i].type + `")'>` +
+                        `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+                        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+                        `</svg>` +
+                        `</button>`
+                } else {
+                    a.innerHTML = `<a class="text-gray-500 hover:text-gray-800 " role="button" ` +
+                        `onclick='downloadFile(` + JSON.stringify(files[i].file) + `, "` + tmp[tmp.length - 1] + `")'> ` + tmp[tmp.length - 1] + ` ` +
+                        `</a>` +
+                        `<button style="display: none" file-type="` + files[i].type + `" onclick='deleteFile(` + JSON.stringify(files[i].file) + `, ` + id + `, "` + contractInfo['id'] + `", "` + files[i].type + `")'>` +
+                        `<svg class="w-4 h-4 ml-1 text-red-500 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">` +
+                        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+                        `</svg>` +
+                        `</button>`
+                }
+
             }
 
             ul.appendChild(a)
@@ -1014,7 +1169,7 @@ function deleteFile(filePath, product_id, contract_id, fileType) {
         url: '/deleteFile',
         type: 'GET',
         contentType: false,
-        data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id, 'fileType': fileType },
+        data: { 'filePath': filePath, 'productId': product_id, 'contractId': contract_id, 'fileType': fileType, 'productDBId': document.getElementById('dbID').value.slice(4) },
         success: function (response) {
             console.log(response)
             createFileList(product_id, response['files'], 'fileList')
@@ -1275,7 +1430,7 @@ function changeDocArrow(id) {
 
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
-    treeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
+    treeElement.className = 'ps-2 min-w-fit max-w-4xl mt-2 ml-4 space-y-1 list-none list-inside';
     if (idd != null && idd != 'root') {
         var tmp = idd + i - 1
         treeElement.id = 'collapse' + tmp;
@@ -1283,7 +1438,7 @@ function createTree(element, data, idd, i) {
         treeElement.setAttribute('data-te-collapse-item', '')
     }
     const docTreeElement = document.createElement('ul');
-    docTreeElement.className = 'ps-2 mt-2 ml-4 space-y-1 list-none list-inside';
+    docTreeElement.className = 'ps-2 min-w-fit max-w-4xl mt-2 ml-4 space-y-1 list-none list-inside';
 
     var tmp = idd + i - 1
     docTreeElement.id = 'collapseDoc' + tmp;
@@ -1294,15 +1449,14 @@ function createTree(element, data, idd, i) {
     var fflag = true
 
     data.forEach((item) => {
-        if
-            (item.idType == 9) {
+        if (item.idType == 9) {
             const doclistItem = document.createElement('li')
             const listItem = document.createElement('li')
-            var tmp
+            // var tmpp
             if (flag == true) {
-                tmp = item.id + i - 2
-                doclistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="elementDoc` + item.id + `" data-te-collapse-init href="#collapseDoc` + tmp + `" role="button" aria-expanded="false" aria-controls="collapseDoc` + tmp + `"` +
-                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick=changeDocArrow(` + item.id + `)>` +
+                // tmpp = item.idDB + i - 2
+                doclistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementDoc` + item.id + `" data-te-collapse-init href="#collapseDoc` + docTreeElement.id.slice(11) + `" role="button" aria-expanded="false" aria-controls="collapseDoc` + tmp + `"` +
+                    `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick=changeDocArrow(` + item.id + `)>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
@@ -1310,19 +1464,17 @@ function createTree(element, data, idd, i) {
                 flag = false
                 treeElement.append(doclistItem)
             }
-            listItem.innerHTML = `<div class="flex gap-2  items-center "><a dbId id="element` + item.id + `" role="button" aria-expanded="false"` +
-                `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
-                `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
+            listItem.innerHTML = `<div class="inline-flex items-center"><a dbId id="element` + item.id + `" role="button" aria-expanded="false"` +
+                `class="inline-flex font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
+                `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `")'  oncontextmenu="customContextMenu(this)"` +
                 `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                 item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
+                item.name + `<span class="text-xs px-2 text-black font-bold">` + item.code + `</span></a></div>`
             docTreeLength += 1
             docTreeElement.append(listItem)
         } else {
             if (fflag == true && docTreeLength != 0) {
-                // console.log(docTreeElement)
-                // console.log(treeElement)
-                // console.log(docTreeLength)
+
                 treeElement.append(docTreeElement)
                 fflag = false
                 docTreeLength = 0
@@ -1330,23 +1482,54 @@ function createTree(element, data, idd, i) {
             const listItem = document.createElement('li')
             if (item.children.length != 0) {
                 var tmp = item.id + i
-                listItem.innerHTML = `<div id="elementDiv` + item.id + `" class="flex gap-2 items-center "><a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `" role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                    `class="flex text-xl p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
+                listItem.innerHTML = `<div id="elementDiv` + item.id + `" z-20 class="inline-flex  items-center">` +
+                    `<a id="element` + item.id + `" data-te-collapse-init href="#collapse` + tmp + `"` +
+                    `role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
+                    `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"  oncontextmenu='customContextMenu("` + item.id + `", "` + item.name + `")'` +
                     `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                    item.name + `</a><span class=" text-sm  p-0.5 text-center text-black font-bold"> ` + item.code + `</span></div>`
+                    item.name + `<span class="text-xs px-2 font-serif  text-black font-bold"> ` + item.code + `</span></a>` +
+                    `<div   state="0" id="custom-menu" z-100 class="border border-black text-xs" style="display: none">` +
+                    `<div class="inline-grid grid-cols-1 grid-rows-3 items-center rounded-sm border-t p-1 border-gray-200 rounded-b ">` +
+                    `<button type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg px-5 py-2.5 text-center ">` +
+                    `Аналитика</button>` +
+                    `<button  type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg px-5 py-2.5 text-center ">` +
+                    `Выгрузить в exel</button>` +
+                    `<button  type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
+                    `Сделать харакири</button>` +
+                    `</div>` +
+                    `</div>` +
+                    `</div>`
                 i += 1
             } else {
-                listItem.innerHTML = `<div class="flex gap-2  items-center "><a id="element` + item.id + `" role="button" aria-expanded="false"` +
-                    `class="flex p-0.5 text-lg text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
+                listItem.innerHTML = `<div id="elementDiv` + item.id + `"z-20 class="inline-flex items-center">` +
+                    `<a id="element` + item.id + `" role="button" aria-expanded="false" ` +
+                    `class="inline-flex font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2" oncontextmenu='customContextMenu("` + item.id + `", "` + item.name + `")'` +
                     `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                    item.name + `</a><span class=" min-w-min text-sm  p-0.5 text-center text-black font-bold">` + item.code + `</span></div>`
+                    item.name + `<span class=" text-xs px-2 text-black font-bold">` + item.code + `</span></a>` +
+                    `<div state="0" id="custom-menu"  z-100 class="border bg-white rounded-sm border-black text-xs" style="display: none">` +
+                    `<div class="inline-grid grid-cols-1 grid-rows-3 items-center border-t p-1 border-gray-200 rounded-b ">` +
+                    `<button type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
+                    `Аналитика</button>` +
+                    `<button  type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
+                    `Выгрузить в exel</button>` +
+                    `<button  type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
+                    `Сделать харакири</button>` +
+                    `</div>` +
+                    `</div>` +
+                    `</div>`
 
                 i += 1
             }
@@ -1360,6 +1543,43 @@ function createTree(element, data, idd, i) {
 };
 
 
+document.addEventListener('contextmenu', event => event.preventDefault());
+function customContextMenu(id, name) {
+    var elems = document.getElementById('elementDiv' + id).getElementsByTagName('div')
+    var my_menu
+    for (var i = 0; i < elems.length; i++) {
+        if (elems[i].id == 'custom-menu') {
+            my_menu = elems[i]
+        }
+    }
+    if (my_menu.getAttribute('state') == '0') {
+        my_menu.style.display = 'block'
+        my_menu.style.position = 'absolute'
+        my_menu.setAttribute('state', '1')
+    } else {
+        my_menu.style.display = 'none'
+        my_menu.style.position = 'relative'
+        my_menu.setAttribute('state', '0')
+    }
+    // my_elem.setAttribute('data-popover-target', 'popover-product' + id)
+    // my_elem.setAttribute('data-popover-trigger', 'click')
+    // my_elem.setAttribute('data-popover-placement', 'bottom-end')
+    // var my_menu = document.createElement('div')
+    // my_menu.id = 'context-menu'
+    // my_menu.innerHTML = 
+    //     `<div data-popover id="popover-product`+ id +`" role="tooltip"` +
+    //     `class="absolute z-10 invisible inline-block w-72  duration-500 rounded-lg bg-gray-500 border-gray-700">` +
+    //     `<div id="info" class="p-2 space-y-1 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">` +
+    //     `<h2>Изделие!</h2>` +
+    //     `</div>` +
+    //     `<div data-popper-arrow></div>` +
+    //     `</div>`
+    // document.getElementById('elementDiv' + id).appendChild(my_menu)
+    // console.log(my_menu)
+    // my_div.click()
+}
+
+
 function startCreation(id) {
     fetch(`/products/${ id }`)
         .then(response => response.json())
@@ -1368,6 +1588,7 @@ function startCreation(id) {
             rootElement.innerHTML = ""
             var i = 1
             createTree(rootElement, data['data'], null, i)
+            document.getElementById('element0').click()
         });
 }
 
@@ -1609,7 +1830,7 @@ function changeInDB() {
         var filelst = document.getElementById('fileList').getElementsByTagName('button')
         for (var i = 0; i < filelst.length; i++) {
             if (filelst[i].getAttribute('file-type') == 'db') {
-                filelst[i].style.display = 'block'
+                filelst[i].style.display = 'block'            
             } else {
                 filelst[i].style.display = 'none'
             }

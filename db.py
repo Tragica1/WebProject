@@ -325,6 +325,7 @@ def db_get_product_id(code):
     cur.close()
     return prod_id
 
+
 def db_has_children(id):
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
@@ -434,10 +435,10 @@ def db_add_company(name, address):
     return company_id
 
 
-def db_add_contact(name, number):
+def db_add_contact(name, post, number, email):
     cur = con.cursor()
-    sql = '''INSERT INTO contact (name, number) VALUES (%s, %s)'''
-    cur.execute(sql, (name, number))
+    sql = '''INSERT INTO contact (name, number, post, email) VALUES (%s, %s, %s, %s)'''
+    cur.execute(sql, (name, number, post, email))
     cur.execute('''SELECT LAST_INSERT_ID()''')
     contact_id = cur.fetchone()
     cur.close()
@@ -459,6 +460,32 @@ def db_delete_contract(contract_id):
     cur.execute(sql, (contract_id,))
     sql = '''DELETE FROM governmentcontract WHERE id=%s'''
     cur.execute(sql, (contract_id,))
+    cur.close()
+    con.commit()
+
+
+def db_delete_provider(provider_id):
+    cur = con.cursor()
+    sql = '''SELECT idContact FROM contactcompanylist WHERE idCompany=%s'''
+    cur.execute(sql, (provider_id,))
+    contacts_id = cur.fetchall()
+    sql = '''DELETE FROM contactcompanylist WHERE idCompany=%s'''
+    cur.execute(sql, (provider_id,))
+    if (contacts_id):
+        sql = '''DELETE FROM contact WHERE id IN (%s)'''
+        cur.execute(sql, (contacts_id))
+    sql = '''DELETE FROM company WHERE id=%s'''
+    cur.execute(sql, (provider_id))
+    cur.close()
+    con.commit()
+
+
+def db_delete_contact(provider_id, contact_id):
+    cur = con.cursor()
+    sql = '''DELETE FROM contactcompanylist WHERE idCompany=%s AND idContact=%s'''
+    cur.execute(sql, (provider_id, contact_id))
+    sql = '''DELETE FROM contact WHERE id=%s'''
+    cur.execute(sql, (contact_id))
     cur.close()
     con.commit()
 
@@ -501,8 +528,10 @@ def db_delete_file(prod_id, file_name):
     cur = con.cursor()
     sql = '''SELECT id FROM file WHERE name=%s'''
     cur.execute(sql, (file_name,))
-    file_id = cur.fetchall()
+    file_id = cur.fetchone()
     sql = '''DELETE FROM productfilelist WHERE idProduct=%s AND idFile=%s'''
-    cur.execute(sql, (prod_id, file_id))
+    cur.execute(sql, (prod_id, file_id[0]))
+    sql = '''DELETE FROM file WHERE id=%s'''
+    cur.execute(sql, (file_id[0]))
     cur.close()
     con.commit()

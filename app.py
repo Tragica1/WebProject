@@ -133,9 +133,35 @@ def get_providers():
         comps = db_get_companies()
         for c in comps:
             tmp = list(c)
+            tmp[1] = fix_quotes(tmp[1])
             companies.append(tmp)
         # print(companies)
         return jsonify({'status': 'success', 'data': companies})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/deleteProvider', methods=['GET'])
+@jwt_required()
+def delete_providers():
+    try:
+        provider_id = request.args.get('providerId')
+        db_delete_provider(provider_id)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/deleteContact', methods=['GET'])
+@jwt_required()
+def delete_contact():
+    try:
+        provider_id = request.args.get('providerId')
+        contact_id = request.args.get('contactId')
+        db_delete_contact(provider_id, contact_id)
+        return jsonify({'status': 'success'})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -376,7 +402,8 @@ def delete_product_file():
         product_id = request.args.get('productId')
         contract_id = request.args.get('contractId')
         file_type = request.args.get('fileType')
-        print(file_name, product_id, contract_id)
+        product_db_id = request.args.get('productDBId')
+        print(file_name, product_id, contract_id, product_db_id)
         dir_path = os.path.join(contract_folder, 'contract_' + str(contract_id))
         with open(os.path.join(dir_path, 'contract' + str(contract_id) + '.json'), 'r') as f:
             contract_data = json.load(f)
@@ -389,13 +416,30 @@ def delete_product_file():
             f.write(json_data)
             f.close()
         if file_type == 'db':
-            db_delete_file(product_id, file_name.replace)            
+            db_delete_file(product_db_id, file_name)            
         os.remove(file_name)
         return jsonify({'status': 'success', 'message': 'File deleted successfully', 'files': file_list['files']})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
-    
+
+
+@app.route('/changeProvider', methods=['POST'])
+@jwt_required()    
+def change_provider():
+    try:
+        data = request.get_json()
+        print(data)
+        db_update_company(data['name'], data['address'])
+        if(data['contacts']):
+            for contact in data['contacts']:
+                db_update_contact(contact['name'], contact['post'], contact['number'], contact['email'])
+        print('Provider added successfully')
+        return jsonify({'status': 'success', 'message': 'Provider changed successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
 
 @app.route('/saveProvider', methods=['POST'])
 @jwt_required()    
@@ -406,7 +450,7 @@ def save_provider():
         company_id = db_add_company(data['name'], data['address'])
         if(data['contacts']):
             for contact in data['contacts']:
-                contact_id = db_add_contact(contact['name'], contact['number'])
+                contact_id = db_add_contact(contact['name'], contact['post'], contact['number'], contact['email'])
                 db_add_contact_company_list(contact_id, company_id)
         print('Provider added successfully')
         return jsonify({'status': 'success', 'message': 'Provider added successfully'})
@@ -479,7 +523,6 @@ def get_product_info():
         return jsonify({'status': 'error', 'message': str(e)}) 
 
 
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     return render_template('login.html')
@@ -521,6 +564,7 @@ def check_product():
             with open(os.path.join(dir_path, 'contract' + str(id) + '.json'), 'r') as f:
                 contract_data = json.load(f)
                 f.close()
+            print(user_roles['roles'])
             main_products = db_get_role_allowed_products(user_roles['roles'])
             print(main_products) 
             condition = {'flag': False}
