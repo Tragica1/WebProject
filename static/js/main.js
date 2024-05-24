@@ -217,19 +217,21 @@ function cleanInputWindow(id_modal) {
 function changeProvider() {
     var contacts = []
     var my_items = document.getElementById('providerContactsList').getElementsByTagName('li')
-    if (counter > 0) {
-        for (var i = 0; i <= my_items.length; i++) {
+    if (my_items.length > 0) {
+        for (var i = 0; i < my_items.length; i++) {
             var tmp = {
-                'name': my_items.getAttribute('name'),
-                'number': my_items.getAttribute('phone'),
-                'post': my_items.getAttribute('post'),
-                'email': my_items.getAttribute('email')
+                'id': my_items[i].id.slice(9),
+                'name': my_items[i].getAttribute('name'),
+                'number': my_items[i].getAttribute('phone'),
+                'post': my_items[i].getAttribute('post'),
+                'email': my_items[i].getAttribute('email')
             }
             contacts[i] = tmp
         }
     }
 
     var formData = {
+        'id': document.getElementById('currentProvider').value,
         'name': $('#companyName').val(),
         'address': $('#companyAddress').val(),
         'contacts': contacts
@@ -271,17 +273,18 @@ function createProviderModal(providers) {
     prodviders_ul.innerHTML = ""
     for (var i = 0; i < providers.length; i++) {
         var elem = document.createElement('li')
-        elem.className = 'grid grid-cols-2 py-1 border-b  hover:bg-gray-200 hover:text-gray-900 rounded-lg'
-        elem.innerHTML = `<button id="productEdit`+ providers[i][0] +`" onclick='showProdviderInfo(`+ providers[i][0] +`, "`+ providers[i][1] +`", "`+ providers[i][2] +`")' `+
-        `class="text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">`+ providers[i][1] +`</button>` +
-        `<button type="button" class="justify-self-end text-end" onclick="deleteProvider('` + providers[i][0] + `')">` +
-        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
-        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
-        `viewBox="0 0 22 22">` +
-        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
-        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
-        `</svg>` +
-        `</button>`
+        elem.id = 'providerLI' + providers[i][0]
+        elem.className = 'grid grid-cols-3 py-1 border-b hover:bg-gray-200 hover:text-gray-900 rounded-lg'
+        elem.innerHTML = `<button id="productEdit` + providers[i][0] + `" onclick='showProdviderInfo(` + providers[i][0] + `, "` + providers[i][1] + `", "` + providers[i][2] + `")' ` +
+            `class="text-sm max-w-32 col-span-2 truncate text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">` + providers[i][1] + `</button>` +
+            `<button type="button" class=" justify-self-end justify-end text-end" onclick="deleteProvider('` + providers[i][0] + `')">` +
+            `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+            `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+            `viewBox="0 0 22 22">` +
+            `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+            `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+            `</svg>` +
+            `</button>`
         prodviders_ul.append(elem)
     }
 }
@@ -292,7 +295,7 @@ function deleteProvider(id) {
         type: 'GET',
         url: '/deleteProvider',
         contentType: false,
-        data: { 'providerId': id},
+        data: { 'providerId': id },
         success: function (response) {
             getProdivers()
             $('#contactName').val('')
@@ -310,12 +313,18 @@ function deleteProvider(id) {
 }
 
 
+function deleteProviderWeb(id) {
+    var to_del = document.getElementById('providerLI' + id)
+    to_del.remove()
+}
+
+
 function deleteContact(idProvider, idContact, name, addr) {
     $.ajax({
         type: 'GET',
         url: '/deleteContact',
         contentType: false,
-        data: { 'providerId': idProvider, 'contactId': idContact},
+        data: { 'providerId': idProvider, 'contactId': idContact },
         success: function (response) {
             // getProdivers()
             showProdviderInfo(idProvider, name, addr)
@@ -328,14 +337,156 @@ function deleteContact(idProvider, idContact, name, addr) {
     });
 }
 
+
+function deleteContactWeb(id) {
+    var to_del = document.getElementById('contactLI' + id)
+    to_del.remove()
+    $('#contactName').val('')
+    $('#contactPost').val('')
+    $('#contactPhone').val('')
+    $('#contactEmail').val('')
+}
+
+
 function updateCurrentContact() {
-    var cur_contact =  document.getElementById('currentContact').value
+    var cur_contact = document.getElementById('currentContact').value
     // console.log(cur_contact)
     var my_li = document.getElementById('contactLI' + cur_contact)
+    if (my_li.getAttribute('is-new') == 'true') {
+
+    } else {
+        my_li.innerHTML = `<button id="contactEdit` + cur_contact + `" onclick='showContactInfo(` + cur_contact + `)' ` +
+        `class="text-sm truncate max-w-32 text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">` + $('#contactName').val() + `</button>` +
+        `<button type="button" class=" justify-self-end justify-end text-end" onclick='deleteContactWeb(` + cur_contact + `)'>` +
+        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+        `viewBox="0 0 22 22">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+        `</svg>` +
+        `</button>`
+    }
+
     my_li.setAttribute('name', $('#contactName').val())
     my_li.setAttribute('post', $('#contactPost').val())
     my_li.setAttribute('phone', $('#contactPhone').val())
     my_li.setAttribute('email', $('#contactEmail').val())
+}
+
+function addNewProvider() {
+    $('#contactName').val('')
+    $('#contactPost').val('')
+    $('#contactPhone').val('')
+    $('#contactEmail').val('')
+    $('#companyName').val('')
+    $('#companyAddress').val('')
+    document.getElementById('providerContactsList').innerHTML = ''
+    var prodviders_ul = document.getElementById('providersList')
+    var tt = prodviders_ul.getElementsByTagName('li').length
+    if (tt != 0) {
+        var new_prod_id = Number(prodviders_ul.getElementsByTagName('li')[tt-1].id.slice(10)) + 1
+    } else {
+        var new_prod_id = 0
+    }
+    var new_prod_elem = document.createElement('li')
+    new_prod_elem.id = 'providerLI' + new_prod_id
+    document.getElementById('currentProvider').value = new_prod_id
+    new_prod_elem.className = 'grid grid-cols-3 py-1 border-b hover:bg-gray-200 hover:text-gray-900 rounded-lg'
+    new_prod_elem.setAttribute('is-new', 'true')
+    new_prod_elem.innerHTML = `<button id="productEdit` + new_prod_id + `" onclick='showProdviderInfo(` + new_prod_id + `, "` + $('#companyName').val() + `", "` + $('#companyAddress').val() + `")' ` +
+        `class="text-sm max-w-32 col-span-2 truncate text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded"></button>` +
+        `<button type="button" class=" justify-self-end justify-end text-end" onclick="deleteProviderWeb(` + new_prod_id + `)">` +
+        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+        `viewBox="0 0 22 22">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+        `</svg>` +
+        `</button>`
+    prodviders_ul.append(new_prod_elem)
+    document.getElementById('providerEditSave').setAttribute('onclick', 'saveNewProvider()')
+}
+
+function addNewContact() {
+    $('#contactName').val('')
+    $('#contactPost').val('')
+    $('#contactPhone').val('')
+    $('#contactEmail').val('')
+    // document.getElementById('providerContactsList').innerHTML = ''
+    var contacts_ul = document.getElementById('providerContactsList')
+    var tt = contacts_ul.getElementsByTagName('li').length
+    if (tt != 0) {
+        var new_contact_id = Number(contacts_ul.getElementsByTagName('li')[tt-1].id.slice(9)) + 1
+    } else {
+        var new_contact_id = 0
+    }
+    var new_contact_elem = document.createElement('li')
+    new_contact_elem.id = 'contactLI' + new_contact_id
+    document.getElementById('currentContact').value = new_contact_id
+    new_contact_elem.className = 'grid grid-cols-2 py-1 items-center border-b hover:bg-gray-200 hover:text-gray-900 rounded-lg'
+    new_contact_elem.innerHTML = `<button id="contactEdit` + new_contact_id + `" onclick='showContactInfo(` + new_contact_id + `)' ` +
+        `class="truncate max-w-32 text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded"></button>` +
+        `<button type="button" class="justify-self-end text-end" onclick='deleteContactWeb(` + new_contact_id + `)'>` +
+        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+        `viewBox="0 0 22 22">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+        `</svg>` +
+        `</button>`
+    contacts_ul.append(new_contact_elem)
+}
+
+function saveNewProvider() {
+    var contacts = []
+    var my_items = document.getElementById('providerContactsList').getElementsByTagName('li')
+    if (my_items.length > 0) {
+        for (var i = 0; i < my_items.length; i++) {
+            var tmp = {
+                'name': my_items[i].getAttribute('name'),
+                'number': my_items[i].getAttribute('phone'),
+                'post': my_items[i].getAttribute('post'),
+                'email': my_items[i].getAttribute('email')
+            }
+            contacts[i] = tmp
+        }
+    }
+
+    var formData = {
+        'name': $('#companyName').val(),
+        'address': $('#companyAddress').val(),
+        'contacts': contacts
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/saveProvider',
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(formData),
+        success: function (response) {
+            getProdivers()
+            console.log(response);
+        },
+        error: function (error) {
+            location.reload();
+            console.log(error);
+        }
+    });
+}
+
+
+function updateCurrentProvider() {
+    var cur_provider = document.getElementById('currentProvider').value
+    var my_li = document.getElementById('providerLI' + cur_provider)
+    my_li.innerHTML = `<button id="productEdit` + cur_provider + `" onclick='showProdviderInfo(` + cur_provider + `, "` + $('#companyName').val() + `", "` + $('#companyAddress').val() + `")' ` +
+        `class="text-sm max-w-32 col-span-2 truncate text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">` + $('#companyName').val() + `</button>` +
+        `<button type="button" class=" justify-self-end justify-end text-end" onclick="deleteProvider('` + cur_provider + `')">` +
+        `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+        `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+        `viewBox="0 0 22 22">` +
+        `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+        `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
+        `</svg>` +
+        `</button>`
 }
 
 
@@ -343,32 +494,33 @@ function showProdviderInfo(id, name, addr) {
     // console.log(provider)
     $('#companyName').val(name)
     $('#companyAddress').val(addr)
+    document.getElementById('currentProvider').value = id
     fetch(`/contacts/${ id }`)
         .then(response => response.json())
         .then(data => {
             contacts = data
-            // console.log(contacts)
+            console.log(contacts)
             var contacts_ul = document.getElementById('providerContactsList')
             contacts_ul.innerHTML = ""
             for (var i = 0; i < contacts.length; i++) {
                 var elem = document.createElement('li')
                 elem.id = 'contactLI' + contacts[i][0]
-                elem.setAttribute('name', contacts[i][1] )
-                elem.setAttribute('post', contacts[i][2] )
-                elem.setAttribute('phone', contacts[i][3] )
-                elem.setAttribute('email', contacts[i][4] )
+                elem.setAttribute('name', contacts[i][1])
+                elem.setAttribute('post', contacts[i][2])
+                elem.setAttribute('phone', contacts[i][3])
+                elem.setAttribute('email', contacts[i][4])
                 elem.className = 'grid grid-cols-2 py-1 items-center border-b hover:bg-gray-200 hover:text-gray-900 rounded-lg'
-                elem.innerHTML = `<button id="contactEdit`+ contacts[i][0] +`" onclick='showContactInfo(`+ contacts[i][0] +`)' `+
-                `class="text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">`+ contacts[i][1] +`</button>` +
-                `<button type="button" class="justify-self-end text-end" onclick='deleteContact(` + id + `, ` +  contacts[i][0]  + `, "` +  $('#companyName').val() + `", "` + $('#companyAddress').val() + `")'>` +
-                `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
-                `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
-                `viewBox="0 0 22 22">` +
-                `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
-                `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />` +
-                `</svg>` +
-                `</button>`
-                contacts_ul.append(elem) 
+                elem.innerHTML = `<button id="contactEdit` + contacts[i][0] + `" onclick='showContactInfo(` + contacts[i][0] + `)' ` +
+                    `class="truncate max-w-32 text-sm text-left justify-self-start ml-2 text-gray-600 font-semibold border-gray-300 rounded">` + contacts[i][1] + `</button>` +
+                    `<button type="button" class="justify-self-end text-end" onclick='deleteContact(` + id + `, ` + contacts[i][0] + `, "` + $('#companyName').val() + `", "` + $('#companyAddress').val() + `")'>` +
+                    `<svg class="w-4 h-4  mr-2 text-red-500 hover:text-red-800" aria-hidden="true"` +
+                    `xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"` +
+                    `viewBox="0 0 22 22">` +
+                    `<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"` +
+                    `stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>` +
+                    `</svg>` +
+                    `</button>`
+                contacts_ul.append(elem)
             }
             $('#contactName').val('')
             $('#contactPost').val('')
@@ -378,9 +530,8 @@ function showProdviderInfo(id, name, addr) {
 }
 
 
-function showContactInfo(id, name, phone, post, email) {
+function showContactInfo(id) {
     document.getElementById('currentContact').value = id
-    document.getElementById('contactLI' + id).getAttribute('name')
     $('#contactName').val(document.getElementById('contactLI' + id).getAttribute('name'))
     $('#contactPost').val(document.getElementById('contactLI' + id).getAttribute('post'))
     $('#contactPhone').val(document.getElementById('contactLI' + id).getAttribute('phone'))
@@ -394,6 +545,7 @@ function getProdivers() {
         url: '/getProdivers',
         success: function (response) {
             providers = response['data']
+            document.getElementById('providerEditSave').setAttribute('onclick', 'changeProvider()')
             createProviderOptionList(providers, 'productProvider')
             createProviderOptionList(providers, 'newProductProvider')
             createProviderModal(providers)
@@ -871,7 +1023,7 @@ function showProduct(id, dbID, name, code, number, type, count, state, isContrac
             mxm.classList.remove('bg-teal-100')
         } else {
             previousElem.className = "inline-flex font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
-        }  
+        }
         if (currentElem.className.indexOf('text-lg') != -1) {
             currentElem.className = "inline-flex font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
             var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
@@ -1830,7 +1982,7 @@ function changeInDB() {
         var filelst = document.getElementById('fileList').getElementsByTagName('button')
         for (var i = 0; i < filelst.length; i++) {
             if (filelst[i].getAttribute('file-type') == 'db') {
-                filelst[i].style.display = 'block'            
+                filelst[i].style.display = 'block'
             } else {
                 filelst[i].style.display = 'none'
             }

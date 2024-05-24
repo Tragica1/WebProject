@@ -408,6 +408,58 @@ def db_update_product(data1, data2):
     con.commit()
 
 
+def db_check_company(id):
+    cur = con.cursor()
+    sql = '''SELECT name FROM company WHERE id=%s'''
+    cur.execute(sql, (id,))
+    name = cur.fetchone()
+    cur.close()
+    con.commit()
+    if name:
+        return True
+    else:
+        return False
+    
+def db_check_company_contact_list(company_id, contact_id):
+    cur = con.cursor()
+    sql = '''SELECT id FROM contactcompanylist WHERE idContact=%s AND idCompany=%s'''
+    cur.execute(sql, (contact_id,company_id))
+    idd = cur.fetchone()
+    cur.close()
+    con.commit()
+    if idd:
+        return True
+    else:
+        return False
+
+def db_check_contact(id):
+    cur = con.cursor()
+    sql = '''SELECT name FROM contact WHERE id=%s'''
+    cur.execute(sql, (id,))
+    name = cur.fetchone()
+    cur.close()
+    con.commit()
+    if name:
+        return True
+    else:
+        return False
+
+def db_update_company(id, name, address):
+    cur = con.cursor()
+    sql = '''UPDATE company SET name=%s, address=%s WHERE id=%s'''
+    cur.execute(sql, (name, address, id))
+    cur.close()
+    con.commit()
+
+
+def db_update_contact(id, name, post, number, email):
+    cur = con.cursor()
+    sql = '''UPDATE contact SET name=%s, number=%s, post=%s, email=%s WHERE id=%s'''
+    cur.execute(sql, (name, number, post, email, id))
+    cur.close()
+    con.commit()
+
+
 def db_update_contract(id, status):
     cur = con.cursor()
     sql = '''UPDATE governmentcontract SET idStatus=%s WHERE id=%s'''

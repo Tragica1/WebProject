@@ -147,7 +147,8 @@ def get_providers():
 def delete_providers():
     try:
         provider_id = request.args.get('providerId')
-        db_delete_provider(provider_id)
+        if db_check_company(provider_id):
+            db_delete_provider(provider_id)
         return jsonify({'status': 'success'})
     except Exception as e:
         print(e)
@@ -160,7 +161,8 @@ def delete_contact():
     try:
         provider_id = request.args.get('providerId')
         contact_id = request.args.get('contactId')
-        db_delete_contact(provider_id, contact_id)
+        if db_check_contact(contact_id):
+            db_delete_contact(provider_id, contact_id)
         return jsonify({'status': 'success'})
     except Exception as e:
         print(e)
@@ -430,11 +432,15 @@ def change_provider():
     try:
         data = request.get_json()
         print(data)
-        db_update_company(data['name'], data['address'])
+        db_update_company(data['id'], data['name'], data['address'])
         if(data['contacts']):
             for contact in data['contacts']:
-                db_update_contact(contact['name'], contact['post'], contact['number'], contact['email'])
-        print('Provider added successfully')
+                if db_check_company_contact_list(int(data['id']), int(contact['id'])) is False:
+                    contact_id = db_add_contact(contact['name'], contact['post'], contact['number'], contact['email'])
+                    db_add_contact_company_list(contact_id, data['id'])
+                else:
+                    db_update_contact(contact['id'], contact['name'], contact['post'], contact['number'], contact['email'])
+        print('Provider changed successfully')
         return jsonify({'status': 'success', 'message': 'Provider changed successfully'})
     except Exception as e:
         print(e)
@@ -610,5 +616,5 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 
 if __name__ == '__main__':
-    # app.run('192.168.0.78', 80)
-    app.run(debug=True)
+    app.run('192.168.0.78', 80)
+    # app.run(debug=True)
