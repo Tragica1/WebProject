@@ -1,15 +1,8 @@
 import pymysql as ps
 
-con = ps.connect(
-    database="mydb",
-    user="root",
-    password="123",
-    host="localhost",
-    port=3306
-)
-
 
 def db_check_users(name):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cursor = con.cursor()
     sql = '''SELECT id FROM user WHERE name=%s'''
     cursor.execute(sql, (name,))
@@ -22,6 +15,7 @@ def db_check_users(name):
 
  
 def db_get_user_password(id_user):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cursor = con.cursor()
     sql = '''SELECT password FROM user WHERE id=%s'''
     cursor.execute(sql, (id_user,))
@@ -31,6 +25,7 @@ def db_get_user_password(id_user):
 
 
 def db_get_user_role(id_user):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cursor = con.cursor()
     sql = '''SELECT role.id, role.name FROM role JOIN userrolelist ON userrolelist.idUser=%s WHERE role.id=userrolelist.idRole'''
     cursor.execute(sql, (id_user,))
@@ -42,6 +37,7 @@ def db_get_user_role(id_user):
     return result
 
 def db_get_role_allowed_products(id_roles):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     result = []
     for id_role in id_roles:
         cursor = con.cursor()
@@ -55,6 +51,7 @@ def db_get_role_allowed_products(id_roles):
 
 
 def db_get_last_contract():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cursor = con.cursor()
     sql = '''SELECT id FROM governmentcontract'''
     cursor.execute(sql)
@@ -65,6 +62,7 @@ def db_get_last_contract():
 
 
 def db_add_localcontract(startDate, endDate):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO localcontract (startDate, endDate) VALUES (%s, %s)'''
     cur.execute(sql, (startDate, endDate))
@@ -77,6 +75,7 @@ def db_add_localcontract(startDate, endDate):
 
 
 def db_get_localcontract(contract_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT localcontract.startDate, localcontract.endDate, companycontractlist.idCompany FROM localcontract JOIN companycontractlist ON localContract.id=%s AND companycontractlist.idContract=%s'''
     cur.execute(sql, (contract_id, contract_id))
@@ -86,6 +85,7 @@ def db_get_localcontract(contract_id):
 
 
 def db_get_companies():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM company'''
     cur.execute(sql)
@@ -95,6 +95,7 @@ def db_get_companies():
 
 
 def db_get_company_contacts(company_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idContact FROM contactcompanylist WHERE idCompany=%s'''
     cur.execute(sql, (company_id,))
@@ -110,6 +111,7 @@ def db_get_company_contacts(company_id):
 
 
 def db_get_states():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM state'''
     cur.execute(sql)
@@ -119,6 +121,7 @@ def db_get_states():
 
 
 def db_get_state(state_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT name FROM state WHERE id=%s'''
     cur.execute(sql, (state_id,))
@@ -128,6 +131,7 @@ def db_get_state(state_id):
     
 
 def db_get_types():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM type'''
     cur.execute(sql)
@@ -137,6 +141,7 @@ def db_get_types():
 
 
 def db_get_type(type_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT name FROM type WHERE id=%s'''
     cur.execute(sql, (type_id,))
@@ -146,6 +151,7 @@ def db_get_type(type_id):
 
 
 def db_get_contract_types():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM contracttype'''
     cur.execute(sql)
@@ -155,6 +161,7 @@ def db_get_contract_types():
 
 
 def db_get_contract_statuses():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM contractstatus'''
     cur.execute(sql)
@@ -163,6 +170,7 @@ def db_get_contract_statuses():
     return statuses
 
 def db_get_contract_type(type_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT name FROM contracttype WHERE id=%s'''
     cur.execute(sql, (type_id,))
@@ -172,6 +180,7 @@ def db_get_contract_type(type_id):
 
 
 def db_add_contact(data):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO contact (name, phone) VALUES (%s, %s)'''
     cur.execute(sql, (data[0], data[1]))
@@ -180,6 +189,7 @@ def db_add_contact(data):
 
 
 def db_add_government_contract(data):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO governmentcontract (number, innerNumber, city, startDate, endDate, isActive, idType, idStatus) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
     cur.execute(sql, (data['number'], data['innerNumber'], data['city'], data['startDate'], data['endDate'], 1, int(data['contractType']), int(data['contractStatus'])))
@@ -191,6 +201,7 @@ def db_add_government_contract(data):
 
 
 def db_add_product_contract_list(contract_id, product_id_list):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     for prod_id in product_id_list:
         cur = con.cursor()
         sql = '''INSERT INTO productcontractlist (idGovernmentContract, idProduct) VALUES (%s, %s)'''
@@ -200,6 +211,7 @@ def db_add_product_contract_list(contract_id, product_id_list):
 
 
 def db_get_product_contract_list(contract_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idProduct FROM productcontractlist WHERE idGovernmentContract=%s'''
     cur.execute(sql, (contract_id,))
@@ -209,6 +221,7 @@ def db_get_product_contract_list(contract_id):
 
 
 def db_get_government_contract(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, contracttype.name, contractstatus.id FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus WHERE governmentcontract.id=%s'''
     cur.execute(sql, (id,))
@@ -221,6 +234,7 @@ def db_get_government_contract(id):
 
 
 def db_get_government_contracts():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT governmentcontract.id, governmentcontract.number, governmentcontract.innerNumber, governmentcontract.city, governmentcontract.startDate, governmentcontract.endDate, governmentcontract.isActive, contracttype.name, contractstatus.id FROM governmentcontract JOIN contracttype ON contracttype.id=governmentcontract.idType JOIN contractstatus ON contractstatus.id=governmentcontract.idStatus'''
     cur.execute(sql)
@@ -233,6 +247,7 @@ def db_get_government_contracts():
 
 
 def db_get_contract(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM contract WHERE idContract=%s'''
     cur.execute(sql, (id,))
@@ -245,6 +260,7 @@ def db_get_contract(id):
 
 
 def db_get_products():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM product'''
     cur.execute(sql)
@@ -256,7 +272,21 @@ def db_get_products():
         return [False, None]
     
 
+def db_get_products_for_select():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
+    cur = con.cursor()
+    sql = '''SELECT * FROM product WHERE idType=14'''
+    cur.execute(sql)
+    product = cur.fetchall()
+    cur.close()
+    if product[0]:
+        return [True, product]
+    else:
+        return [False, None]
+    
+
 def db_get_products_for_autocomplete():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT id, name FROM product'''
     cur.execute(sql)
@@ -269,6 +299,7 @@ def db_get_products_for_autocomplete():
 
 
 def db_get_product_for_autocomplete(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM product WHERE id=%s'''
     cur.execute(sql, (id,))
@@ -292,6 +323,7 @@ def db_get_product_for_autocomplete(id):
 
 
 def db_get_product(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM product WHERE id=%s'''
     cur.execute(sql, (id,))
@@ -303,21 +335,44 @@ def db_get_product(id):
         return [False, None]
 
 
+def db_get_product_by_type(ids, type, children):
+    # print(ids, type)
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
+    cur = con.cursor()
+    sql = '''SELECT * FROM product WHERE id IN{} AND idType=%s'''.format(ids)
+    cur.execute(sql, (type,))
+    products = cur.fetchall()
+    # print(products)
+    # print('\n--------------------------------\n')
+    cur.close()
+    if products:
+        for p in products:
+            children['data'].append(list(p))
+
+
 def db_get_product_children(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
     cur.execute(sql, (id,))
     children = cur.fetchall()
-    childrenData = list()
-    for child in children:
-        tmp = db_get_product(child)
-        if tmp[0]:
-            childrenData.append(tmp[1])
-    cur.close()
-    return childrenData
+    chl = []
+    if children:
+        for c in children:
+            chl.append(c[0])
+        childrenData = {'data': []}
+        types = [9, 14, 1, 3, 10, 7, 2, 5]
+        for type in types:
+            db_get_product_by_type(tuple(chl), type, childrenData)
+        cur.close()
+        # print(childrenData['data'])
+        return childrenData['data']
+    else:
+        return []
 
 
 def db_get_product_id(code):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT id FROM product WHERE code=%s'''
     cur.execute(sql, (code,))
@@ -327,6 +382,7 @@ def db_get_product_id(code):
 
 
 def db_has_children(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist WHERE idParent=%s'''
     cur.execute(sql, (id,))
@@ -338,6 +394,7 @@ def db_has_children(id):
 
 
 def db_is_child(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idChild FROM parentchildlist'''
     cur.execute(sql)
@@ -352,6 +409,7 @@ def db_is_child(id):
 
 
 def db_get_product_child():
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT * FROM parentchildlist'''
     cur.execute(sql)
@@ -363,6 +421,7 @@ def db_get_product_child():
 
 
 def db_add_company_contract_list(company_id, contract_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO companycontractlist (idCompany, idContract) VALUES (%s, %s)'''
     cur.execute(sql, (company_id, contract_id))
@@ -371,6 +430,7 @@ def db_add_company_contract_list(company_id, contract_id):
 
 
 def db_add_product(data):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     if  data['start'] == '':
         data['start'] = None
@@ -391,6 +451,7 @@ def db_add_product(data):
 
 
 def db_update_product(data1, data2):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     print(data1, data2)
     if  data1['start'] == '':
@@ -409,6 +470,7 @@ def db_update_product(data1, data2):
 
 
 def db_check_company(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT name FROM company WHERE id=%s'''
     cur.execute(sql, (id,))
@@ -421,10 +483,12 @@ def db_check_company(id):
         return False
     
 def db_check_company_contact_list(company_id, contact_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT id FROM contactcompanylist WHERE idContact=%s AND idCompany=%s'''
-    cur.execute(sql, (contact_id,company_id))
+    cur.execute(sql, (contact_id, company_id))
     idd = cur.fetchone()
+    print (idd)
     cur.close()
     con.commit()
     if idd:
@@ -433,6 +497,7 @@ def db_check_company_contact_list(company_id, contact_id):
         return False
 
 def db_check_contact(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT name FROM contact WHERE id=%s'''
     cur.execute(sql, (id,))
@@ -445,6 +510,7 @@ def db_check_contact(id):
         return False
 
 def db_update_company(id, name, address):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''UPDATE company SET name=%s, address=%s WHERE id=%s'''
     cur.execute(sql, (name, address, id))
@@ -453,6 +519,7 @@ def db_update_company(id, name, address):
 
 
 def db_update_contact(id, name, post, number, email):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''UPDATE contact SET name=%s, number=%s, post=%s, email=%s WHERE id=%s'''
     cur.execute(sql, (name, number, post, email, id))
@@ -461,6 +528,7 @@ def db_update_contact(id, name, post, number, email):
 
 
 def db_update_contract(id, status):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''UPDATE governmentcontract SET idStatus=%s WHERE id=%s'''
     cur.execute(sql, (status, id))
@@ -469,6 +537,7 @@ def db_update_contract(id, status):
 
 
 def db_add_child(parentId, childId):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO parentchildlist (idParent, idChild) VALUES (%s, %s)'''
     cur.execute(sql, (parentId, childId))
@@ -477,6 +546,7 @@ def db_add_child(parentId, childId):
 
 
 def db_add_company(name, address):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO company (name, address) VALUES (%s, %s)'''
     cur.execute(sql, (name, address))
@@ -488,6 +558,7 @@ def db_add_company(name, address):
 
 
 def db_add_contact(name, post, number, email):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO contact (name, number, post, email) VALUES (%s, %s, %s, %s)'''
     cur.execute(sql, (name, number, post, email))
@@ -499,6 +570,7 @@ def db_add_contact(name, post, number, email):
 
 
 def db_add_contact_company_list(contact_id, company_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO contactcompanylist (idContact, idCompany) VALUES (%s, %s)'''
     cur.execute(sql, (contact_id, company_id))
@@ -507,6 +579,7 @@ def db_add_contact_company_list(contact_id, company_id):
 
 
 def db_delete_contract(contract_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''DELETE FROM productcontractlist WHERE idGovernmentContract=%s'''
     cur.execute(sql, (contract_id,))
@@ -517,15 +590,18 @@ def db_delete_contract(contract_id):
 
 
 def db_delete_provider(provider_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idContact FROM contactcompanylist WHERE idCompany=%s'''
     cur.execute(sql, (provider_id,))
     contacts_id = cur.fetchall()
+    # print(contacts_id)
     sql = '''DELETE FROM contactcompanylist WHERE idCompany=%s'''
     cur.execute(sql, (provider_id,))
     if (contacts_id):
-        sql = '''DELETE FROM contact WHERE id IN (%s)'''
-        cur.execute(sql, (contacts_id))
+        for contact_id in contacts_id:
+            sql = '''DELETE FROM contact WHERE id=%s'''
+            cur.execute(sql, (contact_id[0]))
     sql = '''DELETE FROM company WHERE id=%s'''
     cur.execute(sql, (provider_id))
     cur.close()
@@ -533,6 +609,7 @@ def db_delete_provider(provider_id):
 
 
 def db_delete_contact(provider_id, contact_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''DELETE FROM contactcompanylist WHERE idCompany=%s AND idContact=%s'''
     cur.execute(sql, (provider_id, contact_id))
@@ -543,6 +620,7 @@ def db_delete_contact(provider_id, contact_id):
 
 
 def db_add_files(name):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO file (name) VALUES (%s)'''
     cur.execute(sql, (name,))
@@ -554,6 +632,7 @@ def db_add_files(name):
 
 
 def db_add_product_file_list(file_id, prod_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''INSERT INTO productfilelist (idProduct, idFile) VALUES (%s, %s)'''
     cur.execute(sql, (prod_id, file_id))
@@ -561,6 +640,7 @@ def db_add_product_file_list(file_id, prod_id):
     con.commit()
 
 def db_get_product_files(prod_id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT idFile FROM productfilelist WHERE idProduct=%s'''
     cur.execute(sql, (prod_id,))
@@ -577,6 +657,7 @@ def db_get_product_files(prod_id):
 
 
 def db_delete_file(prod_id, file_name):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
     sql = '''SELECT id FROM file WHERE name=%s'''
     cur.execute(sql, (file_name,))

@@ -1,8 +1,13 @@
 from db import *
 from config import contract_folder, secret_folder
 import os
-
 import shutil
+
+def normalize_order(obj):
+    # print(obj)
+    first_level = obj[0]['children']
+    for f in first_level:
+        print(f['name'])
 
 def create_product(id, name, code, number, count, type, state, idProvider, start, end, note):
     return {
@@ -16,8 +21,8 @@ def create_product(id, name, code, number, count, type, state, idProvider, start
         'idState': state,
         'isContract': 1 if idProvider != None else 0,
         'idProvider': idProvider if idProvider != None else 0,
-        'start': start.strftime('%Y-%m-%d') if idProvider != None else None,
-        'end': end.strftime('%Y-%m-%d') if idProvider != None else None,
+        'start': start.strftime('%Y-%m-%d') if idProvider != None and start != None else None,
+        'end': end.strftime('%Y-%m-%d') if idProvider != None and start != None else None,
         'note': note,
         'files': db_get_product_files(id),
         'children': []
@@ -92,14 +97,23 @@ def get_parents(contract_data, productCode, parents, flag):
     for item in contract_data:
         if len(item['children']) != 0:
             if check_children(item['children'], productCode):
-                parents.append(item['name'])
+                parents.append([item['name'], item['code']])
             get_parents(item['children'], productCode, parents, flag)
 
 
-def change_product_in_json(contract_data, product_data, file_pathes):
+def change_product_children(data, idState):
+    for item in data:
+        item['idState'] = idState
+        if len(item['children']) != 0:
+                change_product_children(item['children'], idState)
+
+
+def change_product_in_json(contract_data, product_data, file_pathes, name, code):
     for item in contract_data:
         if int(product_data['id']) == item['id']:
-            # print(item['name'])
+            if name != None and code != None:
+                item['name'] = name
+                item['code'] = code
             item['number'] = product_data['number']
             item['count'] = product_data['count']
             item['idType'] = product_data['idType']
@@ -109,12 +123,13 @@ def change_product_in_json(contract_data, product_data, file_pathes):
             item['start'] = str(product_data['start'])
             item['end'] = str(product_data['end'])
             item['note'] = str(product_data['note'])
+            change_product_children(item['children'], product_data['idState'])
             if len(file_pathes) != 0:
                 for path in file_pathes:
                     item['files'].append(path)
             return 0
         if len(item['children']) != 0:
-                change_product_in_json(item['children'], product_data, file_pathes)
+                change_product_in_json(item['children'], product_data, file_pathes, name, code)
 
 
 def delete_product_in_json(contract_data, product_id, index, files):
@@ -218,6 +233,8 @@ def get_product_from_json(contract_data, product_id, product):
     for item in contract_data:
         if product_id == int(item['id']):
             product['product'] = {
+                'id': item['id'],
+                'dbID': item['dbID'],
                 'name': item['name'],
                 'code': item['code'],
                 'number': item['number'],

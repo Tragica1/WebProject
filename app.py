@@ -1,8 +1,6 @@
 import os
 import json
-from flask import render_template, redirect, url_for, request, flash, jsonify, send_file
-from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
+from flask import render_template, redirect, url_for, request, jsonify, send_file
 from utils import *
 from config import *
 from printree import ptree
@@ -16,7 +14,6 @@ def send_products(contract_id):
     print(f'\nSelected contract: {contract_id}\n')
     if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
         contract_id = db_get_last_contract()
-        # print(contract_id)
         if not os.path.isdir(os.path.join(contract_folder, 'contract_' + str(contract_id))):
             os.mkdir(os.path.join(contract_folder, 'contract_' + str(contract_id)))
     print(contract_id)
@@ -24,6 +21,7 @@ def send_products(contract_id):
     if file[0]: 
         with open(file[1], 'r') as f:
             json_object = f.read()
+            # normalize_order(json.loads(json_object)['data'])
         f.close()
         return json_object
     else:
@@ -34,6 +32,7 @@ def send_products(contract_id):
         for pr_id in products_id:
             product_tree = create_product_tree(pr_id)
             json_data['data'].append(product_tree)
+            # normalize_order(json_data['data'])
         unique_id(json_data['data'], {'id': 0})
         json_object = json.dumps(json_data)
         with open(os.path.join(contract_folder,'contract_' + str(contract_id), 'contract' + str(contract_id) + '.json'), 'x') as f:
@@ -68,8 +67,9 @@ def index():
     sts = db_get_states()
     contrs_types = db_get_contract_types()
     contrs_status = db_get_contract_statuses()
-    for t in tps:
-        types.append(list(t))
+    # for t in tps:
+    #     types.append(list(t))
+    types = [list(tps[5]), list(tps[7]), list(tps[0]), list(tps[2]), list(tps[6]), list(tps[4]), list(tps[1]), list(tps[3])]
     for s in sts:
         states.append(list(s))
     for ct in contrs_types:
@@ -172,15 +172,14 @@ def delete_contact():
 @app.route('/getSelector')
 @jwt_required()
 def create_product_selector():
-    state, prods = db_get_products()
+    state, prods = db_get_products_for_select()
     res = []
     products = []
     for p in prods:
         products.append(list(p))
     if state:
         for product in products:
-            if product[4] == 1:
-                res.append(dict({'id': product[0], 'name': product[1]}))
+            res.append(dict({'id': product[0], 'name': product[1]}))
     return(json.dumps(res))
 
 
@@ -273,9 +272,11 @@ def change_product():
             for filepath in db_file_pathes:
                 file_id = db_add_files(filepath['file'])
                 db_add_product_file_list(file_id, dataToDB['dbID'])
-            change_product_in_json(contract_data['data'], data, db_file_pathes)
+            change_product_in_json(contract_data['data'], data, db_file_pathes, dataToDB['name'], dataToDB['code'])
+        elif data['toDB']:
+            change_product_in_json(contract_data['data'], data, file_pathes, dataToDB['name'], dataToDB['code'])
         else:
-            change_product_in_json(contract_data['data'], data, file_pathes)
+            change_product_in_json(contract_data['data'], data, file_pathes, None, None)
         with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'w') as f:
             json_data = json.dumps(contract_data)
             f.write(json_data)
@@ -283,6 +284,7 @@ def change_product():
         product = {'product': {}}
         get_product_from_json(contract_data['data'], int(data['id']), product)
         print('Product changed successfully')
+        # print(product['product'])
         return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product']})
     except Exception as e:
         print(e)
@@ -438,8 +440,10 @@ def change_provider():
                 if db_check_company_contact_list(int(data['id']), int(contact['id'])) is False:
                     contact_id = db_add_contact(contact['name'], contact['post'], contact['number'], contact['email'])
                     db_add_contact_company_list(contact_id, data['id'])
+                    print('Contact added successfully')
                 else:
                     db_update_contact(contact['id'], contact['name'], contact['post'], contact['number'], contact['email'])
+                    print('Contact changed successfully')
         print('Provider changed successfully')
         return jsonify({'status': 'success', 'message': 'Provider changed successfully'})
     except Exception as e:

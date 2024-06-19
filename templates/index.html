@@ -13,7 +13,7 @@
 </head>
 
 <body class="w-full">
-    <nav class="relative flex w-full flex-wrap items-center justify-between bg-gray-800 py-2 text-white shadow-lg "
+    <nav class="relative flex w-full flex-wrap items-center justify-between bg-gray-800 py-1 text-white shadow-lg "
         data-te-navbar-ref>
         <div class="flex justify-between items-center w-full px-3">
             <div>
@@ -104,8 +104,8 @@
                         <div data-popper-arrow></div>
                     </div>
                     <div id="contract-modal" tabindex="-1" aria-hidden="true"
-                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                        <div class="relative p-4 w-full min-w-fit max-w-2xl min-h-fit">
+                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center min-w-fit md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative p-2 w-full min-w-fit max-w-2xl min-h-fit">
                             <div class="relative bg-white rounded-lg shadow">
                                 <div class="flex items-center justify-between p-2 border-b rounded-t">
                                     <h3 class="text-xl font-semibold text-black ">
@@ -212,9 +212,9 @@
                                                     </svg>
                                                 </button>
                                                 <div id="dropdownProducts"
-                                                    class="z-10 hidden bg-white divide-y divide-gray-700 rounded-lg shadow w-72 ">
+                                                    class="z-10 hidden bg-white divide-y divide-gray-700 rounded-lg shadow w-80 ">
                                                     <ul id="productsSelector"
-                                                        class="h-72 p-3 space-y-3 overflow-y-auto text-gray-700 "
+                                                        class="h-72 p-3 space-y-2 overflow-y-auto text-gray-700 "
                                                         aria-labelledby="dropdownProductsButton">
                                                     </ul>
                                                 </div>
@@ -244,6 +244,41 @@
                         <h3 class="text-sm font-semibold text-center text-white p-2">Статистика</h3>
                         <div data-popper-arrow></div>
                     </div>
+                    <button data-popover-target="popover-settings" data-popover-trigger="click"
+                        data-popover-placement="bottom-end" type="button">
+                        <svg class="w-6 h-6 ms-2 text-blue-500 hover:text-blue-800" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4" />
+                        </svg>
+                        <span class="sr-only"></span>
+                    </button>
+                    <div data-popover id="popover-settings" role="tooltip"
+                        class="absolute z-10 invisible inline-flex w-64 p-2 duration-500 rounded-lg bg-gray-500 border-gray-700">
+                        <div id="settings"
+                            class="p-1 text-sm text-white  bg-gray-500 border-gray-700 rounded-lg">
+                            <div class="flex gap-6  items-center" style="display: none;">
+                                <div class="py-2">
+                                    <h2 class="text-left font-medium text-white">Использовать подсветку выбранных
+                                        элементов?</h2>
+                                </div>
+                                <div>
+                                    <input id="setting1" type="checkbox" value="" name="bordered-checkbox" oninput="changeSettings(this)"
+                                        class="w-5 h-5 text-teal-600 bg-gray-300 border-gray-400 rounded focus:ring-teal-500">
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-center">
+                                <div class=" py-2">
+                                    <h2 class="text-left font-medium text-white">Использовать подсветку статусов?</h2>
+                                </div>
+                                <div>
+                                    <input id="setting2" type="checkbox" value="" name="bordered-checkbox" oninput="changeSettings(this)"
+                                        class="w-5 h-5 text-teal-600 bg-gray-300 border-gray-400 rounded focus:ring-teal-500">
+                                </div>
+                            </div>
+                        </div>
+                        <div data-popper-arrow></div>
+                    </div>
                 </div>
             </div>
 
@@ -263,42 +298,35 @@
         </div>
     </nav>
 
-    <div class="flex justify-between items-start content-around space-x-6 mx-3 pt-5">
-        <div class="w-2/3">
-            <h2 class="mb-2 text-2xl font-semibold text-black">Список изделий: </h2>
+    <div class="flex justify-between items-start content-around space-x-4 mx-2 pt-2">
+        <div class="w-4/6">
+            <h2 class="mb-1 text-2xl font-semibold text-black">Список изделий: </h2>
             <div id="mainTree">
             </div>
             <a data-te-collapse-init href="#collapseThree" role="button" aria-expanded="false"
-                aria-controls="collapseThree" class="flex items-center px-2">
+                aria-controls="collapseThree">
             </a>
         </div>
-        <div id="currentDetal" class="w-1/3">
-            <h2 class="mb-2 text-2xl font-semibold text-black">Деталь: </h2>
-            <div id="currentProduct" class="border border-teal-800 rounded-lg shadow-xl shadow-teal-400 sm:p-6 md:p-8">
+        <div id="currentDetal" class="w-2/6 max-h-min">
+            <h2 class="mb-1 text-2xl font-semibold text-black">Деталь: </h2>
+            <div id="currentProduct" class="border border-teal-800 rounded-lg shadow-xl text-sm shadow-teal-400 md:p-8">
                 <div class="grid grid-cols-3">
-                    <div class="flex col-span-2 gap-3">
-                        <h5 class="font-medium text-black">Режим редактирования базы данных:</h5>
+                    <div class="flex col-span-2 gap-3 text-center items-center">
+                        <h6 class="font-medium text-sm text-black">Режим редактирования базы данных:</h6>
                         <label class="cursor-pointer mb-1" onclick="changeInDB()">
                             <input id="changeInDB" type="checkbox" value="" class="sr-only peer" disabled
                                 data-modal-target="product-changeDB-modal" data-modal-toggle="product-changeDB-modal">
                             <div
-                                class="mt-1 relative w-10 h-5 bg-red-200 hover:ring-red-800 ring-2 ring-red-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all border-gray-700 peer-checked:bg-red-700">
+                                class="mt-1 relative w-10 h-5 bg-gray-200 hover:ring-gray-800 ring-2 ring-gray-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all border-gray-700 peer-checked:bg-red-700">
                             </div>
                         </label>
-                        <!-- <div data-popover id="popover-changeInDB" role="tooltip"
-                                class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                                <h3 class="text-sm font-semibold text-center text-white p-2">Режим редактирования
-                                    шаблона
-                                </h3>
-                                <div data-popper-arrow></div>
-                            </div> -->
                     </div>
                     <div class="flex justify-end">
                         <button id="dropdownProductsParents" data-dropdown-toggle="dropdownParents" disabled
                             data-dropdown-placement="left" data-popover-target="popover-Parents"
                             data-dropdown-placement="bottom" onclick="getProductParents()" type="button">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6 ms-2 text-cyan-500 hover:text-cyan-800">
+                                stroke="currentColor" class="w-5 h-5 ms-2 text-cyan-500 hover:text-cyan-800">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                             </svg>
@@ -309,10 +337,10 @@
                             <h3 class="text-sm font-semibold text-center text-white p-2">Куда входит?</h3>
                             <div data-popper-arrow></div>
                         </div>
-                        <div id="dropdownParents" style="inset: 0px auto auto -78px;"
+                        <div id="dropdownParents"
                             class="hidden bg-white divide-y divide-gray-900 rounded-lg shadow w-72">
                             <ul id="parentsSelector"
-                                class="h-20 p-3 space-y-3 text-sm overflow-y-auto text-black border border-black rounded-lg"
+                                class="h-20 p-2 space-y-3 text-sm overflow-y-auto text-black border border-black rounded-lg"
                                 aria-labelledby="dropdownProductsParents">
                             </ul>
                         </div>
@@ -320,7 +348,7 @@
                             data-popover-target="popover-addButton" data-modal-target="product-add-modal"
                             data-modal-toggle="product-add-modal">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6 text-left text-green-500 hover:text-green-800">
+                                stroke="currentColor" class="w-5 h-5 text-left text-green-500 hover:text-green-800">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
@@ -333,7 +361,7 @@
                         <button id="deleteButton" type="button" data-popover-target="popover-deleteButton" disabled
                             data-modal-target="product-delete-modal" data-modal-toggle="product-delete-modal">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" stroke-width="1.5"
-                                stroke="currentColor" class="w-6 h-6 text-left text-red-500 hover:text-red-800">
+                                stroke="currentColor" class="w-5 h-5 text-left text-red-500 hover:text-red-800">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
@@ -346,23 +374,23 @@
                     </div>
                 </div>
                 <hr id="dbID" class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
-                <div id="product-change-modal" class="pt-2 space-y-6 text-lg">
-                    <div id="hideen5" class="pt-2 space-y-6 text-lg">
+                <div id="product-change-modal" class=" space-y-1 text-sm">
+                    <div id="hideen5" class="pt-2 space-y-1 text-sm">
                         <h5 id="productName" class="font-medium text-black">Изделие: </h5>
                         <h5 id="productCode" class="font-medium text-black">Обозначение: </h5>
                         <hr class="mt-1 mx-auto h-px bg-black border-teal-800 border-2">
                     </div>
-                    <div id="hideen6" class="pt-2 space-y-6 text-lg">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div id="hideen6" class="pt-2 space-y-1 text-sm">
+                        <div class="grid grid-cols-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Изделие: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="text" id="productNameforDB"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Обозначение: </h2>
                             </div>
@@ -372,13 +400,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black ">Тип: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <select id="productType"
-                                class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block min-w-full p-2.5">
+                                class="bg-green-500 hover:bg-green-800 text-sm border border-black text-white focus:ring-0 rounded-md block min-w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for type in types %}
                                 {%if type[0] == 1%}
@@ -390,13 +418,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black ">Состояние: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <select id="productState"
-                                class="bg-blue-500 hover:bg-blue-800 text-lg border border-black text-white focus:ring-0 rounded-md block min-w-full p-2.5">
+                                class="bg-blue-500 hover:bg-blue-800 text-sm border border-black text-white focus:ring-0 rounded-md block min-w-full p-2.5">
                                 <option value="" selected disabled hidden></option>
                                 {% for state in states %}
                                 {%if state[0] == 1%}
@@ -409,25 +437,25 @@
                             </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="text" id="productNumber" value="б/н"
-                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Кол-во: </h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <input type="number" id="productCount" value="1"
-                                class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Покупное изделие:</h2>
                         </div>
@@ -437,24 +465,9 @@
                         </div>
                     </div>
                     <div id="hideen1">
-                        <div class="grid grid-cols-2 gap-4 py-2 items-baseline ">
+                        <div class="grid grid-cols-2 py-2 items-baseline ">
                             <div class="inline-flex grid-rows-1 py-2">
                                 <div class="flex grid-cols-2 gap-4 py-2">
-                                    <!-- <button type="button" data-modal-target="company-modal"
-                                        data-popover-target="popover-addProvider" data-modal-toggle="company-modal">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22"
-                                            stroke-width="1.5" stroke="currentColor"
-                                            class="w-5 h-5  text-left text-green-500 hover:text-green-800">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                        </svg>
-                                    </button>
-                                    <div data-popover id="popover-addProvider" role="tooltip"
-                                        class="absolute z-10 invisible inline-block w-auto text-sm  transition-opacity duration-300 bg-gray-500 border border-gray-500 rounded-lg shadow-sm opacity-0 ">
-                                        <h3 class="text-sm font-semibold text-center text-white p-2">Добавить поставщика
-                                        </h3>
-                                        <div data-popper-arrow></div>
-                                    </div> -->
                                     <button type="button" data-modal-target="company-modal"
                                         data-popover-target="popover-editProvider" data-modal-toggle="company-modal">
                                         <svg class="w-5 h-5 text-blue-500 hover:text-blue-800" aria-hidden="true"
@@ -478,7 +491,7 @@
                                 <div data-popover-target="popover-description-provider-1" data-popover-placement="left"
                                     type="button">
                                     <select id="productProvider" onchange="showContacts(this)"
-                                        class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                        class="bg-violet-500 hover:bg-violet-800 text-sm border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                     </select>
                                 </div>
                                 <div data-popover id="popover-description-provider-1" role="tooltip"
@@ -502,37 +515,37 @@
 
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 py-2">
+                        <div class="grid grid-cols-2 py-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-gray-900 ">Подписание:
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="date" id="startDate"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 py-2">
+                        <div class="grid grid-cols-2 py-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Исполнение:
                                 </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="date" id="endDate"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Примечание:</h2>
                         </div>
                         <div class="grid grid-rows-1">
                             <textarea id="productNote" rows="4"
-                                class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
+                                class="block p-2.5 w-full text-sm text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 ">
                         <div class="grid grid-rows-1 py-2 text-center">
                             <h2 class="text-left font-medium text-black">Файлы:</h2>
                         </div>
@@ -548,7 +561,8 @@
                                                 stroke-width="2"
                                                 d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                                         </svg>
-                                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Нажмите чтобы
+                                        <p class="mb-2 text-sm text-gray-500"><span
+                                                class="font-semibold text-center items-center">Нажмите чтобы
                                                 загрузить файл.</span></p>
                                     </div>
                                     <input id="productFile" oninput="showFileList('productFile', 'productFilesList')"
@@ -558,18 +572,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 items-center">
-                        <div class="grid grid-rows-1 py-2 text-center">
+                    <div class="flex-col  items-center">
+                        <div class="py-2 text-left">
                             <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
+                            <div id="fileList" class="pt-2 overflow-hidden grid grid-rows-1"> Файлы не найдены
+                            </div>
                         </div>
-                        <div id="fileList" class="relative grid grid-rows-1"> Файлы не найдены
-                        </div>
+
                     </div>
-                    <div id="changeButton" class="grid grid-cols-2 gap-4 py-2">
-                        <div class="grid grid-rows-1 py-2 text-center">
+                    <div id="changeButton" class="grid grid-cols-2 py-1">
+                        <div class="grid grid-rows-1 gap-0 py-2 text-center">
                             <button id="chButton" data-modal-hide="company-modal" type="button"
                                 onclick="changeProduct()"
-                                class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center">
+                                class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-lg px-2 py-2 text-center">
                                 Сохранить</button>
 
                         </div>
@@ -729,8 +744,7 @@
                                 </div> -->
                             </div>
                             <div class="h-1/6 p-3 border-t border-gray-200 rounded-b ">
-                                <button type="button" id="providerEditSave"
-                                    onclick="changeProvider()"
+                                <button type="button" id="providerEditSave" onclick="changeProvider()"
                                     class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-lg px-5 py-2 text-center ">
                                     Сохранить</button>
                             </div>

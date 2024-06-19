@@ -331,48 +331,33 @@ function contractsChart1(contracts) {
 
 function contractsChart2(products) {
     // var products = my_data['products']
-    var types = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var types = [0, 0, 0, 0, 0, 0, 0, 0]
     var states = [0, 0, 0, 0, 0]
     products.forEach((product) => {
         switch (product['type']) {
             case 1:
-                types[0] += 1
-                break
-            case 2:
-                types[1] += 1
-                break
-            case 3:
                 types[2] += 1
                 break
-            case 4:
+            case 2:
+                types[6] += 1
+                break
+            case 3:
                 types[3] += 1
                 break
             case 5:
-                types[4] += 1
-                break
-            case 6:
-                types[5] += 1
-                break
-            case 7:
-                types[6] += 1
-                break
-            case 8:
                 types[7] += 1
                 break
+            case 7:
+                types[5] += 1
+                break
             case 9:
-                types[8] += 1
+                types[0] += 1
                 break
             case 10:
-                types[9] += 1
+                types[4] += 1
                 break
-            case 11:
-                types[10] += 1
-                break
-            case 12:
-                types[11] += 1
-                break
-            case 13:
-                types[12] += 1
+            case 14:
+                types[1] += 1
                 break
         }
         switch (product['state']) {
@@ -395,7 +380,7 @@ function contractsChart2(products) {
     })
     option_types = {
         series: types,
-        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232", "#E06666", "#C90076", "#134F5C", "#3A2386", "#D29534", "#BA13D4", "#24C8ED", "#ED120E"],
+        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232", "#E06666", "#C90076", "#134F5C"],
         chart: {
             height: 620,
             width: "100%",
@@ -416,7 +401,7 @@ function contractsChart2(products) {
                 }
             },
         },
-        labels: ["Сборочная единица", "Материал", "Деталь", "Программное обеспечение", "Комплект", "Комплект принадлежностей", "Прочее изделие", "Часть прочего изделия", "Документ", "Стандартное изделие", "Комплект запасных частей", "Комплект сменных частей", "Инструмент"],
+        labels: ["Документация", "Комплекс", "Сборочная единица", "Деталь", "Стандартное изделие", "Прочее изделие", "Материал", "Комплект"],
         dataLabels: {
             enabled: true,
             style: {
@@ -451,7 +436,7 @@ function contractsChart2(products) {
     }
     option_state = {
         series: states,
-        colors: ["#1C64F2", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232"],
+        colors: ["#93c5fd", "#16BDCA", "#9061F9", "#6AA84F", "#F1C232"],
         chart: {
             height: 620,
             width: "100%",
@@ -472,7 +457,7 @@ function contractsChart2(products) {
                 }
             },
         },
-        labels: ["Комплектование", "Закупка", "Закупка - Согласование договора", "Закупка - Исполнение договора", "Укомплектован"],
+        labels: ["Комплектование", "Закупка - Служба УСИС", "Закупка - Согласование договора", "Закупка - Исполнение договора", "Укомплектован"],
         dataLabels: {
             enabled: true,
             style: {
