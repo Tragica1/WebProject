@@ -15,8 +15,8 @@ def create_product(id, name, code, number, count, type, state, idProvider, start
         'dbID': id,
         'name': fix_quotes(str(name)),
         'code': code,
-        'number': number,
-        'count': count,
+        'number': number if number else "",
+        'count': count if count else 1,
         'idType': type, 
         'idState': state,
         'isContract': 1 if idProvider != None else 0,
@@ -86,6 +86,21 @@ def check_contract_file(contract_id):
     return [False, None]
 
 
+def get_row(data, result):
+    for item in data:    
+        if (item['idType'] == 2 or item['idType'] == 3 or item['idType'] == 7 or item['idType'] == 10):
+            result.append({'Название': item['name'], 'Обозначение': item['code'], 'Тип': db_get_type(item['idType'])[0], 'Зав. номер': item['number'], 'Количество': item['count']})        
+        if len(item['children']) != 0:
+            get_row(item['children'], result)
+
+
+def get_product(data, itemId, myItem):
+    for item in data:
+        if item['id'] == int(itemId):
+            myItem.append(item)
+        if len(item['children']) != 0:
+            get_product(item['children'], itemId, myItem)
+
 def check_children(my_list, code):
     for l in my_list:
         if l['code'] == code:
@@ -114,8 +129,8 @@ def change_product_in_json(contract_data, product_data, file_pathes, name, code)
             if name != None and code != None:
                 item['name'] = name
                 item['code'] = code
-            item['number'] = product_data['number']
-            item['count'] = product_data['count']
+            item['number'] = product_data['number'] if product_data['number'] else ""
+            item['count'] = product_data['count'] if product_data['count'] else 1
             item['idType'] = product_data['idType']
             item['idState'] = product_data['idState']
             item['isContract'] = int(product_data['isContract'])
@@ -178,7 +193,7 @@ def get_product_children_from_json(contract_data, id):
 def change_children(data, contract_data, my_id):
     for item in data:
         get_new_product_id(contract_data, my_id)
-        my_id['id'] +=1
+        my_id['id'] += 1
         item['id'] = my_id['id']
         print(item['id'])
         if len(item['children']) != 0:
@@ -189,7 +204,8 @@ def add_product_in_json(contract_data, product_data, file_pathes, chl, new_id):
     for item in contract_data:
         if int(product_data['mainProductId']) == item['id']:
             item['children'].append({
-                'id': new_id['id'],
+                'id': new_id['id']+1,
+                'dbID': product_data['dbId'],
                 'name': product_data['name'],
                 'code': product_data['code'],
                 'number': product_data['number'],
@@ -224,7 +240,7 @@ def delete_file_in_json(contract_data, product_id, file_name, file_list):
 
 def get_products_from_json(contract_data, products):
     for item in contract_data:
-        products.append({'id': int(item['id']), 'name': item['name'], 'type': 'json'})
+        products.append({'id': int(item['id']), 'name': item['name'], 'code': item['code'], 'type': 'json'})
         if len(item['children']) != 0:
             get_products_from_json(item['children'], products)
 
@@ -273,6 +289,13 @@ def get_products_for_statistic(contract_data, products):
         if len(item['children']) != 0:
             get_products_for_statistic(item['children'], products)
 
+
+def get_products_for_timechart(contract_data, products):
+    for item in contract_data:
+        if item['idProvider'] != 0:
+            products.append({'id': int(item['id']), 'name': item['name'], 'code': item['code'], 'provider': db_get_company(item['idProvider']), 'start': item['start'], 'end': item['end']})
+        if len(item['children']) != 0:
+            get_products_for_timechart(item['children'], products)
 
 def unique_id(contract_data, num):
     for item in contract_data:

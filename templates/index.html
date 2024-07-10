@@ -17,7 +17,7 @@
         data-te-navbar-ref>
         <div class="flex justify-between items-center w-full px-3">
             <div>
-                <div class="relative ml-2" data-te-dropdown-ref>
+                <div class="relative max-w-fit ml-2" data-te-dropdown-ref>
                     <a class="flex items-center text-white transition duration-200 hover:text-gray-400 focus:text-grey-400 motion-reduce:transition-none text-4xl font-bold whitespace-nowrap"
                         href="#" type="button" id="dropdownMenuButton2" data-te-dropdown-toggle-ref
                         aria-expanded="false">
@@ -255,15 +255,15 @@
                     </button>
                     <div data-popover id="popover-settings" role="tooltip"
                         class="absolute z-10 invisible inline-flex w-64 p-2 duration-500 rounded-lg bg-gray-500 border-gray-700">
-                        <div id="settings"
-                            class="p-1 text-sm text-white  bg-gray-500 border-gray-700 rounded-lg">
+                        <div id="settings" class="p-1 text-sm text-white  bg-gray-500 border-gray-700 rounded-lg">
                             <div class="flex gap-6  items-center" style="display: none;">
                                 <div class="py-2">
                                     <h2 class="text-left font-medium text-white">Использовать подсветку выбранных
                                         элементов?</h2>
                                 </div>
                                 <div>
-                                    <input id="setting1" type="checkbox" value="" name="bordered-checkbox" oninput="changeSettings(this)"
+                                    <input id="setting1" type="checkbox" value="" name="bordered-checkbox"
+                                        oninput="changeSettings(this)"
                                         class="w-5 h-5 text-teal-600 bg-gray-300 border-gray-400 rounded focus:ring-teal-500">
                                 </div>
                             </div>
@@ -272,7 +272,8 @@
                                     <h2 class="text-left font-medium text-white">Использовать подсветку статусов?</h2>
                                 </div>
                                 <div>
-                                    <input id="setting2" type="checkbox" value="" name="bordered-checkbox" oninput="changeSettings(this)"
+                                    <input id="setting2" type="checkbox" value="" name="bordered-checkbox"
+                                        oninput="changeSettings(this)"
                                         class="w-5 h-5 text-teal-600 bg-gray-300 border-gray-400 rounded focus:ring-teal-500">
                                 </div>
                             </div>
@@ -307,9 +308,9 @@
                 aria-controls="collapseThree">
             </a>
         </div>
-        <div id="currentDetal" class="w-2/6 max-h-min">
+        <div id="currentDetal" class="w-2/6 ">
             <h2 class="mb-1 text-2xl font-semibold text-black">Деталь: </h2>
-            <div id="currentProduct" class="border border-teal-800 rounded-lg shadow-xl text-sm shadow-teal-400 md:p-8">
+            <div id="currentProduct"  class="border h-custom overflow-y-auto border-teal-800 rounded-lg shadow-xl text-sm shadow-teal-400 md:p-8">
                 <div class="grid grid-cols-3">
                     <div class="flex col-span-2 gap-3 text-center items-center">
                         <h6 class="font-medium text-sm text-black">Режим редактирования базы данных:</h6>
@@ -820,18 +821,22 @@
                             onclick="checkAnswer(0)"
                             class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-10">
                             Нет</button>
+
                     </div>
                 </div>
             </div>
         </div>
+        <audio id="sound">
+            <source src="./static/sounds/doom.mp3" type="audio/mp3">
+        </audio>
         <!-- Добавление изделия  -->
         <div id="product-add-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true"
-            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative p-4 w-full max-w-3xl max-h-full">
-                <div class="relative bg-white rounded-lg shadow p-2">
-                    <div class=" p-4 md:p-2 border-b rounded-t">
+            class="hidden   overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-2rem)] max-h-full">
+            <div class="relative px-2 w-full max-w-2xl  ">
+                <div class="p-1 relative overflow-y-auto h-custom-2 bg-white rounded-lg shadow">
+                    <div class="border-b rounded-t">
                         <div class="flex items-center justify-between">
-                            <h4 class="text-xl font-semibold text-black ">
+                            <h4 class="text-lg font-semibold text-black ">
                                 Добавление изделия в:
                             </h4>
                             <div class="float-right inline-flex items-center">
@@ -860,52 +865,52 @@
                             </div>
                         </div>
                         <div id="addDiv1">
-                            <h4 id="mainProduct" class="text-xl text-black ">
+                            <h4 id="mainProduct" class="text-lg text-black ">
                             </h4>
                         </div>
                     </div>
-                    <div id="addDiv2" class=" p-4 md:p-2 border-b rounded-t">
-                        <div class="flex items-center justify-between">
-                            <h4 class="text-xl font-semibold text-black ">
+                    <div id="addDiv2" class="p-2 border-b rounded-t">
+                        <div class="flex text-left justify-between">
+                            <h5 class="text-sm text-left font-semibold text-black ">
                                 Список существующих изделий:
-                            </h4>
+                            </h5>
                             <div id="autocompleteDiv" class="relative inline-block w-full">
                                 <input type="text" id="productInput"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full ps-2 p-2.5  "
+                                    class="overflow-hidden max-h-48 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full ps-2 p-2.5  "
                                     placeholder="Поиск по изделиям..." required />
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-5 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Название: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="text" id="newProductName" required
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Обозначение: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="text" id="newProductCode" required
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Тип: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <select id="newProductType" required
-                                    class="bg-green-500 hover:bg-green-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                    class="bg-green-500 hover:bg-green-800 text-sm border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                     <!-- <option value="1" selected></option> -->
                                     {% for type in types %}
                                     <option value="{{type[0]}}">{{type[1]}}</option>
@@ -914,14 +919,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Статус: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <select id="newProductState"
-                                    class="bg-blue-500 hover:bg-blue-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
+                                    class="bg-blue-500 hover:bg-blue-800 text-sm border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                     <!-- <option value="1" selected></option> -->
                                     {% for state in states %}
                                     <option value="{{state[0]}}">{{state[1]}}</option>
@@ -930,106 +935,99 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Зав. номер: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="text" id="newProductNumber"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Кол-во: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <input type="number" id="newProductCount"
-                                    class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                    class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                             </div>
                         </div>
                     </div>
-                    <div id="hideen3" class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div id="hideen3" class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Головное изделие: </h2>
                             </div>
                             <div class="grid grid-rows-1 items-center">
                                 <input id="newProductIsMain" type="checkbox" value="" name="bordered-checkbox"
-                                    class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
+                                    class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Покупное изделие: </h2>
                             </div>
                             <div class="grid grid-rows-1 items-center">
                                 <input id="newProductisLocalContract" type="checkbox" value="" name="bordered-checkbox"
-                                    class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
+                                    class="w-4 h-4 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                             </div>
                         </div>
                     </div>
                     <div id="hideen2">
-                        <div class="p-4 md:p-2 space-y-4 text-xl">
-                            <div class="grid grid-cols-2 gap-4">
+                        <div class="px-2 py-1 space-y-3 text-sm">
+                            <div class="grid grid-cols-2 gap-2">
                                 <div class="grid grid-rows-1 py-2 text-center">
                                     <h2 class="text-left font-medium text-black">Поставщик: </h2>
                                 </div>
                                 <div class="grid grid-rows-1">
                                     <select id="newProductProvider"
-                                        class="bg-violet-500 hover:bg-violet-800 text-lg border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
-                                        <!-- <option value="" selected disabled hidden></option>
-                                    {% for company in companies %}
-                                    <option id="company{{company[0]}}" data-address="{{company[2]}}"
-                                        data-contacts="{{company[3]}}" value="{{company[0]}}">
-                                        {{company[1]}}
-                                    </option>
-                                    {% endfor %} -->
+                                        class="bg-violet-500 hover:bg-violet-800 text-sm border border-black text-white focus:ring-0 rounded-md block w-full p-2.5">
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-4 md:p-2 space-y-4 text-xl">
-                            <div class="grid grid-cols-2 gap-4">
+                        <div class="px-2 py-1 space-y-3 text-sm">
+                            <div class="grid grid-cols-2 gap-2">
                                 <div class="grid grid-rows-1 py-2 text-center">
                                     <h2 class="text-left font-medium text-black">Подписание: </h2>
                                 </div>
                                 <div class="grid grid-rows-1">
                                     <input type="date" id="newProductStartDate"
-                                        class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                        class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                             </div>
                         </div>
-                        <div class="p-4 md:p-2 space-y-4 text-xl">
-                            <div class="grid grid-cols-2 gap-4">
+                        <div class="px-2 py-1 space-y-3 text-sm">
+                            <div class="grid grid-cols-2 gap-2">
                                 <div class="grid grid-rows-1 py-2 text-center">
                                     <h2 class="text-left font-medium text-black">Исполнение: </h2>
                                 </div>
                                 <div class="grid grid-rows-1">
                                     <input type="date" id="newProductEndDate"
-                                        class="bg-gray-50 text-lg border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                                        class="bg-gray-50 text-sm border border-gray-300 text-black rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Примечание: </h2>
                             </div>
                             <div class="grid grid-rows-1">
                                 <textarea id="newProductNote" rows="4"
-                                    class="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
+                                    class="block p-2.5 w-full text-sm text-black bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-500 focus:border-teal-500"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Файлы: </h2>
                             </div>
@@ -1057,8 +1055,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 md:p-2 space-y-4 text-xl">
-                        <div class="grid grid-cols-2 gap-4 items-center">
+                    <div class="px-2 py-1 space-y-3 text-sm">
+                        <div class="grid grid-cols-2 gap-2 items-center">
                             <div class="grid grid-rows-1 py-2 text-center">
                                 <h2 class="text-left font-medium text-black">Доступные файлы: </h2>
                             </div>
@@ -1066,10 +1064,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                        <!-- <div class="flex items-center justify-between"> data-modal-hide="product-add-modal"-->
+                    <div class="flex items-center justify-between p-2 border-t border-gray-200 rounded-b ">
                         <button type="button" onclick="addNewProduct()"
-                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center ">
+                            class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center ">
                             Сохранить</button>
 
                         <div id="hideen4" class="float-right inline-flex items-center">
@@ -1079,10 +1076,7 @@
                             <input id="addProductChildren" type="checkbox" value="" name="bordered-checkbox"
                                 class="w-5 h-5 text-teal-600 bg-gray-100 border-gray-300 rounded focus:ring-teal-500">
                         </div>
-
-                        <!-- </div> -->
                     </div>
-
                 </div>
             </div>
         </div>

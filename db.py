@@ -288,12 +288,12 @@ def db_get_products_for_select():
 def db_get_products_for_autocomplete():
     con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
     cur = con.cursor()
-    sql = '''SELECT id, name FROM product'''
+    sql = '''SELECT id, name, code FROM product'''
     cur.execute(sql)
     products = cur.fetchall()
     result = []
     for p in products:
-        result.append({'id': int(p[0]), 'name': p[1], 'type': 'db'})
+        result.append({'id': int(p[0]), 'name': p[1], 'code': p[2], 'type': 'db'})
     cur.close()
     return result
 
@@ -306,6 +306,7 @@ def db_get_product_for_autocomplete(id):
     product = cur.fetchone()
     cur.close()
     return {
+        'dbId': product[0],
         'name': product[1],
         'code': product[2],
         'number': product[3],
@@ -321,6 +322,14 @@ def db_get_product_for_autocomplete(id):
         'children': []
     }
 
+def db_get_company(id):
+    con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)
+    cur = con.cursor()
+    sql = '''SELECT name FROM company WHERE id=%s'''
+    cur.execute(sql, (id,))
+    company = cur.fetchone()
+    cur.close()
+    return company
 
 def db_get_product(id):
     con = ps.connect(database="mydb", user="root", password="123", host="localhost", port=3306)

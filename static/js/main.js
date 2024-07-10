@@ -11,7 +11,7 @@ function getContractFromStorage() {
         document.getElementById('setting1').checked = Number(settings[0].status)
         document.getElementById('setting2').checked = Number(settings[1].status)
     } else {
-        localStorage.setItem("settings", JSON.stringify([{'id': 'setting1', 'status': false}, {'id': 'setting2', 'status': false}]))
+        localStorage.setItem("settings", JSON.stringify([{ 'id': 'setting1', 'status': false }, { 'id': 'setting2', 'status': false }]))
     }
 
     var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
@@ -809,6 +809,7 @@ function deleteProduct() {
         'contractId': contractInfo['id'],
         'productId': $("#currentProduct").val().slice(14),
     }
+    console.log(formData)
     $.ajax({
         type: 'POST',
         url: '/deleteProduct',
@@ -830,7 +831,7 @@ function deleteProduct() {
 
 
 function editProduct() {
-    document.getElementById('currentProduct').className = 'w-full max-w-xl border-2 border-green-700/25 rounded-lg shadow-xl sm:p-6 md:p-8 hover:shadow-green-800 duration-500'
+    document.getElementById('currentProduct').className = 'w-full h-custom overflow-y-auto max-w-xl border-2 border-green-700/25 rounded-lg shadow-xl  md:p-8 hover:shadow-green-800 duration-500'
     document.getElementById('productType').removeAttribute('disabled')
     document.getElementById('productState').removeAttribute('disabled')
     document.getElementById('productNumber').removeAttribute('disabled')
@@ -1059,39 +1060,74 @@ function showProduct(id, dbID, name, code, number, type, count, state, isContrac
     document.getElementById('hideen4').style.display = 'none'
     // document.getElementById('addInDB').removeAttribute('disabled')
     if (document.getElementById('changeInDB').checked == true) {
-        document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 sm:p-6 md:p-8'
+        document.getElementById('currentProduct').className = 'w-full h-custom overflow-y-auto max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 md:p-8'
     } else {
-        document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
+        document.getElementById('currentProduct').className = 'w-full h-custom overflow-y-auto max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 md:p-8'
     }
-    // document.getElementById('currentProduct').className = 'w-full max-w-2xl border duration-500 border-teal-800 shadow-xl hover:shadow-teal-800 rounded-lg shadow-teal-600 sm:p-6 md:p-8'
     var currentElem = document.getElementById('element' + id)
     changeArrow(id)
-
     if (currentElem != previousElem && previousElem) {
         if (previousElem.className.indexOf('text-lg') != -1) {
-            previousElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"
-            var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
-            mxm.classList.remove('rounded-lg')
-            mxm.classList.remove('bg-teal-100')
+            if (document.getElementById('changeInDB').checked) {
+                previousElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center hover:bg-red-400 duration-300 rounded-lg"
+                var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
+                mxm.classList.remove('rounded-lg')
+                mxm.classList.remove('bg-red-100')
+            } else {
+                previousElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"
+                var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
+                mxm.classList.remove('rounded-lg')
+                mxm.classList.remove('bg-teal-100')
+            }
+
         } else {
-            previousElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
+            if (document.getElementById('changeInDB').checked) {
+                previousElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center hover:bg-red-300 duration-200 rounded-lg ml-2"
+
+            } else {
+                previousElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-200 rounded-lg ml-2"
+            }
         }
         if (currentElem.className.indexOf('text-lg') != -1) {
-            currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
-            var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
-            mxm.classList.add('rounded-lg')
-            mxm.classList.add('bg-teal-100')
+            if (document.getElementById('changeInDB').checked) {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-red-400 rounded-lg"
+                var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+                mxm.classList.add('rounded-lg')
+                mxm.classList.add('bg-red-100')
+
+            } else {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
+                var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+                mxm.classList.add('rounded-lg')
+                mxm.classList.add('bg-teal-100')
+            }
         } else {
-            currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
+            if (document.getElementById('changeInDB').checked) {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-red-300 rounded-lg ml-2"
+
+            } else {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
+            }
         }
     } else {
         if (currentElem.className.indexOf('text-lg') != -1) {
-            currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
-            var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
-            mxm.classList.add('rounded-lg')
-            mxm.classList.add('bg-teal-100')
+            if (document.getElementById('changeInDB').checked) {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-red-400 rounded-lg"
+                var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+                mxm.classList.add('rounded-lg')
+                mxm.classList.add('bg-red-100')
+            } else {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 rounded-lg"
+                var mxm = document.getElementById(currentElem.getAttribute('aria-controls'))
+                mxm.classList.add('rounded-lg')
+                mxm.classList.add('bg-teal-100')
+            }
         } else {
-            currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
+            if (document.getElementById('changeInDB').checked) {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-red-300 rounded-lg ml-2"
+            } else {
+                currentElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-teal-300 rounded-lg ml-2"
+            }
         }
     }
     previousElem = currentElem
@@ -1163,6 +1199,7 @@ function addNewProduct() {
     var data = {
         'contractId': contractInfo['id'],
         'mainProductId': -1,
+        'dbId': document.getElementById('productInput').getAttribute('ch-prod-id'),
         'name': $('#newProductName').val(),
         'code': $('#newProductCode').val(),
         'idType': $("#newProductType").val(),
@@ -1416,14 +1453,16 @@ function downloadFile(filePath, filename) {
     })
 }
 
+
 function openTreeElems(condition) {
     if (localStorage.getItem("elemsInfo")) {
         var elemsInfo = JSON.parse(localStorage.getItem("elemsInfo"))
         for (var i = 0; i < elemsInfo.length; i++) {
             if (elemsInfo[i]['clicked']) {
-                document.getElementById(elemsInfo[i]['id']).click()
+                if (document.getElementById(elemsInfo[i]['id'])) {
+                    document.getElementById(elemsInfo[i]['id']).click()
+                }
                 if (condition) {
-                    // console.log(condition)
                     elemsInfo[i]['clicked'] = true
                 }
             }
@@ -1598,9 +1637,11 @@ function changeProduct() {
                 // startCreation(contractInfo['id'])
                 cleanInputWindow('product-change-modal')
                 document.getElementById('element' + data['id']).setAttribute('id-state', data['idState'])
-                var my_ul = document.getElementById(document.getElementById('element' + data['id']).getAttribute('aria-controls'))
-                console.log(typeof (my_ul))
-                updateCurrentBranch(my_ul, data['idState'])
+                if (document.getElementById(document.getElementById('element' + data['id']).getAttribute('aria-controls'))) {
+                    var my_ul = document.getElementById(document.getElementById('element' + data['id']).getAttribute('aria-controls'))
+                    console.log(typeof (my_ul))
+                    updateCurrentBranch(my_ul, data['idState'])
+                }
                 updateProduct(data['id'], response['product'])
                 console.log(response);
             },
@@ -1634,6 +1675,7 @@ function changeSettings(elem) {
     }
     makeColorByType()
 }
+
 
 function updateCurrentBranch(my_ul, newType) {
     console.log(my_ul)
@@ -1671,6 +1713,7 @@ function addProductSelect() {
     }
 };
 
+
 function changeGroupArrow(name, id) {
     var my_elem = document.getElementById(String(name) + String(id))
     var d = my_elem.childNodes
@@ -1686,6 +1729,7 @@ function changeGroupArrow(name, id) {
     }
     d[0].setAttribute('d-num', s)
 }
+
 
 function createTree(element, data, idd, i) {
     const treeElement = document.createElement('ul');
@@ -1768,7 +1812,7 @@ function createTree(element, data, idd, i) {
             const doclistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (doc_flag == true) {
-                doclistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementDoc` + item.id + `" data-te-collapse-init href="#` + docTreeElement.id + `"` +
+                doclistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementDoc` + item.id + `" name="elementOfTree" data-te-collapse-init href="#` + docTreeElement.id + `"` +
                     `role="button" aria-expanded="false" aria-controls="collapseDoc` + doc_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementDoc", ` + item.id + `)'>` +
                     `<div d-num="0">` +
@@ -1791,7 +1835,7 @@ function createTree(element, data, idd, i) {
             const materialistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (material_flag == true) {
-                materialistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementMaterial` + item.id + `"  data-te-collapse-init href="#` + materialTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseMaterial` + material_tmp + `"` +
+                materialistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementMaterial` + item.id + `" name="elementOfTree"  data-te-collapse-init href="#` + materialTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseMaterial` + material_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementMaterial", ` + item.id + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -1813,7 +1857,7 @@ function createTree(element, data, idd, i) {
             const detaillistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (detail_flag == true) {
-                detaillistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementDetail` + item.id + `" data-te-collapse-init href="#` + detailTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseDetail` + detail_tmp + `"` +
+                detaillistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementDetail` + item.id + `" name="elementOfTree" data-te-collapse-init href="#` + detailTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseDetail` + detail_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementDetail", ` + item.id + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -1835,7 +1879,7 @@ function createTree(element, data, idd, i) {
             const standartlistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (standart_flag == true) {
-                standartlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementStandart` + item.id + `" data-te-collapse-init href="#` + standartTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseStandart` + standart_tmp + `"` +
+                standartlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementStandart` + item.id + `" name="elementOfTree" data-te-collapse-init href="#` + standartTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseStandart` + standart_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementStandart", ` + item.id + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -1857,7 +1901,7 @@ function createTree(element, data, idd, i) {
             const otherlistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (other_flag == true) {
-                otherlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementOther` + item.id + `" data-te-collapse-init href="#` + otherTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseOther` + other_tmp + `"` +
+                otherlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementOther` + item.id + `" name="elementOfTree" data-te-collapse-init href="#` + otherTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseOther` + other_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementOther", ` + item.id + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -1879,7 +1923,7 @@ function createTree(element, data, idd, i) {
             const kitlistItem = document.createElement('li')
             const listItem = document.createElement('li')
             if (kit_flag == true) {
-                kitlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementKit` + item.id + `" data-te-collapse-init href="#` + kitTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseKit` + kit_tmp + `"` +
+                kitlistItem.innerHTML = `<div id="elementDiv` + item.id + `" class="inline-flex items-center "><a id="elementKit` + item.id + `" name="elementOfTree" data-te-collapse-init href="#` + kitTreeElement.id + `" role="button" aria-expanded="false" aria-controls="collapseKit` + kit_tmp + `"` +
                     `class="inline-flex font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg" onclick='changeGroupArrow("elementKit", ` + item.id + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
@@ -1934,53 +1978,58 @@ function createTree(element, data, idd, i) {
                 listItem.innerHTML = `<div id="elementDiv` + item.id + `" z-20 class="grid grid-cols-4 items-center">` +
                     `<a id="element` + item.id + `" name="elementOfTree" id-state="` + item.idState + `" data-te-collapse-init href="#collapse` + tmp + `"` +
                     `role="button" aria-expanded="false" aria-controls="collapse` + tmp + `"` +
-                    `class="flex col-span-3 font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"  oncontextmenu='customContextMenu("` + item.id + `", "` + item.name + `")'` +
+                    `class="flex col-span-3 font-serif text-lg p-0.5 text-black italic items-center hover:bg-teal-400 duration-300 rounded-lg"` +
                     `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
                     `<div d-num="0">` +
                     `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">` +
                     `<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>` +
-                    `<span>` + item.name + `</span></a><span class="text-xs px-2 font-serif justify-items-end text-black font-bold"> ` + item.code + `</span>`  +
+                    `<span oncontextmenu='customContextMenu(` + item.id + `, event)'>` + item.name + `</span></a><span class="text-xs px-2 font-serif justify-items-end text-black font-bold">` + item.code +
+                    `</span>` +
+                    `<div state="0" id="custom-menu" z-100 class="duration-300 text-xs" style="display: none">` +
+                    `<div class="inline-grid grid-cols-1 grid-rows-3 space-y-1 items-center rounded-lg bg-gray-300 p-1 border-1 border-gray-600">` +
+                    `<button type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900 font-medium rounded-lg px-5 py-2.5 text-center">` +
+                    `Аналитика</button>` +
+                    `<button  type="button" onclick='getExelFile("` + item.id + `", "` + item.name + `", "` + item.code + `")'` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900 font-medium rounded-lg px-5 py-2.5 text-center">` +
+                    `Выгрузить в exel</button>` +
+                    `<button  type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900  rounded-lg px-5 py-2.5 text-center">` +
+                    `Сделать харакири</button>` +
+                    `</div>` +
+                    `</div>` +
                     `</div>`
                 i += 1
-                // `<div state="0" id="custom-menu" z-100 class="text-xs" style="display: none">` +
-                // `<div class="inline-grid grid-cols-1 grid-rows-3 space-y-1 items-center rounded-lg bg-gray-300 p-1 border-1 border-gray-600">` +
-                // `<button type="button"` +
-                // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg px-5 py-2.5 text-center">` +
-                // `Аналитика</button>` +
-                // `<button  type="button"` +
-                // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300 font-medium rounded-lg px-5 py-2.5 text-center">` +
-                // `Выгрузить в exel</button>` +
-                // `<button  type="button"` +
-                // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center">` +
-                // `Сделать харакири</button>` +
-                // `</div>` +
-                // `</div>` +
+
             } else {
                 listItem.innerHTML = `<div id="elementDiv` + item.id + `"z-20 class="grid grid-cols-4 items-center">` +
                     `<a id="element` + item.id + `" name="elementOfTree" id-state="` + item.idState + `" role="button" aria-expanded="false" ` +
-                    `class="flex col-span-3 font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2" oncontextmenu='customContextMenu("` + item.id + `", "` + item.name + `")'` +
+                    `class="flex col-span-3 font-serif p-0.5 text-sm text-black items-center hover:bg-teal-300 duration-300 rounded-lg ml-2"` +
                     `onclick='showProduct(` + item.id + `, ` + item.dbID + `, "` + item.name + `", "` + item.code + `", "` + item.number + `" ` +
                     `, ` + item.idType + `, ` + item.count + `, ` + item.idState + `, ` +
                     item.isContract + `, ` + item.idProvider + `, "` + item.start + `", "` + item.end + `", ` + JSON.stringify(item.note) + `, ` + JSON.stringify(item.files) + `)'>` +
-                    `<span>` + item.name + `</span></a>` +
-                    `<span class="text-xs px-2 justify-items-end text-black font-bold">` + item.code + `</span></div>`
+                    `<span oncontextmenu='customContextMenu(` + item.id + `, event)'>` + item.name + `</span></a>` +
+                    `<span class="text-xs px-2 justify-items-end text-black font-bold">` + item.code +
+                    `</span>` +
+                    `<div state="0" id="custom-menu" z-100 class="duration-300 text-xs" style="display: none">` +
+                    `<div class="inline-grid grid-cols-1 grid-rows-3 space-y-1 items-center rounded-lg bg-gray-300 p-1 border-1 border-gray-600">` +
+                    `<button type="button"` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900 font-medium rounded-lg px-5 py-2.5 text-center">` +
+                    `Аналитика</button>` +
+                    `<button  type="button" onclick='getExelFile("` + item.id + `", "` + item.name + `", "` + item.code + `")'` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900 font-medium rounded-lg px-5 py-2.5 text-center">` +
+                    `Выгрузить в exel</button>` +
+                    `<button  type="button" ` +
+                    `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-900  rounded-lg px-5 py-2.5 text-center">` +
+                    `Сделать харакири</button>` +
+                    `</div>` +
+                    `</div>` +
+                    `</div>`
 
                 i += 1
-                    // `<div state="0" id="custom-menu"  z-100 class="border bg-white rounded-sm border-black text-xs" style="display: none">` +
-                    // `<div class="inline-grid grid-cols-1 grid-rows-3 items-center border-t p-1 border-gray-200 rounded-b ">` +
-                    // `<button type="button"` +
-                    // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
-                    // `Аналитика</button>` +
-                    // `<button  type="button"` +
-                    // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
-                    // `Выгрузить в exel</button>` +
-                    // `<button  type="button"` +
-                    // `class="text-white bg-teal-700 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-300  rounded-lg px-5 py-2.5 text-center ">` +
-                    // `Сделать харакири</button>` +
-                    // `</div>` +
-                    // `</div>` +
+
             }
             if (item.children.length != 0) {
                 createTree(listItem, item.children, item.id, i)
@@ -1992,40 +2041,70 @@ function createTree(element, data, idd, i) {
 };
 
 
+function getExelFile(itemId, itemName, itemCode) {
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
+    var formData = new FormData()
+    var data = {
+        'contractId': contractInfo['id'],
+        'itemId': itemId,
+        'itemName': itemName,
+        'itemCode': itemCode
+    }
+    formData.append('data', JSON.stringify(data))
+    $.ajax({
+        type: 'POST',
+        url: '/createExel',
+        processData: false,
+        contentType: false,
+        data: formData,
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function (response) {
+            const elem = document.createElement('a')
+            elem.href = URL.createObjectURL(response);
+            elem.download = itemCode + '.xlsx';
+            elem.style.display = 'none';
+            document.body.appendChild(elem)
+            elem.click()
+            document.body.removeChild(elem)
+            // console.log(response);
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
+
 document.addEventListener('contextmenu', event => event.preventDefault());
-function customContextMenu(id, name) {
-    var elems = document.getElementById('elementDiv' + id).getElementsByTagName('div')
-    var my_menu
-    for (var i = 0; i < elems.length; i++) {
-        if (elems[i].id == 'custom-menu') {
-            my_menu = elems[i]
+function customContextMenu(id, e) {
+    const elem = document.getElementById('elementDiv' + id); // выбираем элемент, на котором будем отслеживать движение мыши
+    var x = 0, y = 0
+    if (e.button == 2) {
+        x = e.pageX; // получаем координату X мыши
+        y = e.pageY; // получаем координату Y мыши
+        var elems = elem.getElementsByTagName('div')
+        var my_menu
+        for (var i = 0; i < elems.length; i++) {
+            if (elems[i].id == 'custom-menu') {
+                my_menu = elems[i]
+            }
+        }
+        if (my_menu.getAttribute('state') == '0') {
+            my_menu.style.display = 'block'
+            my_menu.style.position = 'absolute'
+            my_menu.style.top = y + 'px'
+            my_menu.style.left = x + 'px'
+            my_menu.setAttribute('state', '1')
+        } else {
+            my_menu.style.display = 'none'
+            my_menu.style.position = 'relative'
+            my_menu.style.top = 0 + 'px'
+            my_menu.style.left = 0 + 'px'
+            my_menu.setAttribute('state', '0')
         }
     }
-    if (my_menu.getAttribute('state') == '0') {
-        my_menu.style.display = 'block'
-        my_menu.style.position = 'absolute'
-        my_menu.setAttribute('state', '1')
-    } else {
-        my_menu.style.display = 'none'
-        my_menu.style.position = 'relative'
-        my_menu.setAttribute('state', '0')
-    }
-    // my_elem.setAttribute('data-popover-target', 'popover-product' + id)
-    // my_elem.setAttribute('data-popover-trigger', 'click')
-    // my_elem.setAttribute('data-popover-placement', 'bottom-end')
-    // var my_menu = document.createElement('div')
-    // my_menu.id = 'context-menu'
-    // my_menu.innerHTML = 
-    //     `<div data-popover id="popover-product`+ id +`" role="tooltip"` +
-    //     `class="absolute z-10 invisible inline-block w-72  duration-500 rounded-lg bg-gray-500 border-gray-700">` +
-    //     `<div id="info" class="p-2 space-y-1 text-lg text-white bg-gray-500 border-gray-700 rounded-lg">` +
-    //     `<h2>Изделие!</h2>` +
-    //     `</div>` +
-    //     `<div data-popper-arrow></div>` +
-    //     `</div>`
-    // document.getElementById('elementDiv' + id).appendChild(my_menu)
-    // console.log(my_menu)
-    // my_div.click()
 }
 
 
@@ -2042,36 +2121,46 @@ function startCreation(id) {
             createTree(rootElement, data['data'], null, i)
             openTreeElems(true)
             makeColorByType()
+            // localStorage.setItem("elemsInfo", JSON.stringify([]));
         })
 }
+
 
 function makeColorByType() {
     var my_elems = document.getElementsByName('elementOfTree')
     var settings = JSON.parse(localStorage.getItem("settings"))
     if (settings[1]['status'] == true) {
         for (var i = 0; i < my_elems.length; i++) {
-            if (my_elems[i].getAttribute('id-state') == '1') {
-                my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
-                my_elems[i].getElementsByTagName('span')[0].setAttribute('style', 'background-color: #ff44447d')
+            if (my_elems[i].getElementsByTagName('span').length != 0) {
+                if (my_elems[i].getAttribute('id-state') == '1') {
+                    // console.log(my_elems[i].getElementsByTagName('span')[0])
+                    my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
+                    my_elems[i].getElementsByTagName('span')[0].setAttribute('style', 'background-color: #ff44447d')
+                }
+                else if (my_elems[i].getAttribute('id-state') == '2' || my_elems[i].getAttribute('id-state') == '3' || my_elems[i].getAttribute('id-state') == '4') {
+                    my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
+                    my_elems[i].getElementsByTagName('span')[0].setAttribute('style', 'background-color: #f975167d')
+                }
             }
-            else if (my_elems[i].getAttribute('id-state') == '2' || my_elems[i].getAttribute('id-state') == '3' || my_elems[i].getAttribute('id-state') == '4') {
-                my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
-                my_elems[i].getElementsByTagName('span')[0].setAttribute('style', 'background-color: #f975167d')
-            }
+
         }
     } else {
         for (var i = 0; i < my_elems.length; i++) {
-            if (my_elems[i].getAttribute('id-state') == '1') {
-                my_elems[i].getElementsByTagName('span')[0].className = ''
-                my_elems[i].getElementsByTagName('span')[0].setAttribute('style', '')
+            if (my_elems[i].getElementsByTagName('span').length != 0) {
+                if (my_elems[i].getAttribute('id-state') == '1') {
+                    // console.log(my_elems[i].getElementsByTagName('span')[0])
+
+                    my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
+                    my_elems[i].getElementsByTagName('span')[0].setAttribute('style', '')
+                }
+                else if (my_elems[i].getAttribute('id-state') == '2' || my_elems[i].getAttribute('id-state') == '3' || my_elems[i].getAttribute('id-state') == '4') {
+                    my_elems[i].getElementsByTagName('span')[0].className = 'rounded-lg'
+                    my_elems[i].getElementsByTagName('span')[0].setAttribute('style', '')
+                }
             }
-            else if (my_elems[i].getAttribute('id-state') == '2' || my_elems[i].getAttribute('id-state') == '3' || my_elems[i].getAttribute('id-state') == '4') {
-                my_elems[i].getElementsByTagName('span')[0].className = ''
-                my_elems[i].getElementsByTagName('span')[0].setAttribute('style', '')
-            }
+
         }
     }
-
 }
 
 
@@ -2104,7 +2193,7 @@ function getProductList(only_db) {
         success: function (response) {
             productList = response['products']
             console.log(only_db)
-            db_productList = []
+            var db_productList = []
             var j = 0
             if (only_db) {
                 for (var i = 0; i < productList.length; i++) {
@@ -2192,23 +2281,25 @@ function productAutocomplete(productList, only_db) {
         currentFocus = -1;
         a = document.createElement("div");
         a.setAttribute("id", "product-autocomplete-list");
-        a.setAttribute("class", "auto-list");
+        a.setAttribute("class", "auto-list h-96 overflow-y-auto");
         this.parentNode.appendChild(a);
         for (i = 0; i < productList.length; i++) {
-            if (productList[i]['name'].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+            if (productList[i]['name'].includes(val)) {
                 b = document.createElement("div");
-                b.setAttribute('class', 'text-black text-sm border-b p-1 cursor-pointer hover:bg-gray-200')
-                b.innerHTML = "<strong>" + productList[i]['name'].substr(0, val.length) + "</strong>";
-                b.innerHTML += productList[i]['name'].substr(val.length);
+                b.setAttribute('class', 'space-y-1  text-black text-sm border-b p-1 cursor-pointer hover:bg-gray-200')
+                b.innerHTML = productList[i]['name'].substr(0, productList[i]['name'].indexOf(val));
+                b.innerHTML += "<strong>" + productList[i]['name'].substr(productList[i]['name'].indexOf(val), val.length) + "</strong>";
+                b.innerHTML += productList[i]['name'].substr(productList[i]['name'].indexOf(val) + val.length);
                 if (productList[i]['type'] == 'db') {
-                    b.innerHTML += "<strong> (Из шаблона)</strong>"
+                    b.innerHTML += "<strong> "+ productList[i]['code'] +"</strong><strong class='text-gray-500'> (Из шаблона)</strong>"
                 } else {
-                    b.innerHTML += "<strong> (Из контракта)</strong>"
+                    b.innerHTML += "<strong> "+ productList[i]['code'] +"</strong><strong class='text-gray-500'> (Из контракта)</strong>"
                 }
                 b.innerHTML += "<input type='hidden' id='product-item-" + productList[i]['id'] + "' value='" + productList[i]['name'] + "' data-type='" + productList[i]['type'] + "'>";
                 b.addEventListener("click", function (e) {
                     inp.value = this.getElementsByTagName("input")[0].value;
                     if (!only_db) {
+                        // console.log(this.getElementsByTagName("input")[0].id)
                         autocomplete(this.getElementsByTagName("input")[0].id, this.getElementsByTagName("input")[0].getAttribute('data-type'))
                         inp.setAttribute('m-prod-id', '-1')
                         inp.setAttribute('data-type', this.getElementsByTagName("input")[0].getAttribute('data-type'))
@@ -2307,7 +2398,6 @@ function saveInDB() {
 var buttonStyle = document.getElementById('chButton').className
 function changeInDB() {
     var option = document.getElementById('changeInDB').checked
-    // console.log($('#dbID').val())
     if (option) {
         var filelst = document.getElementById('fileList').getElementsByTagName('button')
         for (var i = 0; i < filelst.length; i++) {
@@ -2316,9 +2406,7 @@ function changeInDB() {
             } else {
                 filelst[i].style.display = 'none'
             }
-
         }
-
     } else {
         var filelst = document.getElementById('fileList').getElementsByTagName('button')
         for (var i = 0; i < filelst.length; i++) {
@@ -2334,6 +2422,55 @@ function changeInDB() {
     }
 }
 
+function changeTreeColor(condition) {
+    var elems = document.getElementsByName('elementOfTree')
+    if (condition) {
+        for (var i = 0; i < elems.length; i++) {
+            if (elems[i].className.indexOf('text-lg') != -1) {
+                elems[i].classList.replace('hover:bg-teal-400', 'hover:bg-red-400')
+            } else {
+                elems[i].classList.replace('hover:bg-teal-300', 'hover:bg-red-300')
+
+            }
+        }
+        if (previousElem.className.indexOf('text-lg') != -1) {
+            previousElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-red-400 duration-300 rounded-lg"
+            var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
+            mxm.classList.replace('bg-teal-100', 'bg-red-100')
+        } else {
+            previousElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-red-300 duration-200 rounded-lg ml-2"
+        }
+    } else {
+        for (var i = 0; i < elems.length; i++) {
+            if (elems[i].className.indexOf('text-lg') != -1) {
+                elems[i].classList.replace('hover:bg-red-400', 'hover:bg-teal-400')
+            } else {
+                elems[i].classList.replace('hover:bg-red-300', 'hover:bg-teal-300')
+
+            }
+        }
+        if (previousElem.className.indexOf('text-lg') != -1) {
+            previousElem.className = "flex col-span-3 font-serif p-0.5 text-lg text-black italic items-center bg-teal-400 duration-300 rounded-lg"
+            var mxm = document.getElementById(previousElem.getAttribute('aria-controls'))
+            mxm.classList.replace('bg-red-100', 'bg-teal-100')
+        } else {
+            previousElem.className = "flex col-span-3 font-serif p-0.5 text-sm text-black items-center bg-teal-300 duration-200 rounded-lg ml-2"
+        }
+    }
+}
+
+function playSound(sound, cond) {
+    var song = document.getElementById(sound);
+    song.volume = 1;
+    if (cond) {
+        song.play();
+    } else {
+        song.pause();
+        song.currentTime = 0;
+    }
+
+}
+
 document.getElementById('hideen6').style.display = 'none'
 function checkAnswer(answ) {
     if (answ == 0) {
@@ -2343,11 +2480,15 @@ function checkAnswer(answ) {
         document.getElementById('changeInDB').checked = false
         document.getElementById('currentProduct').className = curProdStyle
         document.getElementById('chButton').className = buttonStyle
+        changeTreeColor(false)
+        playSound('sound', false)
     } else {
         document.getElementById('hideen5').style.display = 'none'
         document.getElementById('hideen6').style.display = 'block'
-        document.getElementById('currentProduct').className = 'w-full max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 sm:p-6 md:p-8'
+        document.getElementById('currentProduct').className = 'w-full h-custom overflow-y-auto max-w-2xl border border-red-800 rounded-lg shadow-xl shadow-red-400 md:p-8'
         document.getElementById('chButton').className = 'text-white bg-red-700 hover:bg-red-800 focus:ring-2 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xl px-5 py-2.5 text-center'
+        changeTreeColor(true)
+        playSound('sound', true)
     }
 }
 

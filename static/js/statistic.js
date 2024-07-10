@@ -161,11 +161,12 @@ function getChartData(option) {
         contentType: false,
         data: { 'contractId': contractInfo['id'] },
         success: function (response) {
-            console.log(response)
             result = response
+            console.log(response)
             if (option == 0) {
                 contractsChart1(response['contracts'])
                 contractsChart2(response['products'])
+                contractsChart3(response['products_for_timechart'], response['companies'])
             }
             else if (option == 1) {
                 contractsChart1(response['contracts'])
@@ -501,4 +502,68 @@ function contractsChart2(products) {
         const chart2 = new ApexCharts(document.getElementById("states-chart"), option_state);
         chart2.render();
     }
+}
+
+function contractsChart3(products, companies) {
+    var my_series = []
+    for (var i = 0; i < companies.length; i++) {
+        my_series.push({'name': companies[i][1], 'data': []})
+    }
+    console.log(my_series)
+    for (var i = 0; i < products.length; i++) {
+        // if (products[i]['provider'] != '0') {
+            for (var j = 0; j < my_series.length; j++) {
+                if (my_series[j]['name'] == products[i]['provider'] && products[i]['start'] && products[i]['end']) {
+                    my_series[j]['data'].push({'x': products[i]['name'] + ' ' + products[i]['code'], 'y': [new Date(products[i]['start']).getTime(), new Date(products[i]['end']).getTime()]})
+                }
+            }
+            // console.log(products[i])
+        // }
+    }
+    console.log(my_series)
+
+    var options = {
+        series: my_series,
+        chart: {
+            height: 650,
+            type: 'rangeBar'
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 10,
+                horizontal: true
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val) {
+                // var a = moment(val[0])
+                // var b = moment(val[1])
+                // var diff = b.diff(a, 'days')
+                // return diff + (diff > 1 ? ' days' : ' day')
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'dark',
+                type: 'vertical',
+                shadeIntensity: 0.25,
+                gradientToColors: undefined,
+                inverseColors: true,
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [50, 0, 100, 100]
+            }
+        },
+        xaxis: {
+            type: 'datetime'
+        },
+        legend: {
+            position: 'top'
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#prods-chart"), options);
+    chart.render();
 }

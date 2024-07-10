@@ -5,6 +5,7 @@ from utils import *
 from config import *
 from printree import ptree
 import copy
+import pandas as pd
 
 
 
@@ -116,10 +117,12 @@ def data_for_chart():
         with open(os.path.join(dir_path, 'contract' + str(contractId) + '.json'), 'r') as f:
             contract_data = json.load(f)
             f.close()
-        products = []
-        get_products_for_statistic(contract_data['data'], products)
-        # print(products)
-        return jsonify({'status': 'success', 'contracts': contracts, 'products': products})
+        products_for_progress = []
+        products_for_timechart = []
+        get_products_for_statistic(contract_data['data'], products_for_progress)
+        get_products_for_timechart(contract_data['data'], products_for_timechart)
+        companies = db_get_companies()
+        return jsonify({'status': 'success', 'contracts': contracts, 'products': products_for_progress, 'products_for_timechart': products_for_timechart, 'companies': companies})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -284,8 +287,39 @@ def change_product():
         product = {'product': {}}
         get_product_from_json(contract_data['data'], int(data['id']), product)
         print('Product changed successfully')
-        # print(product['product'])
+        print(product['product'])
         return jsonify({'status': 'success', 'message': 'Product changed successfully', 'product': product['product']})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
+@app.route('/createExel', methods=['GET', 'POST'])
+@jwt_required()
+def create_exel():
+    try:
+        data = json.loads(request.form['data'])
+        print(data)
+        dir_path = os.path.join(contract_folder,'contract_' + str(data['contractId']))
+        with open(os.path.join(dir_path, 'contract' + str(data['contractId']) + '.json'), 'r') as f:
+            contract_data = json.load(f)
+            f.close()
+        result = {'res': []}
+        my_item = {'item': []}
+        get_product(contract_data['data'], data['itemId'], my_item['item'])
+        get_row(my_item['item'], result['res'])
+        df = pd.DataFrame(pd.json_normalize(result['res']))
+        # df = pd.json_normalize(data['data'])
+        # print(df)
+        # df.to_excel('result.xlsx', sheet_name='Исходные данные')
+        # pivot.to_excel('result.xlsx', sheet_name='Сводная таблица')
+        pivot = pd.pivot_table(df, values='Количество', index=['Название', 'Обозначение'],
+                      aggfunc="sum")
+        with pd.ExcelWriter(os.path.join(dir_path, data['itemCode'] + '.xlsx')) as writer:  
+            df.to_excel(writer, sheet_name='Исходные данные')
+            pivot.to_excel(writer, sheet_name='Сводная таблица')
+        return send_file(os.path.join(dir_path, data['itemCode'] + '.xlsx'), as_attachment=True, download_name=data['itemCode'] + '.xlsx')
+        # return jsonify({'status': 'success', 'message': 'Exel file success'})
     except Exception as e:
         print(e)
         return jsonify({'status': 'error', 'message': str(e)})
@@ -620,5 +654,5 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 
 if __name__ == '__main__':
-    app.run('192.168.0.78', 80)
-    # app.run(debug=True)
+    # app.run('192.168.0.78', 80)
+    app.run(debug=True)
