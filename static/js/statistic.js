@@ -101,7 +101,6 @@ function changeContractStatus(inp) {
 }
 
 
-
 function updateContractList(contracts) {
     var list = document.getElementById('contractList')
     list.innerHTML = ''
@@ -162,7 +161,7 @@ function getChartData(option) {
         data: { 'contractId': contractInfo['id'] },
         success: function (response) {
             result = response
-            console.log(response)
+            // console.log(response)
             if (option == 0) {
                 contractsChart1(response['contracts'])
                 contractsChart2(response['products'])
@@ -170,8 +169,10 @@ function getChartData(option) {
             }
             else if (option == 1) {
                 contractsChart1(response['contracts'])
+
             } else if (option == 2) {
                 contractsChart2(response['products'])
+                contractsChart3(response['products_for_timechart'], response['companies'])
             }
         },
         error: function (error) {
@@ -361,23 +362,26 @@ function contractsChart2(products) {
                 types[1] += 1
                 break
         }
-        switch (product['state']) {
-            case 1:
-                states[0] += 1
-                break
-            case 2:
-                states[1] += 1
-                break
-            case 3:
-                states[2] += 1
-                break
-            case 4:
-                states[3] += 1
-                break
-            case 5:
-                states[4] += 1
-                break
+        if (product['type'] == 1 || product['type'] == 7 || product['type'] == 14) {
+            switch (product['state']) {
+                case 1:
+                    states[0] += 1
+                    break
+                case 2:
+                    states[1] += 1
+                    break
+                case 3:
+                    states[2] += 1
+                    break
+                case 4:
+                    states[3] += 1
+                    break
+                case 5:
+                    states[4] += 1
+                    break
+            }
         }
+
     })
     option_types = {
         series: types,
@@ -504,66 +508,198 @@ function contractsChart2(products) {
     }
 }
 
-function contractsChart3(products, companies) {
-    var my_series = []
-    for (var i = 0; i < companies.length; i++) {
-        my_series.push({'name': companies[i][1], 'data': []})
-    }
-    console.log(my_series)
-    for (var i = 0; i < products.length; i++) {
-        // if (products[i]['provider'] != '0') {
-            for (var j = 0; j < my_series.length; j++) {
-                if (my_series[j]['name'] == products[i]['provider'] && products[i]['start'] && products[i]['end']) {
-                    my_series[j]['data'].push({'x': products[i]['name'] + ' ' + products[i]['code'], 'y': [new Date(products[i]['start']).getTime(), new Date(products[i]['end']).getTime()]})
-                }
-            }
-            // console.log(products[i])
-        // }
-    }
-    console.log(my_series)
 
+function sortSeriesByCompany(series, companies) {
+    var result = []
+    for (var i = 0; i < companies.length; i++) {
+        for (var j = 0; j < series.length; j++) {
+            if (series[j]['data'][0]['x'] == companies[i][1]) {
+                result.push(series[j])
+            }
+        }
+    }
+
+    return result
+}
+
+
+function getColor(state, start, end) {
+    var color = ['#77DD77', '#FF7514', '#E4717A']
+    console.log(state)
+    if (state == 'Укомплектован') {
+        return color[0]
+    } else if (Date.now() < end) {
+        return color[1]
+    } else if (Date.now() > end) {
+        return color[2]
+    }
+}
+
+
+function contractsChart3(products, companies) {
+    var my_series = [{ 'data': [] }]
+    console.log(products)
+    for (var i = 0; i < products.length; i++) {
+        if (products[i]['start'] && products[i]['end']) {
+            var d1 = products[i]['start'].split('-')
+            var d2 = products[i]['end'].split('-')
+            // my_series.push({'name': String(products[i]['name']) + ' ' + String(products[i]['code']), 'data': [{ 'x': String(products[i]['provider'][0]), 
+            //     'y': [new Date(Number(d1[0]), Number(d1[1]), Number(d1[2])).getTime(), new Date(Number(d2[0]), Number(d2[1]), Number(d2[2])).getTime()]}]})
+            my_series[0]['data'].push({
+                'x': String(products[i]['provider'][0]),
+                'y': [new Date(Number(d1[0]), Number(d1[1] - 1), Number(d1[2])).getTime(), new Date(Number(d2[0]), Number(d2[1] - 1), Number(d2[2])).getTime()],
+                'fillColor': getColor(products[i]['state'], new Date(Number(d1[0]), Number(d1[1] - 1), Number(d1[2])).getTime(), new Date(Number(d2[0]), Number(d2[1] - 1), Number(d2[2])).getTime())
+            })
+        }
+    }
+    console.log(my_series)
+    var contractInfo = JSON.parse(localStorage.getItem("currentContract"))
     var options = {
         series: my_series,
         chart: {
-            height: 650,
-            type: 'rangeBar'
+            height: 400,
+            type: 'rangeBar',
+            zoom: {
+                autoScaleYaxis: true
+            },
+            locales: [{
+                "name": "ru",
+                "options": {
+                    "months": [
+                        "Январь",
+                        "Февраль",
+                        "Март",
+                        "Апрель",
+                        "Май",
+                        "Июнь",
+                        "Июль",
+                        "Август",
+                        "Сентябрь",
+                        "Октябрь",
+                        "Ноябрь",
+                        "Декабрь"
+                    ],
+                    "shortMonths": [
+                        "Янв",
+                        "Фев",
+                        "Мар",
+                        "Апр",
+                        "Май",
+                        "Июн",
+                        "Июл",
+                        "Авг",
+                        "Сен",
+                        "Окт",
+                        "Ноя",
+                        "Дек"
+                    ],
+                    "days": [
+                        "Воскресенье",
+                        "Понедельник",
+                        "Вторник",
+                        "Среда",
+                        "Четверг",
+                        "Пятница",
+                        "Суббота"
+                    ],
+                    "shortDays": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                    "toolbar": {
+                        "exportToSVG": "Сохранить SVG",
+                        "exportToPNG": "Сохранить PNG",
+                        "exportToCSV": "Сохранить CSV",
+                        "menu": "Меню",
+                        "selection": "Выбор",
+                        "selectionZoom": "Выбор с увеличением",
+                        "zoomIn": "Увеличить",
+                        "zoomOut": "Уменьшить",
+                        "pan": "Перемещение",
+                        "reset": "Сбросить увеличение"
+                    }
+                }
+            }],
+            defaultLocale: "ru"
         },
+
         plotOptions: {
             bar: {
                 borderRadius: 10,
-                horizontal: true
+                horizontal: true,
+                barHeight: '90%'
             }
+        },
+        annotations: {
+            xaxis: [{
+                x: Date.now(),
+                borderColor: '#999',
+                yAxisIndex: 0,
+            }]
         },
         dataLabels: {
             enabled: true,
             formatter: function (val) {
-                // var a = moment(val[0])
-                // var b = moment(val[1])
-                // var diff = b.diff(a, 'days')
-                // return diff + (diff > 1 ? ' days' : ' day')
+                var a = moment(val[0])
+                var b = moment(val[1])
+                var diff = b.diff(a, 'days')
+                return diff + (diff > 1 ? ' дней' : ' день')
             }
         },
         fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'dark',
-                type: 'vertical',
-                shadeIntensity: 0.25,
-                gradientToColors: undefined,
-                inverseColors: true,
-                opacityFrom: 1,
-                opacityTo: 1,
-                stops: [50, 0, 100, 100]
-            }
+            type: 'solid',
+            opacity: 0.9
         },
         xaxis: {
-            type: 'datetime'
+            type: 'datetime',
+            min: new Date(contractInfo['startDate']).getTime(),
+            max: new Date(contractInfo['endDate']).getTime(),
         },
         legend: {
-            position: 'top'
+            show: false,
+        },
+        tooltip: {
+            custom: function (opts) {
+                const shortMonths = [
+                    "Янв",
+                    "Фев",
+                    "Мар",
+                    "Апр",
+                    "Май",
+                    "Июн",
+                    "Июл",
+                    "Авг",
+                    "Сен",
+                    "Окт",
+                    "Ноя",
+                    "Дек"]
+                const fromYear = String(new Date(opts.y1).getDate()) + ' ' + shortMonths[Number(new Date(opts.y1).getMonth())] + ' ' + String(new Date(opts.y1).getFullYear())
+                const toYear = String(new Date(opts.y2).getDate()) + ' ' + shortMonths[Number(new Date(opts.y2).getMonth())] + ' ' + String(new Date(opts.y2).getFullYear())
+
+                const w = opts.ctx.w
+                let ylabel = w.globals.labels[opts.dataPointIndex]
+                let seriesName = w.config.series[opts.seriesIndex].name
+                    ? w.config.series[opts.seriesIndex].name
+                    : ''
+                const color = w.globals.colors[opts.seriesIndex]
+
+                return (
+                    '<div class="apexcharts-tooltip-rangebar">' +
+                    '<div> <span class="series-name" style="color: ' +
+                    color +
+                    '">' +
+                    (seriesName ? seriesName : '') +
+                    '</span></div>' +
+                    '<div><span class="value start-value">' +
+                    fromYear +
+                    '</span> <span class="separator">-</span> <span class="value end-value">' +
+                    toYear +
+                    '</span></div>' +
+                    '</div>'
+                )
+            }
         }
     };
-
-    var chart = new ApexCharts(document.querySelector("#prods-chart"), options);
-    chart.render();
+    if (document.getElementById("prods-chart") && typeof ApexCharts !== 'undefined') {
+        document.getElementById("prods-chart").innerHTML = ''
+        const chart = new ApexCharts(document.getElementById("prods-chart"), options);
+        chart.render();
+    }
 }

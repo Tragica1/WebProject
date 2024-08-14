@@ -277,7 +277,6 @@ def check_files(contract_id, files):
         my_file = os.path.join(contract_folder, 'contract_' + str(contract_id), tmp)
         print(my_file)
         if os.path.isfile(my_file) == False:
-            print('!!!!!!!!!!!!!!!')
             shutil.copy(file, my_file)
         new_files.append(my_file)
     return new_files
@@ -292,8 +291,8 @@ def get_products_for_statistic(contract_data, products):
 
 def get_products_for_timechart(contract_data, products):
     for item in contract_data:
-        if item['idProvider'] != 0:
-            products.append({'id': int(item['id']), 'name': item['name'], 'code': item['code'], 'provider': db_get_company(item['idProvider']), 'start': item['start'], 'end': item['end']})
+        if item['idProvider'] != 0 and item['idProvider'] != None:
+            products.append({'id': int(item['id']), 'name': item['name'], 'code': item['code'], 'state': db_get_state(int(item['idState']))[0], 'provider': db_get_company(item['idProvider']), 'start': item['start'], 'end': item['end']})
         if len(item['children']) != 0:
             get_products_for_timechart(item['children'], products)
 

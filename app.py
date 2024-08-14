@@ -125,7 +125,7 @@ def data_for_chart():
         return jsonify({'status': 'success', 'contracts': contracts, 'products': products_for_progress, 'products_for_timechart': products_for_timechart, 'companies': companies})
     except Exception as e:
         print(e)
-        return jsonify({'status': 'error', 'message': str(e)})
+        return jsonify({'status': 'error', 'message': str(e)}) 
 
 
 @app.route('/getProdivers', methods=['GET'])
@@ -654,5 +654,5 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 
 if __name__ == '__main__':
-    # app.run('192.168.0.78', 80)
-    app.run(debug=True)
+    app.run('192.168.0.78', 80)
+    # app.run(debug=True)

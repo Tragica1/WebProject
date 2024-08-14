@@ -37,9 +37,9 @@
                         {% for contract in contracts %}
                         <li class="flex grid-cols-2 gap-2 mx-2 rounded-lg">
                             <button id="contact_{{contract[0]}}"
-                                class="text-left bg-transparent ml-2 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline "
+                                class="text-left bg-transparent ml-2 mr-10 py-2 text-lg font-normal rounded-sm text-white hover:text-gray-400 active:no-underline "
                                 data-te-dropdown-item-ref
-                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт
+                                onclick="getContractInfo('{{ contract[0] }}', '{{ contract[1] }}', '{{contract[2]}}', '{{contract[3]}}', '{{contract[4]}}', '{{contract[5]}}', '{{contract[7]}}', '{{contract[8]}}', true)">Контракт ({{contract[3]}})<br/>
                                 № {{contract[1]}}
                             </button>
                             <button id="deleteContractButton" type="button"
@@ -299,7 +299,7 @@
         </div>
     </nav>
 
-    <div class="flex justify-between items-start content-around space-x-4 mx-2 pt-2">
+    <div class="flex justify-between items-start content-around space-x-3 mx-2 pt-2">
         <div class="w-4/6">
             <h2 class="mb-1 text-2xl font-semibold text-black">Список изделий: </h2>
             <div id="mainTree">
